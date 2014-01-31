@@ -81,7 +81,7 @@ import org.json.simple.JSONValue;
 public class Nxt
   extends HttpServlet
 {
-  static final String VERSION = "0.5.10";
+  static final String VERSION = "0.5.11";
   static final long GENESIS_BLOCK_ID = 2680262203532249785L;
   static final long CREATOR_ID = 1739068987193023818L;
   static final byte[] CREATOR_PUBLIC_KEY = { 18, 89, -20, 33, -45, 26, 48, -119, -115, 124, -47, 96, -97, -128, -39, 102, -117, 71, 120, -29, -39, 126, -108, 16, 68, -77, -97, 12, 68, -46, -27, 27 };
@@ -295,6 +295,7 @@ public class Nxt
     private final Map<Long, Integer> assetBalances = new HashMap();
     private long unconfirmedBalance;
     private final Map<Long, Integer> unconfirmedAssetBalances = new HashMap();
+    private static final int maxNumberOfConfirmations = 2881;
     
     private Account(long id)
     {
@@ -498,47 +499,115 @@ public class Nxt
       return this.balance;
     }
     
-    long getGuaranteedBalance(int numberOfConfirmations)
+    static class GuaranteedBalance
+      implements Comparable<GuaranteedBalance>
     {
-      long guaranteedBalance = getBalance();
-      ArrayList<Nxt.Block> lastBlocks = Nxt.Block.getLastBlocks(numberOfConfirmations - 1);
-      byte[] accountPublicKey = (byte[])this.publicKey.get();
-      for (Iterator i$ = lastBlocks.iterator(); i$.hasNext();)
+      final int height;
+      long balance;
+      boolean ignore;
+      
+      GuaranteedBalance(int height, long balance)
       {
-        block = (Nxt.Block)i$.next();
-        if (Arrays.equals(block.generatorPublicKey, accountPublicKey)) {
-          if (guaranteedBalance -= block.totalFee * 100L <= 0L) {
-            return 0L;
+        this.height = height;
+        this.balance = balance;
+        this.ignore = false;
+      }
+      
+      public int compareTo(GuaranteedBalance o)
+      {
+        if (this.height < o.height) {
+          return -1;
+        }
+        if (this.height > o.height) {
+          return 1;
+        }
+        return 0;
+      }
+      
+      public String toString()
+      {
+        return "height: " + this.height + ", guaranteed: " + this.balance;
+      }
+    }
+    
+    private synchronized void addToGuaranteedBalance(long amount)
+    {
+      int blockchainHeight = ((Nxt.Block)Nxt.lastBlock.get()).height;
+      Nxt.Account.GuaranteedBalance last = null;
+      if ((this.guaranteedBalances.size() > 0) && ((last = (Nxt.Account.GuaranteedBalance)this.guaranteedBalances.get(this.guaranteedBalances.size() - 1)).height > blockchainHeight))
+      {
+        if (amount > 0L)
+        {
+          Iterator<Nxt.Account.GuaranteedBalance> iter = this.guaranteedBalances.iterator();
+          while (iter.hasNext())
+          {
+            Nxt.Account.GuaranteedBalance gb = (Nxt.Account.GuaranteedBalance)iter.next();
+            gb.balance += amount;
           }
         }
-        for (i = block.blockTransactions.length; i-- > 0;)
-        {
-          Nxt.Transaction transaction = block.blockTransactions[i];
-          if (Arrays.equals(transaction.senderPublicKey, accountPublicKey))
-          {
-            long deltaBalance = transaction.getSenderDeltaBalance();
-            if ((deltaBalance > 0L) && (guaranteedBalance -= deltaBalance <= 0L)) {
-              return 0L;
-            }
-            if ((deltaBalance < 0L) && (guaranteedBalance += deltaBalance <= 0L)) {
-              return 0L;
-            }
-          }
-          if (transaction.recipient == this.id)
-          {
-            long deltaBalance = transaction.getRecipientDeltaBalance();
-            if ((deltaBalance > 0L) && (guaranteedBalance -= deltaBalance <= 0L)) {
-              return 0L;
-            }
-            if ((deltaBalance < 0L) && (guaranteedBalance += deltaBalance <= 0L)) {
-              return 0L;
-            }
-          }
+        last.ignore = true;
+        return;
+      }
+      int trimTo = 0;
+      for (int i = 0; i < this.guaranteedBalances.size(); i++)
+      {
+        Nxt.Account.GuaranteedBalance gb = (Nxt.Account.GuaranteedBalance)this.guaranteedBalances.get(i);
+        if ((gb.height < blockchainHeight - 2881) && (i < this.guaranteedBalances.size() - 1) && (((Nxt.Account.GuaranteedBalance)this.guaranteedBalances.get(i + 1)).height >= blockchainHeight - 2881)) {
+          trimTo = i;
+        } else if (amount < 0L) {
+          gb.balance += amount;
         }
       }
-      Nxt.Block block;
-      int i;
-      return guaranteedBalance;
+      if (trimTo > 0)
+      {
+        Iterator<Nxt.Account.GuaranteedBalance> iter = this.guaranteedBalances.iterator();
+        while ((iter.hasNext()) && (trimTo > 0))
+        {
+          iter.next();
+          iter.remove();
+          trimTo--;
+        }
+      }
+      if ((this.guaranteedBalances.size() == 0) || (last.height < blockchainHeight))
+      {
+        this.guaranteedBalances.add(new Nxt.Account.GuaranteedBalance(blockchainHeight, this.balance));
+      }
+      else if (last.height == blockchainHeight)
+      {
+        last.balance = this.balance;
+        last.ignore = false;
+      }
+      else
+      {
+        throw new IllegalStateException("last guaranteed balance height exceeds blockchain height");
+      }
+    }
+    
+    private final List<Nxt.Account.GuaranteedBalance> guaranteedBalances = new ArrayList();
+    
+    synchronized long getGuaranteedBalance(int numberOfConfirmations)
+    {
+      if ((numberOfConfirmations > 2881) || (numberOfConfirmations >= ((Nxt.Block)Nxt.lastBlock.get()).height) || (numberOfConfirmations < 0)) {
+        throw new IllegalArgumentException("Number of required confirmations must be between 0 and 2881");
+      }
+      if (this.guaranteedBalances.isEmpty()) {
+        return 0L;
+      }
+      int i = Collections.binarySearch(this.guaranteedBalances, new Nxt.Account.GuaranteedBalance(((Nxt.Block)Nxt.lastBlock.get()).height - numberOfConfirmations, 0L));
+      if (i == -1) {
+        return 0L;
+      }
+      if (i < -1) {
+        i = -i - 2;
+      }
+      if (i > this.guaranteedBalances.size() - 1) {
+        i = this.guaranteedBalances.size() - 1;
+      }
+      Nxt.Account.GuaranteedBalance result;
+      while (((result = (Nxt.Account.GuaranteedBalance)this.guaranteedBalances.get(i)).ignore) && (i > 0)) {
+        i--;
+      }
+      return result.ignore ? 0L : result.balance;
     }
     
     synchronized long getUnconfirmedBalance()
@@ -551,6 +620,7 @@ public class Nxt
       synchronized (this)
       {
         this.balance += amount;
+        addToGuaranteedBalance(amount);
       }
       updatePeerWeights();
     }
@@ -570,6 +640,7 @@ public class Nxt
       {
         this.balance += amount;
         this.unconfirmedBalance += amount;
+        addToGuaranteedBalance(amount);
       }
       updatePeerWeights();
       updateUserUnconfirmedBalance();
@@ -800,7 +871,10 @@ public class Nxt
           Nxt.blocks.put(Long.valueOf(2680262203532249785L), this);
           Nxt.lastBlock.set(this);
           
-          Nxt.Account.addAccount(1739068987193023818L);
+          Nxt.Account generatorAccount = Nxt.Account.addAccount(1739068987193023818L);
+          if (!generatorAccount.setOrVerify(Nxt.CREATOR_PUBLIC_KEY)) {
+            throw new IllegalStateException("Creator public key mismatch");
+          }
         }
         else
         {
@@ -810,14 +884,17 @@ public class Nxt
           previousLastBlock.height += 1;
           this.baseTarget = calculateBaseTarget();
           this.cumulativeDifficulty = previousLastBlock.cumulativeDifficulty.add(Nxt.two64.divide(BigInteger.valueOf(this.baseTarget)));
+          Nxt.Account generatorAccount = (Nxt.Account)Nxt.accounts.get(Long.valueOf(getGeneratorAccountId()));
+          if (!generatorAccount.setOrVerify(this.generatorPublicKey)) {
+            throw new IllegalStateException("Block generator public key mismatch");
+          }
           if ((previousLastBlock.getId() != this.previousBlock) || (!Nxt.lastBlock.compareAndSet(previousLastBlock, this))) {
             throw new IllegalStateException("Last block not equal to this.previousBlock");
           }
-          Nxt.Account generatorAccount = (Nxt.Account)Nxt.accounts.get(Long.valueOf(getGeneratorAccountId()));
-          generatorAccount.addToBalanceAndUnconfirmedBalance(this.totalFee * 100L);
           if (Nxt.blocks.putIfAbsent(Long.valueOf(getId()), this) != null) {
             throw new IllegalStateException("duplicate block id: " + getId());
           }
+          generatorAccount.addToBalanceAndUnconfirmedBalance(this.totalFee * 100L);
         }
         for (Nxt.Transaction transaction : this.blockTransactions)
         {
@@ -1098,20 +1175,6 @@ public class Nxt
       };
       this.jsonRef = new SoftReference(json);
       return json;
-    }
-    
-    static ArrayList<Block> getLastBlocks(int numberOfBlocks)
-    {
-      ArrayList<Block> lastBlocks = new ArrayList(numberOfBlocks);
-      
-      long curBlock = ((Block)Nxt.lastBlock.get()).getId();
-      do
-      {
-        Block block = (Block)Nxt.blocks.get(Long.valueOf(curBlock));
-        lastBlocks.add(block);
-        curBlock = block.previousBlock;
-      } while ((lastBlocks.size() < numberOfBlocks) && (curBlock != 0L));
-      return lastBlocks;
     }
     
     public static final Comparator<Block> heightComparator = new Comparator()
@@ -2564,6 +2627,9 @@ public class Nxt
         byte[] publicKey = new byte[32];
         buffer.get(publicKey);
         int hostLength = buffer.getShort();
+        if (hostLength > 300) {
+          return false;
+        }
         byte[] hostBytes = new byte[hostLength];
         buffer.get(hostBytes);
         String host = new String(hostBytes, "UTF-8");
@@ -2687,7 +2753,7 @@ public class Nxt
         request.put("hallmark", Nxt.myHallmark);
       }
       request.put("application", "NRS");
-      request.put("version", "0.5.10");
+      request.put("version", "0.5.11");
       request.put("platform", Nxt.myPlatform);
       request.put("scheme", Nxt.myScheme);
       request.put("port", Integer.valueOf(Nxt.myPort));
@@ -3427,9 +3493,15 @@ public class Nxt
           break;
         case 1: 
           int aliasLength = buffer.get();
+          if (aliasLength > 300) {
+            throw new IllegalArgumentException();
+          }
           byte[] alias = new byte[aliasLength];
           buffer.get(alias);
           int uriLength = buffer.getShort();
+          if (uriLength > 5000) {
+            throw new IllegalArgumentException();
+          }
           byte[] uri = new byte[uriLength];
           buffer.get(uri);
           try
@@ -3447,9 +3519,15 @@ public class Nxt
         {
         case 0: 
           int nameLength = buffer.get();
+          if (nameLength > 300) {
+            throw new IllegalArgumentException();
+          }
           byte[] name = new byte[nameLength];
           buffer.get(name);
           int descriptionLength = buffer.getShort();
+          if (descriptionLength > 5000) {
+            throw new IllegalArgumentException();
+          }
           byte[] description = new byte[descriptionLength];
           buffer.get(description);
           int quantity = buffer.getInt();
@@ -4592,7 +4670,7 @@ public class Nxt
   public void init(ServletConfig servletConfig)
     throws ServletException
   {
-    logMessage("NRS 0.5.10 starting...");
+    logMessage("NRS 0.5.11 starting...");
     if (debug) {
       logMessage("DEBUG logging enabled");
     }
@@ -5401,8 +5479,15 @@ public class Nxt
                             Nxt.accounts.clear();
                             Nxt.aliases.clear();
                             Nxt.aliasIdToAliasMappings.clear();
+                            Nxt.assets.clear();
+                            Nxt.assetNameToIdMappings.clear();
+                            Nxt.askOrders.clear();
+                            Nxt.bidOrders.clear();
+                            Nxt.sortedAskOrders.clear();
+                            Nxt.sortedBidOrders.clear();
                             Nxt.unconfirmedTransactions.clear();
                             Nxt.doubleSpendingTransactions.clear();
+                            Nxt.nonBroadcastedTransactions.clear();
                             
                             Nxt.logMessage("Re-scanning blockchain...");
                             Map<Long, Nxt.Block> loadedBlocks = new HashMap(Nxt.blocks);
@@ -5573,7 +5658,7 @@ public class Nxt
 
 
 
-      logMessage("NRS 0.5.10 started successfully.");
+      logMessage("NRS 0.5.11 started successfully.");
     }
     catch (Exception e)
     {
@@ -5976,6 +6061,9 @@ public class Nxt
                   byte[] publicKey = new byte[32];
                   buffer.get(publicKey);
                   int hostLength = buffer.getShort();
+                  if (hostLength > 300) {
+                    throw new IllegalArgumentException();
+                  }
                   byte[] hostBytes = new byte[hostLength];
                   buffer.get(hostBytes);
                   String host = new String(hostBytes, "UTF-8");
@@ -6595,7 +6683,7 @@ public class Nxt
 
               break;
             case 19: 
-              response.put("version", "0.5.10");
+              response.put("version", "0.5.11");
               response.put("time", Integer.valueOf(getEpochTime(System.currentTimeMillis())));
               response.put("lastBlock", ((Nxt.Block)lastBlock.get()).getStringId());
               response.put("cumulativeDifficulty", ((Nxt.Block)lastBlock.get()).cumulativeDifficulty.toString());
@@ -7499,7 +7587,7 @@ public class Nxt
         }
         JSONObject response = new JSONObject();
         response.put("response", "processInitialData");
-        response.put("version", "0.5.10");
+        response.put("version", "0.5.11");
         if (unconfirmedTransactions.size() > 0) {
           response.put("unconfirmedTransactions", unconfirmedTransactions);
         }
@@ -8145,7 +8233,7 @@ public class Nxt
             response.put("hallmark", myHallmark);
           }
           response.put("application", "NRS");
-          response.put("version", "0.5.10");
+          response.put("version", "0.5.11");
           response.put("platform", myPlatform);
           response.put("shareAddress", Boolean.valueOf(shareMyAddress));
           
@@ -8399,7 +8487,7 @@ public class Nxt
     {
       logMessage("Error saving transactions", e);
     }
-    logMessage("NRS 0.5.10 stopped.");
+    logMessage("NRS 0.5.11 stopped.");
   }
   
   private static void shutdownExecutor(ExecutorService executor)
