@@ -67,7 +67,7 @@ import org.json.simple.JSONValue;
 public class Nxt
   extends HttpServlet
 {
-  static final String VERSION = "0.5.0";
+  static final String VERSION = "0.5.1";
   static final long GENESIS_BLOCK_ID = 2680262203532249785L;
   static final long CREATOR_ID = 1739068987193023818L;
   static final int BLOCK_HEADER_LENGTH = 224;
@@ -221,7 +221,7 @@ public class Nxt
   public void init(ServletConfig paramServletConfig)
     throws ServletException
   {
-    logMessage("Nxt 0.5.0 started.");
+    logMessage("Nxt 0.5.1 started.");
     try
     {
       Calendar localCalendar = Calendar.getInstance();
@@ -638,8 +638,8 @@ public class Nxt
                     {
                       Object localObject1 = localIterator.next();
                       long l2 = new BigInteger((String)localObject1).longValue();
-                      Nxt.Block localBlock = (Nxt.Block)Nxt.blocks.get(Long.valueOf(l2));
-                      if (localBlock != null)
+                      Nxt.Block localBlock1 = (Nxt.Block)Nxt.blocks.get(Long.valueOf(l2));
+                      if (localBlock1 != null)
                       {
                         l1 = l2;
                         break;
@@ -771,6 +771,22 @@ public class Nxt
                             Nxt.Block.loadBlocks("blocks.nxt.bak");
                             Nxt.Transaction.loadTransactions("transactions.nxt.bak");
                             localPeer.blacklist();
+                            Nxt.accounts.clear();
+                            Nxt.aliases.clear();
+                            Nxt.aliasIdToAliasMappings.clear();
+                            Nxt.logMessage("Re-scanning blockchain...");
+                            localObject2 = new HashMap(Nxt.blocks);
+                            Nxt.blocks.clear();
+                            Nxt.lastBlock = 2680262203532249785L;
+                            long l5 = 2680262203532249785L;
+                            do
+                            {
+                              Nxt.Block localBlock2 = (Nxt.Block)((Map)localObject2).get(Long.valueOf(l5));
+                              long l6 = localBlock2.nextBlock;
+                              localBlock2.analyze();
+                              l5 = l6;
+                            } while (l3 != 0L);
+                            Nxt.logMessage("...Done");
                           }
                         }
                       }
@@ -1690,7 +1706,7 @@ public class Nxt
               ((JSONObject)localObject2).put("peers", localObject7);
               break;
             case 16: 
-              ((JSONObject)localObject2).put("version", "0.5.0");
+              ((JSONObject)localObject2).put("version", "0.5.1");
               ((JSONObject)localObject2).put("time", Integer.valueOf(getEpochTime(System.currentTimeMillis())));
               ((JSONObject)localObject2).put("lastBlock", convert(lastBlock));
               ((JSONObject)localObject2).put("numberOfBlocks", Integer.valueOf(blocks.size()));
@@ -2341,7 +2357,7 @@ public class Nxt
         }
         Object localObject26 = new JSONObject();
         ((JSONObject)localObject26).put("response", "processInitialData");
-        ((JSONObject)localObject26).put("version", "0.5.0");
+        ((JSONObject)localObject26).put("version", "0.5.1");
         if (((JSONArray)localObject4).size() > 0) {
           ((JSONObject)localObject26).put("unconfirmedTransactions", localObject4);
         }
@@ -3009,15 +3025,13 @@ public class Nxt
             catch (Exception localException2) {}
             if (localPeer.analyzeHallmark(paramHttpServletRequest.getRemoteHost(), (String)localJSONObject2.get("hallmark"))) {
               localPeer.setState(1);
-            } else {
-              localPeer.blacklist();
             }
           }
           if ((myHallmark != null) && (myHallmark.length() > 0)) {
             localJSONObject1.put("hallmark", myHallmark);
           }
           localJSONObject1.put("application", "NRS");
-          localJSONObject1.put("version", "0.5.0");
+          localJSONObject1.put("version", "0.5.1");
           localJSONObject1.put("platform", myPlatform);
           localJSONObject1.put("shareAddress", Boolean.valueOf(shareMyAddress));
           break;
@@ -4036,14 +4050,11 @@ public class Nxt
       if (localAccount == null) {
         return false;
       }
-      if (!localAccount.setOrVerify(this.senderPublicKey)) {
-        return false;
-      }
       byte[] arrayOfByte = getBytes();
       for (int i = 64; i < 128; i++) {
         arrayOfByte[i] = 0;
       }
-      return Nxt.Crypto.verify(this.signature, arrayOfByte, this.senderPublicKey);
+      return (Nxt.Crypto.verify(this.signature, arrayOfByte, this.senderPublicKey)) && (localAccount.setOrVerify(this.senderPublicKey));
     }
     
     public static byte[] calculateTransactionsChecksum()
@@ -4420,10 +4431,6 @@ public class Nxt
         {
           this.hallmark = paramString2;
           long l1 = Nxt.Account.getId(arrayOfByte2);
-          Nxt.Account localAccount = (Nxt.Account)Nxt.accounts.get(Long.valueOf(l1));
-          if (localAccount == null) {
-            return false;
-          }
           LinkedList localLinkedList = new LinkedList();
           int m = 0;
           this.accountId = l1;
@@ -4530,7 +4537,7 @@ public class Nxt
         localJSONObject1.put("hallmark", Nxt.myHallmark);
       }
       localJSONObject1.put("application", "NRS");
-      localJSONObject1.put("version", "0.5.0");
+      localJSONObject1.put("version", "0.5.1");
       localJSONObject1.put("platform", Nxt.myPlatform);
       localJSONObject1.put("scheme", Nxt.myScheme);
       localJSONObject1.put("port", Integer.valueOf(Nxt.myPort));
@@ -4551,8 +4558,6 @@ public class Nxt
         }
         if (analyzeHallmark(this.announcedAddress, (String)localJSONObject2.get("hallmark"))) {
           setState(1);
-        } else {
-          blacklist();
         }
       }
     }
@@ -4936,7 +4941,7 @@ public class Nxt
         localJSONObject2.put("weight", Integer.valueOf(getWeight()));
         localJSONObject2.put("downloaded", Long.valueOf(this.downloadedVolume));
         localJSONObject2.put("uploaded", Long.valueOf(this.uploadedVolume));
-        localJSONObject2.put("software", (this.application == null ? "?" : this.application) + " (" + (this.version == null ? "?" : this.version) + ")" + " @ " + (this.platform == null ? "?" : this.platform));
+        localJSONObject2.put("software", (this.application == null ? "?" : this.application.substring(0, Math.min(this.application.length(), 10))) + " (" + (this.version == null ? "?" : this.version.substring(0, Math.min(this.version.length(), 10))) + ")" + " @ " + (this.platform == null ? "?" : this.platform.substring(0, Math.min(this.platform.length(), 10))));
         localIterator = Nxt.wellKnownPeers.iterator();
         while (localIterator.hasNext())
         {
@@ -6590,13 +6595,10 @@ public class Nxt
       if (localAccount == null) {
         return false;
       }
-      if (!localAccount.setOrVerify(this.generatorPublicKey)) {
-        return false;
-      }
       byte[] arrayOfByte1 = getBytes();
       byte[] arrayOfByte2 = new byte[arrayOfByte1.length - 64];
       System.arraycopy(arrayOfByte1, 0, arrayOfByte2, 0, arrayOfByte2.length);
-      return Nxt.Crypto.verify(this.blockSignature, arrayOfByte2, this.generatorPublicKey);
+      return (Nxt.Crypto.verify(this.blockSignature, arrayOfByte2, this.generatorPublicKey)) && (localAccount.setOrVerify(this.generatorPublicKey));
     }
     
     boolean verifyGenerationSignature()
@@ -6611,7 +6613,7 @@ public class Nxt
           return false;
         }
         Nxt.Account localAccount = (Nxt.Account)Nxt.accounts.get(Long.valueOf(Nxt.Account.getId(this.generatorPublicKey)));
-        if ((localAccount == null) || (localAccount.getEffectiveBalance() == 0)) {
+        if ((localAccount == null) || (localAccount.getEffectiveBalance() <= 0)) {
           return false;
         }
         int i = this.timestamp - localBlock.timestamp;
