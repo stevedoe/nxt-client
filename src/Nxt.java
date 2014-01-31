@@ -67,7 +67,7 @@ import org.json.simple.JSONValue;
 public class Nxt
   extends HttpServlet
 {
-  static final String VERSION = "0.5.2";
+  static final String VERSION = "0.5.3";
   static final long GENESIS_BLOCK_ID = 2680262203532249785L;
   static final long CREATOR_ID = 1739068987193023818L;
   static final int BLOCK_HEADER_LENGTH = 224;
@@ -222,7 +222,7 @@ public class Nxt
   public void init(ServletConfig paramServletConfig)
     throws ServletException
   {
-    logMessage("Nxt 0.5.2 started.");
+    logMessage("Nxt 0.5.3 started.");
     try
     {
       Calendar localCalendar = Calendar.getInstance();
@@ -778,6 +778,8 @@ public class Nxt
                             Nxt.accounts.clear();
                             Nxt.aliases.clear();
                             Nxt.aliasIdToAliasMappings.clear();
+                            Nxt.unconfirmedTransactions.clear();
+                            Nxt.doubleSpendingTransactions.clear();
                             Nxt.logMessage("Re-scanning blockchain...");
                             localObject2 = new HashMap(Nxt.blocks);
                             Nxt.blocks.clear();
@@ -789,7 +791,7 @@ public class Nxt
                               long l6 = localBlock2.nextBlock;
                               localBlock2.analyze();
                               l5 = l6;
-                            } while (l3 != 0L);
+                            } while (l5 != 0L);
                             Nxt.logMessage("...Done");
                           }
                         }
@@ -898,7 +900,7 @@ public class Nxt
       Object localObject3;
       Object localObject4;
       Object localObject33;
-      Object localObject28;
+      Object localObject29;
       Object localObject16;
       if (str1 == null)
       {
@@ -1050,15 +1052,17 @@ public class Nxt
             Object localObject21;
             String str6;
             int i13;
+            Nxt.Account localAccount;
             Object localObject34;
             Object localObject35;
             int i5;
             byte[] arrayOfByte2;
+            int i20;
             Object localObject9;
             Object localObject25;
-            Object localObject29;
             Object localObject19;
             Object localObject22;
+            Object localObject28;
             Object localObject15;
             Object localObject10;
             Object localObject11;
@@ -1139,21 +1143,21 @@ public class Nxt
                           long l11 = localObject21 == null ? 0L : new BigInteger((String)localObject21).longValue();
                           byte[] arrayOfByte4 = Nxt.Crypto.getPublicKey((String)localObject7);
                           long l13 = Nxt.Account.getId(arrayOfByte4);
-                          localObject34 = (Nxt.Account)accounts.get(Long.valueOf(l13));
-                          if (localObject34 == null)
+                          localAccount = (Nxt.Account)accounts.get(Long.valueOf(l13));
+                          if (localAccount == null)
                           {
                             ((JSONObject)localObject2).put("errorCode", Integer.valueOf(6));
                             ((JSONObject)localObject2).put("errorDescription", "Not enough funds");
                           }
-                          else if (i15 * 100L > ((Nxt.Account)localObject34).getUnconfirmedBalance())
+                          else if (i15 * 100L > localAccount.getUnconfirmedBalance())
                           {
                             ((JSONObject)localObject2).put("errorCode", Integer.valueOf(6));
                             ((JSONObject)localObject2).put("errorDescription", "Not enough funds");
                           }
                           else
                           {
-                            localObject35 = (Nxt.Alias)aliases.get(str6);
-                            if ((localObject35 != null) && (((Nxt.Alias)localObject35).account != localObject34))
+                            localObject34 = (Nxt.Alias)aliases.get(str6);
+                            if ((localObject34 != null) && (((Nxt.Alias)localObject34).account != localAccount))
                             {
                               ((JSONObject)localObject2).put("errorCode", Integer.valueOf(8));
                               ((JSONObject)localObject2).put("errorDescription", "\"" + (String)localObject8 + "\" is already used");
@@ -1161,20 +1165,20 @@ public class Nxt
                             else
                             {
                               int i22 = getEpochTime(System.currentTimeMillis());
-                              Nxt.Transaction localTransaction = new Nxt.Transaction((byte)1, (byte)1, i22, s2, arrayOfByte4, 1739068987193023818L, 0, i15, l11, new byte[64]);
-                              localTransaction.attachment = new Nxt.Transaction.MessagingAliasAssignmentAttachment((String)localObject8, (String)localObject13);
-                              localTransaction.sign((String)localObject7);
-                              JSONObject localJSONObject6 = new JSONObject();
-                              localJSONObject6.put("requestType", "processTransactions");
-                              JSONArray localJSONArray4 = new JSONArray();
-                              localJSONArray4.add(localTransaction.getJSONObject());
-                              localJSONObject6.put("transactions", localJSONArray4);
-                              Nxt.Peer.sendToAllPeers(localJSONObject6);
-                              ((JSONObject)localObject2).put("transaction", convert(localTransaction.getId()));
+                              localObject35 = new Nxt.Transaction((byte)1, (byte)1, i22, s2, arrayOfByte4, 1739068987193023818L, 0, i15, l11, new byte[64]);
+                              ((Nxt.Transaction)localObject35).attachment = new Nxt.Transaction.MessagingAliasAssignmentAttachment((String)localObject8, (String)localObject13);
+                              ((Nxt.Transaction)localObject35).sign((String)localObject7);
+                              JSONObject localJSONObject8 = new JSONObject();
+                              localJSONObject8.put("requestType", "processTransactions");
+                              JSONArray localJSONArray3 = new JSONArray();
+                              localJSONArray3.add(((Nxt.Transaction)localObject35).getJSONObject());
+                              localJSONObject8.put("transactions", localJSONArray3);
+                              Nxt.Peer.sendToAllPeers(localJSONObject8);
+                              ((JSONObject)localObject2).put("transaction", convert(((Nxt.Transaction)localObject35).getId()));
                             }
                           }
                         }
-                        catch (Exception localException21)
+                        catch (Exception localException20)
                         {
                           ((JSONObject)localObject2).put("errorCode", Integer.valueOf(4));
                           ((JSONObject)localObject2).put("errorDescription", "Incorrect \"deadline\"");
@@ -1247,10 +1251,10 @@ public class Nxt
                   ((JSONObject)localObject2).put("account", convert(Nxt.Account.getId((byte[])localObject14)));
                   ((JSONObject)localObject2).put("host", str6);
                   ((JSONObject)localObject2).put("weight", Integer.valueOf(i13));
-                  int i19 = i16 / 10000;
-                  int i20 = i16 % 10000 / 100;
+                  int i18 = i16 / 10000;
+                  i20 = i16 % 10000 / 100;
                   int i21 = i16 % 100;
-                  ((JSONObject)localObject2).put("date", (i19 < 1000 ? "0" : i19 < 100 ? "00" : i19 < 10 ? "000" : "") + i19 + "-" + (i20 < 10 ? "0" : "") + i20 + "-" + (i21 < 10 ? "0" : "") + i21);
+                  ((JSONObject)localObject2).put("date", (i18 < 1000 ? "0" : i18 < 100 ? "00" : i18 < 10 ? "000" : "") + i18 + "-" + (i20 < 10 ? "0" : "") + i20 + "-" + (i21 < 10 ? "0" : "") + i21);
                   localObject33 = new byte[arrayOfByte1.length - 64];
                   System.arraycopy(arrayOfByte1, 0, localObject33, 0, localObject33.length);
                   ((JSONObject)localObject2).put("valid", Boolean.valueOf((str6.length() > 100) || (i13 <= 0) || (i13 > 1000000000L) ? false : Nxt.Crypto.verify(arrayOfByte2, (byte[])localObject33, (byte[])localObject14)));
@@ -1710,7 +1714,7 @@ public class Nxt
               ((JSONObject)localObject2).put("peers", localObject7);
               break;
             case 16: 
-              ((JSONObject)localObject2).put("version", "0.5.2");
+              ((JSONObject)localObject2).put("version", "0.5.3");
               ((JSONObject)localObject2).put("time", Integer.valueOf(getEpochTime(System.currentTimeMillis())));
               ((JSONObject)localObject2).put("lastBlock", convert(lastBlock));
               ((JSONObject)localObject2).put("numberOfBlocks", Integer.valueOf(blocks.size()));
@@ -1815,10 +1819,10 @@ public class Nxt
               break;
             case 20: 
               localObject7 = new JSONArray();
-              Iterator localIterator1 = unconfirmedTransactions.keySet().iterator();
-              while (localIterator1.hasNext())
+              Iterator localIterator = unconfirmedTransactions.keySet().iterator();
+              while (localIterator.hasNext())
               {
-                ??? = (Long)localIterator1.next();
+                ??? = (Long)localIterator.next();
                 ((JSONArray)localObject7).add(convert(((Long)???).longValue()));
               }
               ((JSONObject)localObject2).put("unconfirmedTransactionIds", localObject7);
@@ -1974,7 +1978,11 @@ public class Nxt
               {
                 try
                 {
-                  long l10 = new BigInteger(str3).longValue();
+                  localObject25 = new BigInteger(str3.trim());
+                  if ((((BigInteger)localObject25).signum() < 0) || (((BigInteger)localObject25).compareTo(two64) != -1)) {
+                    throw new Exception();
+                  }
+                  long l10 = ((BigInteger)localObject25).longValue();
                   try
                   {
                     int i17 = Integer.parseInt((String)???);
@@ -1983,39 +1991,39 @@ public class Nxt
                     }
                     try
                     {
-                      int i18 = Integer.parseInt((String)localObject16);
-                      if ((i18 <= 0) || (i18 >= 1000000000L)) {
+                      int i19 = Integer.parseInt((String)localObject16);
+                      if ((i19 <= 0) || (i19 >= 1000000000L)) {
                         throw new Exception();
                       }
                       try
                       {
-                        short s3 = Short.parseShort(str4);
-                        if (s3 < 1) {
+                        i20 = Short.parseShort(str4);
+                        if (i20 < 1) {
                           throw new Exception();
                         }
                         long l12 = str5 == null ? 0L : new BigInteger(str5).longValue();
-                        localObject33 = Nxt.Crypto.getPublicKey((String)localObject7);
-                        Nxt.Account localAccount = (Nxt.Account)accounts.get(Long.valueOf(Nxt.Account.getId((byte[])localObject33)));
+                        byte[] arrayOfByte5 = Nxt.Crypto.getPublicKey((String)localObject7);
+                        localAccount = (Nxt.Account)accounts.get(Long.valueOf(Nxt.Account.getId(arrayOfByte5)));
                         if (localAccount == null)
                         {
                           ((JSONObject)localObject2).put("errorCode", Integer.valueOf(6));
                           ((JSONObject)localObject2).put("errorDescription", "Not enough funds");
                         }
-                        else if ((i17 + i18) * 100L > localAccount.getUnconfirmedBalance())
+                        else if ((i17 + i19) * 100L > localAccount.getUnconfirmedBalance())
                         {
                           ((JSONObject)localObject2).put("errorCode", Integer.valueOf(6));
                           ((JSONObject)localObject2).put("errorDescription", "Not enough funds");
                         }
                         else
                         {
-                          localObject34 = new Nxt.Transaction((byte)0, (byte)0, getEpochTime(System.currentTimeMillis()), s3, (byte[])localObject33, l10, i17, i18, l12, new byte[64]);
+                          localObject34 = new Nxt.Transaction((byte)0, (byte)0, getEpochTime(System.currentTimeMillis()), i20, arrayOfByte5, l10, i17, i19, l12, new byte[64]);
                           ((Nxt.Transaction)localObject34).sign((String)localObject7);
-                          localObject35 = new JSONObject();
-                          ((JSONObject)localObject35).put("requestType", "processTransactions");
-                          JSONArray localJSONArray3 = new JSONArray();
-                          localJSONArray3.add(((Nxt.Transaction)localObject34).getJSONObject());
-                          ((JSONObject)localObject35).put("transactions", localJSONArray3);
-                          Nxt.Peer.sendToAllPeers((JSONObject)localObject35);
+                          JSONObject localJSONObject7 = new JSONObject();
+                          localJSONObject7.put("requestType", "processTransactions");
+                          localObject35 = new JSONArray();
+                          ((JSONArray)localObject35).add(((Nxt.Transaction)localObject34).getJSONObject());
+                          localJSONObject7.put("transactions", localObject35);
+                          Nxt.Peer.sendToAllPeers(localJSONObject7);
                           ((JSONObject)localObject2).put("transaction", convert(((Nxt.Transaction)localObject34).getId()));
                           ((JSONObject)localObject2).put("bytes", convert(((Nxt.Transaction)localObject34).getBytes()));
                         }
@@ -2032,7 +2040,7 @@ public class Nxt
                       ((JSONObject)localObject2).put("errorDescription", "Incorrect \"fee\"");
                     }
                   }
-                  catch (Exception localException19)
+                  catch (Exception localException21)
                   {
                     ((JSONObject)localObject2).put("errorCode", Integer.valueOf(4));
                     ((JSONObject)localObject2).put("errorDescription", "Incorrect \"amount\"");
@@ -2266,73 +2274,73 @@ public class Nxt
           ((JSONArray)localObject4).add(localObject23);
         }
         localObject16 = peers.entrySet().iterator();
+        JSONObject localJSONObject4;
         while (((Iterator)localObject16).hasNext())
         {
           localObject20 = (Map.Entry)((Iterator)localObject16).next();
           localObject23 = (String)((Map.Entry)localObject20).getKey();
           localObject26 = (Nxt.Peer)((Map.Entry)localObject20).getValue();
-          Iterator localIterator2;
           if (((Nxt.Peer)localObject26).blacklistingTime > 0L)
           {
-            localObject28 = new JSONObject();
-            ((JSONObject)localObject28).put("index", Integer.valueOf(((Nxt.Peer)localObject26).index));
-            ((JSONObject)localObject28).put("announcedAddress", ((Nxt.Peer)localObject26).announcedAddress.length() > 0 ? ((Nxt.Peer)localObject26).announcedAddress : ((Nxt.Peer)localObject26).announcedAddress.length() > 30 ? ((Nxt.Peer)localObject26).announcedAddress.substring(0, 30) + "..." : localObject23);
-            localIterator2 = wellKnownPeers.iterator();
-            while (localIterator2.hasNext())
+            localJSONObject4 = new JSONObject();
+            localJSONObject4.put("index", Integer.valueOf(((Nxt.Peer)localObject26).index));
+            localJSONObject4.put("announcedAddress", ((Nxt.Peer)localObject26).announcedAddress.length() > 0 ? ((Nxt.Peer)localObject26).announcedAddress : ((Nxt.Peer)localObject26).announcedAddress.length() > 30 ? ((Nxt.Peer)localObject26).announcedAddress.substring(0, 30) + "..." : localObject23);
+            localObject29 = wellKnownPeers.iterator();
+            while (((Iterator)localObject29).hasNext())
             {
-              localObject31 = (String)localIterator2.next();
+              localObject31 = (String)((Iterator)localObject29).next();
               if (((Nxt.Peer)localObject26).announcedAddress.equals(localObject31))
               {
-                ((JSONObject)localObject28).put("wellKnown", Boolean.valueOf(true));
+                localJSONObject4.put("wellKnown", Boolean.valueOf(true));
                 break;
               }
             }
-            ((JSONArray)localObject12).add(localObject28);
+            ((JSONArray)localObject12).add(localJSONObject4);
           }
           else if (((Nxt.Peer)localObject26).state == 0)
           {
             if (((Nxt.Peer)localObject26).announcedAddress.length() > 0)
             {
-              localObject28 = new JSONObject();
-              ((JSONObject)localObject28).put("index", Integer.valueOf(((Nxt.Peer)localObject26).index));
-              ((JSONObject)localObject28).put("announcedAddress", ((Nxt.Peer)localObject26).announcedAddress.length() > 30 ? ((Nxt.Peer)localObject26).announcedAddress.substring(0, 30) + "..." : ((Nxt.Peer)localObject26).announcedAddress);
-              localIterator2 = wellKnownPeers.iterator();
-              while (localIterator2.hasNext())
+              localJSONObject4 = new JSONObject();
+              localJSONObject4.put("index", Integer.valueOf(((Nxt.Peer)localObject26).index));
+              localJSONObject4.put("announcedAddress", ((Nxt.Peer)localObject26).announcedAddress.length() > 30 ? ((Nxt.Peer)localObject26).announcedAddress.substring(0, 30) + "..." : ((Nxt.Peer)localObject26).announcedAddress);
+              localObject29 = wellKnownPeers.iterator();
+              while (((Iterator)localObject29).hasNext())
               {
-                localObject31 = (String)localIterator2.next();
+                localObject31 = (String)((Iterator)localObject29).next();
                 if (((Nxt.Peer)localObject26).announcedAddress.equals(localObject31))
                 {
-                  ((JSONObject)localObject28).put("wellKnown", Boolean.valueOf(true));
+                  localJSONObject4.put("wellKnown", Boolean.valueOf(true));
                   break;
                 }
               }
-              ((JSONArray)localObject7).add(localObject28);
+              ((JSONArray)localObject7).add(localJSONObject4);
             }
           }
           else
           {
-            localObject28 = new JSONObject();
-            ((JSONObject)localObject28).put("index", Integer.valueOf(((Nxt.Peer)localObject26).index));
+            localJSONObject4 = new JSONObject();
+            localJSONObject4.put("index", Integer.valueOf(((Nxt.Peer)localObject26).index));
             if (((Nxt.Peer)localObject26).state == 2) {
-              ((JSONObject)localObject28).put("disconnected", Boolean.valueOf(true));
+              localJSONObject4.put("disconnected", Boolean.valueOf(true));
             }
-            ((JSONObject)localObject28).put("address", ((String)localObject23).length() > 30 ? ((String)localObject23).substring(0, 30) + "..." : localObject23);
-            ((JSONObject)localObject28).put("announcedAddress", ((Nxt.Peer)localObject26).announcedAddress.length() > 30 ? ((Nxt.Peer)localObject26).announcedAddress.substring(0, 30) + "..." : ((Nxt.Peer)localObject26).announcedAddress);
-            ((JSONObject)localObject28).put("weight", Integer.valueOf(((Nxt.Peer)localObject26).getWeight()));
-            ((JSONObject)localObject28).put("downloaded", Long.valueOf(((Nxt.Peer)localObject26).downloadedVolume));
-            ((JSONObject)localObject28).put("uploaded", Long.valueOf(((Nxt.Peer)localObject26).uploadedVolume));
-            ((JSONObject)localObject28).put("software", ((Nxt.Peer)localObject26).getSoftware());
-            localIterator2 = wellKnownPeers.iterator();
-            while (localIterator2.hasNext())
+            localJSONObject4.put("address", ((String)localObject23).length() > 30 ? ((String)localObject23).substring(0, 30) + "..." : localObject23);
+            localJSONObject4.put("announcedAddress", ((Nxt.Peer)localObject26).announcedAddress.length() > 30 ? ((Nxt.Peer)localObject26).announcedAddress.substring(0, 30) + "..." : ((Nxt.Peer)localObject26).announcedAddress);
+            localJSONObject4.put("weight", Integer.valueOf(((Nxt.Peer)localObject26).getWeight()));
+            localJSONObject4.put("downloaded", Long.valueOf(((Nxt.Peer)localObject26).downloadedVolume));
+            localJSONObject4.put("uploaded", Long.valueOf(((Nxt.Peer)localObject26).uploadedVolume));
+            localJSONObject4.put("software", ((Nxt.Peer)localObject26).getSoftware());
+            localObject29 = wellKnownPeers.iterator();
+            while (((Iterator)localObject29).hasNext())
             {
-              localObject31 = (String)localIterator2.next();
+              localObject31 = (String)((Iterator)localObject29).next();
               if (((Nxt.Peer)localObject26).announcedAddress.equals(localObject31))
               {
-                ((JSONObject)localObject28).put("wellKnown", Boolean.valueOf(true));
+                localJSONObject4.put("wellKnown", Boolean.valueOf(true));
                 break;
               }
             }
-            ((JSONArray)localObject6).add(localObject28);
+            ((JSONArray)localObject6).add(localJSONObject4);
           }
         }
         l6 = lastBlock;
@@ -2341,19 +2349,19 @@ public class Nxt
         {
           i10++;
           localObject26 = (Nxt.Block)blocks.get(Long.valueOf(l6));
-          localObject28 = new JSONObject();
-          ((JSONObject)localObject28).put("index", Integer.valueOf(((Nxt.Block)localObject26).index));
-          ((JSONObject)localObject28).put("timestamp", Integer.valueOf(((Nxt.Block)localObject26).timestamp));
-          ((JSONObject)localObject28).put("numberOfTransactions", Integer.valueOf(((Nxt.Block)localObject26).numberOfTransactions));
-          ((JSONObject)localObject28).put("totalAmount", Integer.valueOf(((Nxt.Block)localObject26).totalAmount));
-          ((JSONObject)localObject28).put("totalFee", Integer.valueOf(((Nxt.Block)localObject26).totalFee));
-          ((JSONObject)localObject28).put("payloadLength", Integer.valueOf(((Nxt.Block)localObject26).payloadLength));
-          ((JSONObject)localObject28).put("generator", convert(Nxt.Account.getId(((Nxt.Block)localObject26).generatorPublicKey)));
-          ((JSONObject)localObject28).put("height", Integer.valueOf(((Nxt.Block)localObject26).height));
-          ((JSONObject)localObject28).put("version", Integer.valueOf(((Nxt.Block)localObject26).version));
-          ((JSONObject)localObject28).put("block", convert(l6));
-          ((JSONObject)localObject28).put("baseTarget", BigInteger.valueOf(((Nxt.Block)localObject26).baseTarget).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
-          ((JSONArray)???).add(localObject28);
+          localJSONObject4 = new JSONObject();
+          localJSONObject4.put("index", Integer.valueOf(((Nxt.Block)localObject26).index));
+          localJSONObject4.put("timestamp", Integer.valueOf(((Nxt.Block)localObject26).timestamp));
+          localJSONObject4.put("numberOfTransactions", Integer.valueOf(((Nxt.Block)localObject26).numberOfTransactions));
+          localJSONObject4.put("totalAmount", Integer.valueOf(((Nxt.Block)localObject26).totalAmount));
+          localJSONObject4.put("totalFee", Integer.valueOf(((Nxt.Block)localObject26).totalFee));
+          localJSONObject4.put("payloadLength", Integer.valueOf(((Nxt.Block)localObject26).payloadLength));
+          localJSONObject4.put("generator", convert(Nxt.Account.getId(((Nxt.Block)localObject26).generatorPublicKey)));
+          localJSONObject4.put("height", Integer.valueOf(((Nxt.Block)localObject26).height));
+          localJSONObject4.put("version", Integer.valueOf(((Nxt.Block)localObject26).version));
+          localJSONObject4.put("block", convert(l6));
+          localJSONObject4.put("baseTarget", BigInteger.valueOf(((Nxt.Block)localObject26).baseTarget).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
+          ((JSONArray)???).add(localJSONObject4);
           if (l6 == 2680262203532249785L) {
             break;
           }
@@ -2361,7 +2369,7 @@ public class Nxt
         }
         Object localObject26 = new JSONObject();
         ((JSONObject)localObject26).put("response", "processInitialData");
-        ((JSONObject)localObject26).put("version", "0.5.2");
+        ((JSONObject)localObject26).put("version", "0.5.3");
         if (((JSONArray)localObject4).size() > 0) {
           ((JSONObject)localObject26).put("unconfirmedTransactions", localObject4);
         }
@@ -2475,12 +2483,16 @@ public class Nxt
           short s1 = 0;
           try
           {
-            l6 = new BigInteger(((String)localObject5).trim()).longValue();
+            localObject29 = new BigInteger(((String)localObject5).trim());
+            if ((((BigInteger)localObject29).signum() < 0) || (((BigInteger)localObject29).compareTo(two64) != -1)) {
+              throw new Exception();
+            }
+            l6 = ((BigInteger)localObject29).longValue();
             i10 = Integer.parseInt(((String)localObject6).trim());
             i12 = Integer.parseInt(((String)localObject7).trim());
             s1 = (short)(int)(Double.parseDouble((String)localObject12) * 60.0D);
           }
-          catch (Exception localException20)
+          catch (Exception localException19)
           {
             localObject31 = new JSONObject();
             ((JSONObject)localObject31).put("response", "notifyOfIncorrectTransaction");
@@ -2556,12 +2568,12 @@ public class Nxt
             {
               localObject32 = new Nxt.Transaction((byte)0, (byte)0, getEpochTime(System.currentTimeMillis()), s1, (byte[])localObject30, l6, i10, i12, 0L, new byte[64]);
               ((Nxt.Transaction)localObject32).sign(((Nxt.User)localObject1).secretPhrase);
-              JSONObject localJSONObject5 = new JSONObject();
-              localJSONObject5.put("requestType", "processTransactions");
+              JSONObject localJSONObject6 = new JSONObject();
+              localJSONObject6.put("requestType", "processTransactions");
               JSONArray localJSONArray2 = new JSONArray();
               localJSONArray2.add(((Nxt.Transaction)localObject32).getJSONObject());
-              localJSONObject5.put("transactions", localJSONArray2);
-              Nxt.Peer.sendToAllPeers(localJSONObject5);
+              localJSONObject6.put("transactions", localJSONArray2);
+              Nxt.Peer.sendToAllPeers(localJSONObject6);
               localObject33 = new JSONObject();
               ((JSONObject)localObject33).put("response", "notifyOfAcceptedTransaction");
               ((Nxt.User)localObject1).pendingResponses.offer(localObject33);
@@ -2666,14 +2678,14 @@ public class Nxt
             localObject27 = (Nxt.Block)blocks.get(Long.valueOf(l7));
             if ((Nxt.Account.getId(((Nxt.Block)localObject27).generatorPublicKey) == ((BigInteger)localObject6).longValue()) && (((Nxt.Block)localObject27).totalFee > 0))
             {
-              JSONObject localJSONObject4 = new JSONObject();
-              localJSONObject4.put("index", convert(l7));
-              localJSONObject4.put("blockTimestamp", Integer.valueOf(((Nxt.Block)localObject27).timestamp));
-              localJSONObject4.put("block", convert(l7));
-              localJSONObject4.put("earnedAmount", Integer.valueOf(((Nxt.Block)localObject27).totalFee));
-              localJSONObject4.put("numberOfConfirmations", Integer.valueOf(i11));
-              localJSONObject4.put("id", "-");
-              ((JSONArray)???).add(localJSONObject4);
+              JSONObject localJSONObject5 = new JSONObject();
+              localJSONObject5.put("index", convert(l7));
+              localJSONObject5.put("blockTimestamp", Integer.valueOf(((Nxt.Block)localObject27).timestamp));
+              localJSONObject5.put("block", convert(l7));
+              localJSONObject5.put("earnedAmount", Integer.valueOf(((Nxt.Block)localObject27).totalFee));
+              localJSONObject5.put("numberOfConfirmations", Integer.valueOf(i11));
+              localJSONObject5.put("id", "-");
+              ((JSONArray)???).add(localJSONObject5);
             }
             for (int i14 = 0; i14 < ((Nxt.Block)localObject27).transactions.length; i14++)
             {
@@ -3036,7 +3048,7 @@ public class Nxt
             localJSONObject1.put("hallmark", myHallmark);
           }
           localJSONObject1.put("application", "NRS");
-          localJSONObject1.put("version", "0.5.2");
+          localJSONObject1.put("version", "0.5.3");
           localJSONObject1.put("platform", myPlatform);
           localJSONObject1.put("shareAddress", Boolean.valueOf(shareMyAddress));
           break;
@@ -4553,7 +4565,7 @@ public class Nxt
         localJSONObject1.put("hallmark", Nxt.myHallmark);
       }
       localJSONObject1.put("application", "NRS");
-      localJSONObject1.put("version", "0.5.2");
+      localJSONObject1.put("version", "0.5.3");
       localJSONObject1.put("platform", Nxt.myPlatform);
       localJSONObject1.put("scheme", Nxt.myScheme);
       localJSONObject1.put("port", Integer.valueOf(Nxt.myPort));
@@ -5860,10 +5872,10 @@ public class Nxt
     
     Block(int paramInt1, int paramInt2, long paramLong, int paramInt3, int paramInt4, int paramInt5, int paramInt6, byte[] paramArrayOfByte1, byte[] paramArrayOfByte2, byte[] paramArrayOfByte3, byte[] paramArrayOfByte4, byte[] paramArrayOfByte5)
     {
-      if (paramInt3 > 255) {
+      if ((paramInt3 > 255) || (paramInt3 < 0)) {
         throw new IllegalArgumentException("attempted to create a block with " + paramInt3 + " transactions");
       }
-      if (paramInt6 > 32640) {
+      if ((paramInt6 > 32640) || (paramInt6 < 0)) {
         throw new IllegalArgumentException("attempted to create a block with payloadLength " + paramInt6);
       }
       this.version = paramInt1;
