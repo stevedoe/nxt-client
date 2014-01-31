@@ -81,7 +81,7 @@ import org.json.simple.JSONValue;
 public class Nxt
   extends HttpServlet
 {
-  static final String VERSION = "0.5.9";
+  static final String VERSION = "0.5.10";
   static final long GENESIS_BLOCK_ID = 2680262203532249785L;
   static final long CREATOR_ID = 1739068987193023818L;
   static final byte[] CREATOR_PUBLIC_KEY = { 18, 89, -20, 33, -45, 26, 48, -119, -115, 124, -47, 96, -97, -128, -39, 102, -117, 71, 120, -29, -39, 126, -108, 16, 68, -77, -97, 12, 68, -46, -27, 27 };
@@ -93,6 +93,7 @@ public class Nxt
   static final int TRANSPARENT_FORGING_BLOCK = 30000;
   static final int ARBITRARY_MESSAGES_BLOCK = 40000;
   static final int TRANSPARENT_FORGING_BLOCK_2 = 47000;
+  static final int TRANSPARENT_FORGING_BLOCK_3 = 51000;
   static final byte[] CHECKSUM_TRANSPARENT_FORGING = { 27, -54, -59, -98, 49, -42, 48, -68, -112, 49, 41, 94, -41, 78, -84, 27, -87, -22, -28, 36, -34, -90, 112, -50, -9, 5, 89, -35, 80, -121, -128, 112 };
   static final long MAX_BALANCE = 1000000000L;
   static final long initialBaseTarget = 153722867L;
@@ -421,7 +422,7 @@ public class Nxt
     int getEffectiveBalance()
     {
       Nxt.Block lastBlock = (Nxt.Block)Nxt.lastBlock.get();
-      if (this.height < 47000)
+      if ((lastBlock.height < 51000) && (this.height < 47000))
       {
         if (this.height == 0) {
           return (int)(getBalance() / 100L);
@@ -429,13 +430,13 @@ public class Nxt
         if (lastBlock.height - this.height < 1440) {
           return 0;
         }
-        int amount = 0;
+        int receivedInlastBlock = 0;
         for (Nxt.Transaction transaction : lastBlock.blockTransactions) {
           if (transaction.recipient == this.id) {
-            amount += transaction.amount;
+            receivedInlastBlock += transaction.amount;
           }
         }
-        return (int)(getBalance() / 100L) - amount;
+        return (int)(getBalance() / 100L) - receivedInlastBlock;
       }
       return (int)(getGuaranteedBalance(1440) / 100L);
     }
@@ -785,8 +786,12 @@ public class Nxt
     {
       synchronized (Nxt.blocksAndTransactionsLock)
       {
-        for (int i = 0; i < this.transactions.length; i++) {
+        for (int i = 0; i < this.transactions.length; i++)
+        {
           this.blockTransactions[i] = ((Nxt.Transaction)Nxt.transactions.get(Long.valueOf(this.transactions[i])));
+          if (this.blockTransactions[i] == null) {
+            throw new IllegalStateException("Missing transaction " + Nxt.convert(this.transactions[i]));
+          }
         }
         if (this.previousBlock == 0L)
         {
@@ -2606,14 +2611,10 @@ public class Nxt
           }
           long totalWeight = 0L;
           for (Peer peer : groupedPeers) {
-            if (peer.date == validDate)
-            {
+            if (peer.date == validDate) {
               totalWeight += peer.weight;
-            }
-            else
-            {
-              peer.adjustedWeight = 0L;
-              peer.updateWeight();
+            } else {
+              peer.weight = 0;
             }
           }
           for (Peer peer : groupedPeers)
@@ -2686,7 +2687,7 @@ public class Nxt
         request.put("hallmark", Nxt.myHallmark);
       }
       request.put("application", "NRS");
-      request.put("version", "0.5.9");
+      request.put("version", "0.5.10");
       request.put("platform", Nxt.myPlatform);
       request.put("scheme", Nxt.myScheme);
       request.put("port", Integer.valueOf(Nxt.myPort));
@@ -4591,7 +4592,7 @@ public class Nxt
   public void init(ServletConfig servletConfig)
     throws ServletException
   {
-    logMessage("NRS 0.5.9 starting...");
+    logMessage("NRS 0.5.10 starting...");
     if (debug) {
       logMessage("DEBUG logging enabled");
     }
@@ -5572,7 +5573,7 @@ public class Nxt
 
 
 
-      logMessage("NRS 0.5.9 started successfully.");
+      logMessage("NRS 0.5.10 started successfully.");
     }
     catch (Exception e)
     {
@@ -6594,7 +6595,7 @@ public class Nxt
 
               break;
             case 19: 
-              response.put("version", "0.5.9");
+              response.put("version", "0.5.10");
               response.put("time", Integer.valueOf(getEpochTime(System.currentTimeMillis())));
               response.put("lastBlock", ((Nxt.Block)lastBlock.get()).getStringId());
               response.put("cumulativeDifficulty", ((Nxt.Block)lastBlock.get()).cumulativeDifficulty.toString());
@@ -7498,7 +7499,7 @@ public class Nxt
         }
         JSONObject response = new JSONObject();
         response.put("response", "processInitialData");
-        response.put("version", "0.5.9");
+        response.put("version", "0.5.10");
         if (unconfirmedTransactions.size() > 0) {
           response.put("unconfirmedTransactions", unconfirmedTransactions);
         }
@@ -8144,7 +8145,7 @@ public class Nxt
             response.put("hallmark", myHallmark);
           }
           response.put("application", "NRS");
-          response.put("version", "0.5.9");
+          response.put("version", "0.5.10");
           response.put("platform", myPlatform);
           response.put("shareAddress", Boolean.valueOf(shareMyAddress));
           
@@ -8398,7 +8399,7 @@ public class Nxt
     {
       logMessage("Error saving transactions", e);
     }
-    logMessage("NRS 0.5.9 stopped.");
+    logMessage("NRS 0.5.10 stopped.");
   }
   
   private static void shutdownExecutor(ExecutorService executor)
