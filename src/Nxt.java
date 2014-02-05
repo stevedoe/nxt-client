@@ -81,7 +81,7 @@ import org.json.simple.JSONValue;
 public class Nxt
   extends HttpServlet
 {
-  static final String VERSION = "0.5.11";
+  static final String VERSION = "0.5.12";
   static final long GENESIS_BLOCK_ID = 2680262203532249785L;
   static final long CREATOR_ID = 1739068987193023818L;
   static final byte[] CREATOR_PUBLIC_KEY = { 18, 89, -20, 33, -45, 26, 48, -119, -115, 124, -47, 96, -97, -128, -39, 102, -117, 71, 120, -29, -39, 126, -108, 16, 68, -77, -97, 12, 68, -46, -27, 27 };
@@ -145,6 +145,7 @@ public class Nxt
   static final ConcurrentMap<Long, TreeSet<Nxt.AskOrder>> sortedAskOrders = new ConcurrentHashMap();
   static final ConcurrentMap<Long, TreeSet<Nxt.BidOrder>> sortedBidOrders = new ConcurrentHashMap();
   static final ConcurrentMap<String, Nxt.User> users = new ConcurrentHashMap();
+  static final Set<Long> signatureLastBytes = Collections.synchronizedSet(new HashSet());
   static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(8);
   static final ExecutorService sendToPeersService = Executors.newFixedThreadPool(10);
   
@@ -863,6 +864,9 @@ public class Nxt
           if (this.blockTransactions[i] == null) {
             throw new IllegalStateException("Missing transaction " + Nxt.convert(this.transactions[i]));
           }
+          byte[] transactionSignature = this.blockTransactions[i].signature;
+          Long lastBytes = Long.valueOf(new BigInteger(Arrays.copyOfRange(transactionSignature, transactionSignature.length - 8, transactionSignature.length)).longValue());
+          Nxt.signatureLastBytes.add(lastBytes);
         }
         if (this.previousBlock == 0L)
         {
@@ -1536,6 +1540,11 @@ public class Nxt
             Nxt.Transaction transaction = (Nxt.Transaction)transactionEntry.getValue();
             transaction.height = block.height;
             transaction.block = block.getId();
+            
+            Long lastBytes = Long.valueOf(new BigInteger(Arrays.copyOfRange(transaction.signature, transaction.signature.length - 8, transaction.signature.length)).longValue());
+            if ((!Nxt.signatureLastBytes.add(lastBytes)) && (transaction.height != 58294)) {
+              return false;
+            }
             if (Nxt.transactions.putIfAbsent(transactionEntry.getKey(), transaction) != null)
             {
               Nxt.logMessage("duplicate transaction id " + transactionEntry.getKey());
@@ -2753,7 +2762,7 @@ public class Nxt
         request.put("hallmark", Nxt.myHallmark);
       }
       request.put("application", "NRS");
-      request.put("version", "0.5.11");
+      request.put("version", "0.5.12");
       request.put("platform", Nxt.myPlatform);
       request.put("scheme", Nxt.myScheme);
       request.put("port", Integer.valueOf(Nxt.myPort));
@@ -3737,6 +3746,10 @@ public class Nxt
               if ((Nxt.transactions.get(Long.valueOf(id)) == null) && (Nxt.unconfirmedTransactions.get(Long.valueOf(id)) == null) && (Nxt.doubleSpendingTransactions.get(Long.valueOf(id)) == null) && (!transaction.verify())) {
                 continue;
               }
+              Long lastBytes = Long.valueOf(new BigInteger(Arrays.copyOfRange(transaction.signature, transaction.signature.length - 8, transaction.signature.length)).longValue());
+              if (Nxt.signatureLastBytes.contains(lastBytes)) {
+                continue;
+              }
               senderId = transaction.getSenderAccountId();
               Nxt.Account account = (Nxt.Account)Nxt.accounts.get(Long.valueOf(senderId));
               boolean doubleSpendingTransaction;
@@ -4670,7 +4683,7 @@ public class Nxt
   public void init(ServletConfig servletConfig)
     throws ServletException
   {
-    logMessage("NRS 0.5.11 starting...");
+    logMessage("NRS 0.5.12 starting...");
     if (debug) {
       logMessage("DEBUG logging enabled");
     }
@@ -5658,7 +5671,7 @@ public class Nxt
 
 
 
-      logMessage("NRS 0.5.11 started successfully.");
+      logMessage("NRS 0.5.12 started successfully.");
     }
     catch (Exception e)
     {
@@ -6683,7 +6696,7 @@ public class Nxt
 
               break;
             case 19: 
-              response.put("version", "0.5.11");
+              response.put("version", "0.5.12");
               response.put("time", Integer.valueOf(getEpochTime(System.currentTimeMillis())));
               response.put("lastBlock", ((Nxt.Block)lastBlock.get()).getStringId());
               response.put("cumulativeDifficulty", ((Nxt.Block)lastBlock.get()).cumulativeDifficulty.toString());
@@ -7587,7 +7600,7 @@ public class Nxt
         }
         JSONObject response = new JSONObject();
         response.put("response", "processInitialData");
-        response.put("version", "0.5.11");
+        response.put("version", "0.5.12");
         if (unconfirmedTransactions.size() > 0) {
           response.put("unconfirmedTransactions", unconfirmedTransactions);
         }
@@ -8233,7 +8246,7 @@ public class Nxt
             response.put("hallmark", myHallmark);
           }
           response.put("application", "NRS");
-          response.put("version", "0.5.11");
+          response.put("version", "0.5.12");
           response.put("platform", myPlatform);
           response.put("shareAddress", Boolean.valueOf(shareMyAddress));
           
@@ -8487,7 +8500,7 @@ public class Nxt
     {
       logMessage("Error saving transactions", e);
     }
-    logMessage("NRS 0.5.11 stopped.");
+    logMessage("NRS 0.5.12 stopped.");
   }
   
   private static void shutdownExecutor(ExecutorService executor)
