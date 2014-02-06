@@ -1,14 +1,11 @@
 package nxt.http;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.PriorityQueue;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Block;
 import nxt.Blockchain;
 import nxt.util.Convert;
+import nxt.util.DbIterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -52,22 +49,40 @@ final class GetAccountBlockIds
     {
       return JSONResponses.INCORRECT_TIMESTAMP;
     }
-    PriorityQueue localPriorityQueue = new PriorityQueue(11, Block.heightComparator);
-    byte[] arrayOfByte = localAccount.getPublicKey();
-    for (Object localObject1 = Blockchain.getAllBlocks().iterator(); ((Iterator)localObject1).hasNext();)
+    JSONArray localJSONArray = new JSONArray();
+    Object localObject1 = Blockchain.getAllBlocks(localAccount, i);Object localObject2 = null;
+    try
     {
-      localObject2 = (Block)((Iterator)localObject1).next();
-      if ((((Block)localObject2).getTimestamp() >= i) && (Arrays.equals(((Block)localObject2).getGeneratorPublicKey(), arrayOfByte))) {
-        localPriorityQueue.offer(localObject2);
+      while (((DbIterator)localObject1).hasNext())
+      {
+        Block localBlock = (Block)((DbIterator)localObject1).next();
+        localJSONArray.add(localBlock.getStringId());
       }
     }
-    localObject1 = new JSONArray();
-    while (!localPriorityQueue.isEmpty()) {
-      ((JSONArray)localObject1).add(((Block)localPriorityQueue.poll()).getStringId());
+    catch (Throwable localThrowable2)
+    {
+      localObject2 = localThrowable2;throw localThrowable2;
     }
-    Object localObject2 = new JSONObject();
-    ((JSONObject)localObject2).put("blockIds", localObject1);
+    finally
+    {
+      if (localObject1 != null) {
+        if (localObject2 != null) {
+          try
+          {
+            ((DbIterator)localObject1).close();
+          }
+          catch (Throwable localThrowable3)
+          {
+            localObject2.addSuppressed(localThrowable3);
+          }
+        } else {
+          ((DbIterator)localObject1).close();
+        }
+      }
+    }
+    localObject1 = new JSONObject();
+    ((JSONObject)localObject1).put("blockIds", localJSONArray);
     
-    return localObject2;
+    return localObject1;
   }
 }

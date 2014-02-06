@@ -6,14 +6,16 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Block;
 import nxt.Blockchain;
-import nxt.Genesis;
 import nxt.Transaction;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
+import nxt.util.DbIterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -59,7 +61,6 @@ final class UnlockAccount
       localJSONObject1.put("balance", Long.valueOf(localAccount.getUnconfirmedBalance()));
       
       long l = localAccount.getEffectiveBalance();
-      Object localObject7;
       Object localObject6;
       if (l > 0L)
       {
@@ -120,71 +121,118 @@ final class UnlockAccount
           ((JSONArray)localObject3).add(localObject7);
         }
       }
-      localObject5 = Blockchain.getLastBlock().getId();
-      int i = 1;
-      while (((JSONArray)localObject3).size() < 1000)
+      localObject5 = new TreeMap();
+      
+      int i = Blockchain.getLastBlock().getHeight();
+      Object localObject7 = Blockchain.getAllBlocks(localAccount, 0);Object localObject8 = null;
+      JSONObject localJSONObject2;
+      try
       {
-        localObject7 = Blockchain.getBlock((Long)localObject5);
-        Object localObject8;
-        if ((((Block)localObject7).getTotalFee() > 0) && (Arrays.equals(((Block)localObject7).getGeneratorPublicKey(), (byte[])localObject4)))
+        while (((DbIterator)localObject7).hasNext())
         {
-          localObject8 = new JSONObject();
-          ((JSONObject)localObject8).put("index", ((Block)localObject7).getStringId());
-          ((JSONObject)localObject8).put("blockTimestamp", Integer.valueOf(((Block)localObject7).getTimestamp()));
-          ((JSONObject)localObject8).put("block", ((Block)localObject7).getStringId());
-          ((JSONObject)localObject8).put("earnedAmount", Integer.valueOf(((Block)localObject7).getTotalFee()));
-          ((JSONObject)localObject8).put("numberOfConfirmations", Integer.valueOf(i));
-          ((JSONObject)localObject8).put("id", "-");
-          
-          ((JSONArray)localObject3).add(localObject8);
-        }
-        for (Object localObject9 : ((Block)localObject7).getTransactions())
-        {
-          JSONObject localJSONObject2;
-          if (Arrays.equals(localObject9.getSenderPublicKey(), (byte[])localObject4))
+          Block localBlock = (Block)((DbIterator)localObject7).next();
+          if (localBlock.getTotalFee() > 0)
           {
             localJSONObject2 = new JSONObject();
-            localJSONObject2.put("index", Integer.valueOf(localObject9.getIndex()));
-            localJSONObject2.put("blockTimestamp", Integer.valueOf(((Block)localObject7).getTimestamp()));
-            localJSONObject2.put("transactionTimestamp", Integer.valueOf(localObject9.getTimestamp()));
-            localJSONObject2.put("account", Convert.convert(localObject9.getRecipientId()));
-            localJSONObject2.put("sentAmount", Integer.valueOf(localObject9.getAmount()));
-            if (((Long)localObject2).equals(localObject9.getRecipientId())) {
-              localJSONObject2.put("receivedAmount", Integer.valueOf(localObject9.getAmount()));
+            localJSONObject2.put("index", localBlock.getStringId());
+            localJSONObject2.put("blockTimestamp", Integer.valueOf(localBlock.getTimestamp()));
+            localJSONObject2.put("block", localBlock.getStringId());
+            localJSONObject2.put("earnedAmount", Integer.valueOf(localBlock.getTotalFee()));
+            localJSONObject2.put("numberOfConfirmations", Integer.valueOf(i - localBlock.getHeight()));
+            localJSONObject2.put("id", "-");
+            ((SortedMap)localObject5).put(Integer.valueOf(-localBlock.getTimestamp()), localJSONObject2);
+          }
+        }
+      }
+      catch (Throwable localThrowable2)
+      {
+        localObject8 = localThrowable2;throw localThrowable2;
+      }
+      finally
+      {
+        if (localObject7 != null) {
+          if (localObject8 != null) {
+            try
+            {
+              ((DbIterator)localObject7).close();
             }
-            localJSONObject2.put("fee", Integer.valueOf(localObject9.getFee()));
-            localJSONObject2.put("numberOfConfirmations", Integer.valueOf(i));
-            localJSONObject2.put("id", localObject9.getStringId());
-            
-            ((JSONArray)localObject3).add(localJSONObject2);
+            catch (Throwable localThrowable5)
+            {
+              ((Throwable)localObject8).addSuppressed(localThrowable5);
+            }
+          } else {
+            ((DbIterator)localObject7).close();
           }
-          else if (((Long)localObject2).equals(localObject9.getRecipientId()))
+        }
+      }
+      localObject7 = Blockchain.getAllTransactions(localAccount, (byte)-1, (byte)-1, 0);localObject8 = null;
+      try
+      {
+        while (((DbIterator)localObject7).hasNext())
+        {
+          Transaction localTransaction = (Transaction)((DbIterator)localObject7).next();
+          if (localTransaction.getSenderAccountId().equals(localObject2))
           {
             localJSONObject2 = new JSONObject();
-            localJSONObject2.put("index", Integer.valueOf(localObject9.getIndex()));
-            localJSONObject2.put("blockTimestamp", Integer.valueOf(((Block)localObject7).getTimestamp()));
-            localJSONObject2.put("transactionTimestamp", Integer.valueOf(localObject9.getTimestamp()));
-            localJSONObject2.put("account", Convert.convert(localObject9.getSenderAccountId()));
-            localJSONObject2.put("receivedAmount", Integer.valueOf(localObject9.getAmount()));
-            localJSONObject2.put("fee", Integer.valueOf(localObject9.getFee()));
-            localJSONObject2.put("numberOfConfirmations", Integer.valueOf(i));
-            localJSONObject2.put("id", localObject9.getStringId());
-            
-            ((JSONArray)localObject3).add(localJSONObject2);
+            localJSONObject2.put("index", Integer.valueOf(localTransaction.getIndex()));
+            localJSONObject2.put("blockTimestamp", Integer.valueOf(localTransaction.getBlock().getTimestamp()));
+            localJSONObject2.put("transactionTimestamp", Integer.valueOf(localTransaction.getTimestamp()));
+            localJSONObject2.put("account", Convert.convert(localTransaction.getRecipientId()));
+            localJSONObject2.put("sentAmount", Integer.valueOf(localTransaction.getAmount()));
+            if (((Long)localObject2).equals(localTransaction.getRecipientId())) {
+              localJSONObject2.put("receivedAmount", Integer.valueOf(localTransaction.getAmount()));
+            }
+            localJSONObject2.put("fee", Integer.valueOf(localTransaction.getFee()));
+            localJSONObject2.put("numberOfConfirmations", Integer.valueOf(i - localTransaction.getBlock().getHeight()));
+            localJSONObject2.put("id", localTransaction.getStringId());
+            ((SortedMap)localObject5).put(Integer.valueOf(-localTransaction.getTimestamp()), localJSONObject2);
+          }
+          else if (localTransaction.getRecipientId().equals(localObject2))
+          {
+            localJSONObject2 = new JSONObject();
+            localJSONObject2.put("index", Integer.valueOf(localTransaction.getIndex()));
+            localJSONObject2.put("blockTimestamp", Integer.valueOf(localTransaction.getBlock().getTimestamp()));
+            localJSONObject2.put("transactionTimestamp", Integer.valueOf(localTransaction.getTimestamp()));
+            localJSONObject2.put("account", Convert.convert(localTransaction.getSenderAccountId()));
+            localJSONObject2.put("receivedAmount", Integer.valueOf(localTransaction.getAmount()));
+            localJSONObject2.put("fee", Integer.valueOf(localTransaction.getFee()));
+            localJSONObject2.put("numberOfConfirmations", Integer.valueOf(i - localTransaction.getBlock().getHeight()));
+            localJSONObject2.put("id", localTransaction.getStringId());
+            ((SortedMap)localObject5).put(Integer.valueOf(-localTransaction.getTimestamp()), localJSONObject2);
           }
         }
-        if (((Long)localObject5).equals(Genesis.GENESIS_BLOCK_ID)) {
-          break;
+      }
+      catch (Throwable localThrowable4)
+      {
+        localObject8 = localThrowable4;throw localThrowable4;
+      }
+      finally
+      {
+        if (localObject7 != null) {
+          if (localObject8 != null) {
+            try
+            {
+              ((DbIterator)localObject7).close();
+            }
+            catch (Throwable localThrowable6)
+            {
+              ((Throwable)localObject8).addSuppressed(localThrowable6);
+            }
+          } else {
+            ((DbIterator)localObject7).close();
+          }
         }
-        localObject5 = ((Block)localObject7).getPreviousBlockId();
-        i++;
+      }
+      localObject7 = ((SortedMap)localObject5).values().iterator();
+      while ((((JSONArray)localObject3).size() < 1000) && (((Iterator)localObject7).hasNext())) {
+        ((JSONArray)localObject3).add(((Iterator)localObject7).next());
       }
       if (((JSONArray)localObject3).size() > 0)
       {
-        localObject7 = new JSONObject();
-        ((JSONObject)localObject7).put("response", "processNewData");
-        ((JSONObject)localObject7).put("addedMyTransactions", localObject3);
-        paramUser.enqueue((JSONStreamAware)localObject7);
+        localObject8 = new JSONObject();
+        ((JSONObject)localObject8).put("response", "processNewData");
+        ((JSONObject)localObject8).put("addedMyTransactions", localObject3);
+        paramUser.enqueue((JSONStreamAware)localObject8);
       }
     }
     return localJSONObject1;

@@ -1,16 +1,11 @@
 package nxt.http;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.PriorityQueue;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
-import nxt.Block;
 import nxt.Blockchain;
 import nxt.Transaction;
-import nxt.Transaction.Type;
 import nxt.util.Convert;
+import nxt.util.DbIterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -54,39 +49,57 @@ final class GetAccountTransactionIds
     {
       return JSONResponses.INCORRECT_TIMESTAMP;
     }
-    int j;
+    byte b1;
     try
     {
-      j = Integer.parseInt(paramHttpServletRequest.getParameter("type"));
+      b1 = Byte.parseByte(paramHttpServletRequest.getParameter("type"));
     }
     catch (NumberFormatException localNumberFormatException2)
     {
-      j = -1;
+      b1 = -1;
     }
-    int k;
+    byte b2;
     try
     {
-      k = Integer.parseInt(paramHttpServletRequest.getParameter("subtype"));
+      b2 = Byte.parseByte(paramHttpServletRequest.getParameter("subtype"));
     }
     catch (NumberFormatException localNumberFormatException3)
     {
-      k = -1;
+      b2 = -1;
     }
-    PriorityQueue localPriorityQueue = new PriorityQueue(11, Transaction.timestampComparator);
-    byte[] arrayOfByte = localAccount.getPublicKey();
-    for (Object localObject1 = Blockchain.getAllTransactions().iterator(); ((Iterator)localObject1).hasNext();)
+    JSONArray localJSONArray = new JSONArray();
+    Object localObject1 = Blockchain.getAllTransactions(localAccount, b1, b2, i);Object localObject2 = null;
+    try
     {
-      localObject2 = (Transaction)((Iterator)localObject1).next();
-      if (((((Transaction)localObject2).getRecipientId().equals(localAccount.getId())) || (Arrays.equals(((Transaction)localObject2).getSenderPublicKey(), arrayOfByte))) && ((j < 0) || (((Transaction)localObject2).getType().getType() == j)) && ((k < 0) || (((Transaction)localObject2).getType().getSubtype() == k)) && (((Transaction)localObject2).getBlock().getTimestamp() >= i)) {
-        localPriorityQueue.offer(localObject2);
+      while (((DbIterator)localObject1).hasNext())
+      {
+        Transaction localTransaction = (Transaction)((DbIterator)localObject1).next();
+        localJSONArray.add(localTransaction.getStringId());
       }
     }
-    localObject1 = new JSONArray();
-    while (!localPriorityQueue.isEmpty()) {
-      ((JSONArray)localObject1).add(((Transaction)localPriorityQueue.poll()).getStringId());
+    catch (Throwable localThrowable2)
+    {
+      localObject2 = localThrowable2;throw localThrowable2;
     }
-    Object localObject2 = new JSONObject();
-    ((JSONObject)localObject2).put("transactionIds", localObject1);
-    return localObject2;
+    finally
+    {
+      if (localObject1 != null) {
+        if (localObject2 != null) {
+          try
+          {
+            ((DbIterator)localObject1).close();
+          }
+          catch (Throwable localThrowable3)
+          {
+            localObject2.addSuppressed(localThrowable3);
+          }
+        } else {
+          ((DbIterator)localObject1).close();
+        }
+      }
+    }
+    localObject1 = new JSONObject();
+    ((JSONObject)localObject1).put("transactionIds", localJSONArray);
+    return localObject1;
   }
 }

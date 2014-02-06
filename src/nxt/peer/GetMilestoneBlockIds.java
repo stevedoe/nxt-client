@@ -2,6 +2,7 @@ package nxt.peer;
 
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.util.Convert;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -14,17 +15,17 @@ final class GetMilestoneBlockIds
   {
     JSONObject localJSONObject = new JSONObject();
     
+
     JSONArray localJSONArray = new JSONArray();
     Block localBlock = Blockchain.getLastBlock();
-    int i = localBlock.getHeight() * 4 / 1461 + 1;
-    for (; (localBlock != null) && (localBlock.getHeight() > 0); goto 64)
+    long l = localBlock.getId().longValue();
+    int i = localBlock.getHeight();
+    int j = i * 4 / 1461 + 1;
+    while (i > 0)
     {
-      localJSONArray.add(localBlock.getStringId());
-      int j = 0;
-      if ((j < i) && (localBlock != null) && (localBlock.getHeight() > 0))
-      {
-        localBlock = Blockchain.getBlock(localBlock.getPreviousBlockId());j++;
-      }
+      localJSONArray.add(Convert.convert(l));
+      l = Blockchain.getBlockIdAtHeight(i);
+      i -= j;
     }
     localJSONObject.put("milestoneBlockIds", localJSONArray);
     

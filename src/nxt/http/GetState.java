@@ -26,7 +26,7 @@ final class GetState
   {
     JSONObject localJSONObject = new JSONObject();
     
-    localJSONObject.put("version", "0.6.1");
+    localJSONObject.put("version", "0.7.0e");
     localJSONObject.put("time", Integer.valueOf(Convert.getEpochTime()));
     localJSONObject.put("lastBlock", Blockchain.getLastBlock().getStringId());
     localJSONObject.put("cumulativeDifficulty", Blockchain.getLastBlock().getCumulativeDifficulty().toString());
@@ -42,8 +42,8 @@ final class GetState
     }
     localJSONObject.put("totalEffectiveBalance", Long.valueOf(l1 * 100L));
     
-    localJSONObject.put("numberOfBlocks", Integer.valueOf(Blockchain.getAllBlocks().size()));
-    localJSONObject.put("numberOfTransactions", Integer.valueOf(Blockchain.getAllTransactions().size()));
+    localJSONObject.put("numberOfBlocks", Integer.valueOf(Blockchain.getBlockCount()));
+    localJSONObject.put("numberOfTransactions", Integer.valueOf(Blockchain.getTransactionCount()));
     localJSONObject.put("numberOfAccounts", Integer.valueOf(Account.getAllAccounts().size()));
     localJSONObject.put("numberOfAssets", Integer.valueOf(Asset.getAllAssets().size()));
     localJSONObject.put("numberOfOrders", Integer.valueOf(Order.Ask.getAllAskOrders().size() + Order.Bid.getAllBidOrders().size()));

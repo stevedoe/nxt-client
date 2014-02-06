@@ -118,12 +118,24 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#broadcast(nxt.Transaction)">broadcast</a></strong>(<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&nbsp;transaction)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static java.util.Collection&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;</code></td>
+<td class="colFirst"><code>static <a href="../nxt/util/DbIterator.html" title="class in nxt.util">DbIterator</a>&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getAllBlocks()">getAllBlocks</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static java.util.Collection&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;</code></td>
+<td class="colFirst"><code>static <a href="../nxt/util/DbIterator.html" title="class in nxt.util">DbIterator</a>&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getAllBlocks(nxt.Account, int)">getAllBlocks</a></strong>(<a href="../nxt/Account.html" title="class in nxt">Account</a>&nbsp;account,
+            int&nbsp;timestamp)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="../nxt/util/DbIterator.html" title="class in nxt.util">DbIterator</a>&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getAllTransactions()">getAllTransactions</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static <a href="../nxt/util/DbIterator.html" title="class in nxt.util">DbIterator</a>&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getAllTransactions(nxt.Account, byte, byte, int)">getAllTransactions</a></strong>(<a href="../nxt/Account.html" title="class in nxt">Account</a>&nbsp;account,
+                  byte&nbsp;type,
+                  byte&nbsp;subtype,
+                  int&nbsp;timestamp)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>static java.util.Collection&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;</code></td>
@@ -131,19 +143,45 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static <a href="../nxt/Block.html" title="class in nxt">Block</a></code></td>
-<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getBlock(java.lang.Long)">getBlock</a></strong>(java.lang.Long&nbsp;id)</code>&nbsp;</td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getBlock(java.lang.Long)">getBlock</a></strong>(java.lang.Long&nbsp;blockId)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getBlockCount()">getBlockCount</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static long</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getBlockIdAtHeight(int)">getBlockIdAtHeight</a></strong>(int&nbsp;height)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.util.List&lt;java.lang.Long&gt;</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getBlockIdsAfter(java.lang.Long, int)">getBlockIdsAfter</a></strong>(java.lang.Long&nbsp;blockId,
+                int&nbsp;limit)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.util.List&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getBlocksAfter(java.lang.Long, int)">getBlocksAfter</a></strong>(java.lang.Long&nbsp;blockId,
+              int&nbsp;limit)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.util.List&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getBlocksFromHeight(int)">getBlocksFromHeight</a></strong>(int&nbsp;height)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>static <a href="../nxt/Block.html" title="class in nxt">Block</a></code></td>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getLastBlock()">getLastBlock</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static <a href="../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a></code></td>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getLastBlockchainFeeder()">getLastBlockchainFeeder</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static <a href="../nxt/Transaction.html" title="class in nxt">Transaction</a></code></td>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getTransaction(java.lang.Long)">getTransaction</a></strong>(java.lang.Long&nbsp;transactionId)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static int</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getTransactionCount()">getTransactionCount</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static <a href="../nxt/Transaction.html" title="class in nxt">Transaction</a></code></td>
@@ -185,7 +223,26 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getAllBlocks</h4>
-<pre>public static&nbsp;java.util.Collection&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&nbsp;getAllBlocks()</pre>
+<pre>public static&nbsp;<a href="../nxt/util/DbIterator.html" title="class in nxt.util">DbIterator</a>&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&nbsp;getAllBlocks()</pre>
+</li>
+</ul>
+<a name="getAllBlocks(nxt.Account, int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getAllBlocks</h4>
+<pre>public static&nbsp;<a href="../nxt/util/DbIterator.html" title="class in nxt.util">DbIterator</a>&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&nbsp;getAllBlocks(<a href="../nxt/Account.html" title="class in nxt">Account</a>&nbsp;account,
+                             int&nbsp;timestamp)</pre>
+</li>
+</ul>
+<a name="getBlockCount()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getBlockCount</h4>
+<pre>public static&nbsp;int&nbsp;getBlockCount()</pre>
 </li>
 </ul>
 <a name="getAllTransactions()">
@@ -194,7 +251,66 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getAllTransactions</h4>
-<pre>public static&nbsp;java.util.Collection&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;&nbsp;getAllTransactions()</pre>
+<pre>public static&nbsp;<a href="../nxt/util/DbIterator.html" title="class in nxt.util">DbIterator</a>&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;&nbsp;getAllTransactions()</pre>
+</li>
+</ul>
+<a name="getAllTransactions(nxt.Account, byte, byte, int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getAllTransactions</h4>
+<pre>public static&nbsp;<a href="../nxt/util/DbIterator.html" title="class in nxt.util">DbIterator</a>&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;&nbsp;getAllTransactions(<a href="../nxt/Account.html" title="class in nxt">Account</a>&nbsp;account,
+                                         byte&nbsp;type,
+                                         byte&nbsp;subtype,
+                                         int&nbsp;timestamp)</pre>
+</li>
+</ul>
+<a name="getTransactionCount()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getTransactionCount</h4>
+<pre>public static&nbsp;int&nbsp;getTransactionCount()</pre>
+</li>
+</ul>
+<a name="getBlockIdsAfter(java.lang.Long, int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getBlockIdsAfter</h4>
+<pre>public static&nbsp;java.util.List&lt;java.lang.Long&gt;&nbsp;getBlockIdsAfter(java.lang.Long&nbsp;blockId,
+                                              int&nbsp;limit)</pre>
+</li>
+</ul>
+<a name="getBlocksAfter(java.lang.Long, int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getBlocksAfter</h4>
+<pre>public static&nbsp;java.util.List&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&nbsp;getBlocksAfter(java.lang.Long&nbsp;blockId,
+                                   int&nbsp;limit)</pre>
+</li>
+</ul>
+<a name="getBlockIdAtHeight(int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getBlockIdAtHeight</h4>
+<pre>public static&nbsp;long&nbsp;getBlockIdAtHeight(int&nbsp;height)</pre>
+</li>
+</ul>
+<a name="getBlocksFromHeight(int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getBlocksFromHeight</h4>
+<pre>public static&nbsp;java.util.List&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&nbsp;getBlocksFromHeight(int&nbsp;height)</pre>
 </li>
 </ul>
 <a name="getAllUnconfirmedTransactions()">
@@ -221,7 +337,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getBlock</h4>
-<pre>public static&nbsp;<a href="../nxt/Block.html" title="class in nxt">Block</a>&nbsp;getBlock(java.lang.Long&nbsp;id)</pre>
+<pre>public static&nbsp;<a href="../nxt/Block.html" title="class in nxt">Block</a>&nbsp;getBlock(java.lang.Long&nbsp;blockId)</pre>
 </li>
 </ul>
 <a name="getTransaction(java.lang.Long)">

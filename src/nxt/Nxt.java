@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
 public final class Nxt
   extends HttpServlet
 {
-  public static final String VERSION = "0.6.1";
+  public static final String VERSION = "0.7.0e";
   public static final int BLOCK_HEADER_LENGTH = 224;
   public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
   public static final int MAX_PAYLOAD_LENGTH = 32640;
@@ -82,7 +82,7 @@ public final class Nxt
   public void init(ServletConfig paramServletConfig)
     throws ServletException
   {
-    Logger.logMessage("NRS 0.6.1 starting...");
+    Logger.logMessage("NRS 0.7.0e starting...");
     if (Logger.debug) {
       Logger.logMessage("DEBUG logging enabled");
     }
@@ -284,11 +284,13 @@ public final class Nxt
         sendToPeersLimit = 10;
         Logger.logMessage("Invalid value for sendToPeersLimit " + str11 + ", using default " + sendToPeersLimit);
       }
+      Db.init();
+      
       Blockchain.init();
       
       ThreadPools.start();
       
-      Logger.logMessage("NRS 0.6.1 started successfully.");
+      Logger.logMessage("NRS 0.7.0e started successfully.");
     }
     catch (Exception localException)
     {
@@ -376,8 +378,8 @@ public final class Nxt
   {
     ThreadPools.shutdown();
     
-    Blockchain.shutdown();
+    Db.shutdown();
     
-    Logger.logMessage("NRS 0.6.1 stopped.");
+    Logger.logMessage("NRS 0.7.0e stopped.");
   }
 }
