@@ -122,7 +122,7 @@ final class GetInitialData
     }
     Object localObject3 = new JSONObject();
     ((JSONObject)localObject3).put("response", "processInitialData");
-    ((JSONObject)localObject3).put("version", "0.6.0");
+    ((JSONObject)localObject3).put("version", "0.6.1");
     if (localJSONArray1.size() > 0) {
       ((JSONObject)localObject3).put("unconfirmedTransactions", localJSONArray1);
     }

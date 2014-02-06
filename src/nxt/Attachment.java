@@ -73,8 +73,8 @@ public abstract interface Attachment
     
     public MessagingAliasAssignment(String paramString1, String paramString2)
     {
-      this.aliasName = paramString1;
-      this.aliasURI = paramString2;
+      this.aliasName = paramString1.trim().intern();
+      this.aliasURI = paramString2.trim().intern();
     }
     
     public int getSize()

@@ -700,7 +700,7 @@ public final class Transaction
           paramAnonymousByteBuffer.get(arrayOfByte2);
           try
           {
-            paramAnonymousTransaction.attachment = new Attachment.MessagingAliasAssignment(new String(arrayOfByte1, "UTF-8").intern(), new String(arrayOfByte2, "UTF-8").intern());
+            paramAnonymousTransaction.attachment = new Attachment.MessagingAliasAssignment(new String(arrayOfByte1, "UTF-8"), new String(arrayOfByte2, "UTF-8"));
             
             return validateAttachment(paramAnonymousTransaction);
           }
@@ -716,7 +716,7 @@ public final class Transaction
         {
           String str1 = (String)paramAnonymousJSONObject.get("alias");
           String str2 = (String)paramAnonymousJSONObject.get("uri");
-          paramAnonymousTransaction.attachment = new Attachment.MessagingAliasAssignment(str1.trim(), str2.trim());
+          paramAnonymousTransaction.attachment = new Attachment.MessagingAliasAssignment(str1, str2);
           return validateAttachment(paramAnonymousTransaction);
         }
         

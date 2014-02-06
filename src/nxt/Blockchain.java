@@ -302,8 +302,8 @@ public final class Blockchain
                     if ((!localLinkedList.isEmpty()) && (((Block)Blockchain.lastBlock.get()).getHeight() - ((Block)Blockchain.blocks.get(localObject1)).getHeight() < 720)) {
                       synchronized (Blockchain.class)
                       {
-                        Blockchain.saveBlocks("blocks.nxt.bak");
                         Blockchain.saveTransactions("transactions.nxt.bak");
+                        Blockchain.saveBlocks("blocks.nxt.bak");
                         
                         localBigInteger1 = ((Block)Blockchain.lastBlock.get()).getCumulativeDifficulty();
                         for (;;)
@@ -338,8 +338,8 @@ public final class Blockchain
                         }
                         if (k != 0)
                         {
-                          Blockchain.loadBlocks("blocks.nxt.bak");
                           Blockchain.loadTransactions("transactions.nxt.bak");
+                          Blockchain.loadBlocks("blocks.nxt.bak");
                           Account.clear();
                           Alias.clear();
                           Asset.clear();
@@ -356,8 +356,8 @@ public final class Blockchain
                     }
                     synchronized (Blockchain.class)
                     {
-                      Blockchain.saveBlocks("blocks.nxt");
                       Blockchain.saveTransactions("transactions.nxt");
+                      Blockchain.saveBlocks("blocks.nxt");
                     }
                   }
                 }
@@ -959,8 +959,6 @@ public final class Blockchain
         }
         paramBlock.apply();
         
-        purgeExpiredHashes();
-        
         localJSONArray1 = new JSONArray();
         localJSONArray2 = new JSONArray();
         for (localObject4 = ((Map)localObject1).entrySet().iterator(); ((Iterator)localObject4).hasNext();)
@@ -1243,12 +1241,11 @@ public final class Blockchain
     }
   }
   
-  private static void purgeExpiredHashes()
+  static void purgeExpiredHashes(int paramInt)
   {
-    int i = Convert.getEpochTime();
     Iterator localIterator = transactionHashes.entrySet().iterator();
     while (localIterator.hasNext()) {
-      if (((Transaction)((Map.Entry)localIterator.next()).getValue()).getExpiration() < i) {
+      if (((Transaction)((Map.Entry)localIterator.next()).getValue()).getExpiration() < paramInt) {
         localIterator.remove();
       }
     }

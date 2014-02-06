@@ -213,10 +213,10 @@ public final class Peer
     if ((Nxt.myAddress != null) && (Nxt.myAddress.length() > 0) && (Nxt.myAddress.equalsIgnoreCase(paramString2))) {
       return null;
     }
-    Peer localPeer = (Peer)peers.get(paramString2.length() > 0 ? paramString2 : paramString1);
+    String str = paramString2.length() > 0 ? paramString2 : paramString1;
+    Peer localPeer = (Peer)peers.get(str);
     if (localPeer == null)
     {
-      String str = paramString2.length() > 0 ? paramString2 : paramString1;
       localPeer = new Peer(str, paramString2);
       peers.put(str, localPeer);
     }
@@ -325,7 +325,7 @@ public final class Peer
   
   private static String truncate(String paramString, int paramInt, boolean paramBoolean)
   {
-    return paramString.length() > paramInt ? paramString.substring(0, paramInt) + (paramBoolean ? "..." : "") : paramString == null ? "?" : paramString;
+    return paramString.length() > paramInt ? paramString.substring(0, paramBoolean ? paramInt - 3 : paramInt) + (paramBoolean ? "..." : "") : paramString == null ? "?" : paramString;
   }
   
   private Peer(String paramString1, String paramString2)
@@ -418,6 +418,14 @@ public final class Peer
   
   void setAnnouncedAddress(String paramString)
   {
+    try
+    {
+      new URL("http://" + paramString);
+    }
+    catch (MalformedURLException localMalformedURLException)
+    {
+      paramString = "";
+    }
     this.announcedAddress = paramString;
   }
   
@@ -458,7 +466,7 @@ public final class Peer
     JSONArray localJSONArray2 = new JSONArray();
     JSONObject localJSONObject3 = new JSONObject();
     localJSONObject3.put("index", Integer.valueOf(this.index));
-    localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 30, true));
+    localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 25, true));
     if (Nxt.wellKnownPeers.contains(this.announcedAddress)) {
       localJSONObject3.put("wellKnown", Boolean.valueOf(true));
     }
@@ -488,7 +496,7 @@ public final class Peer
       JSONArray localJSONArray2 = new JSONArray();
       JSONObject localJSONObject3 = new JSONObject();
       localJSONObject3.put("index", Integer.valueOf(this.index));
-      localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 30, true));
+      localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 25, true));
       if (Nxt.wellKnownPeers.contains(this.announcedAddress)) {
         localJSONObject3.put("wellKnown", Boolean.valueOf(true));
       }
@@ -538,7 +546,7 @@ public final class Peer
     JSONArray localJSONArray2 = new JSONArray();
     JSONObject localJSONObject3 = new JSONObject();
     localJSONObject3.put("index", Integer.valueOf(this.index));
-    localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 30, true));
+    localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 25, true));
     if (Nxt.wellKnownPeers.contains(this.announcedAddress)) {
       localJSONObject3.put("wellKnown", Boolean.valueOf(true));
     }
@@ -837,8 +845,8 @@ public final class Peer
       if (paramState == State.DISCONNECTED) {
         localJSONObject2.put("disconnected", Boolean.valueOf(true));
       }
-      localJSONObject2.put("address", truncate(this.peerAddress, 30, true));
-      localJSONObject2.put("announcedAddress", truncate(this.announcedAddress, 30, true));
+      localJSONObject2.put("address", truncate(this.peerAddress, 25, true));
+      localJSONObject2.put("announcedAddress", truncate(this.announcedAddress, 25, true));
       localJSONObject2.put("weight", Integer.valueOf(getWeight()));
       localJSONObject2.put("downloaded", Long.valueOf(this.downloadedVolume));
       localJSONObject2.put("uploaded", Long.valueOf(this.uploadedVolume));
@@ -913,7 +921,7 @@ public final class Peer
       localJSONObject1.put("hallmark", Nxt.myHallmark);
     }
     localJSONObject1.put("application", "NRS");
-    localJSONObject1.put("version", "0.6.0");
+    localJSONObject1.put("version", "0.6.1");
     localJSONObject1.put("platform", Nxt.myPlatform);
     localJSONObject1.put("scheme", Nxt.myScheme);
     localJSONObject1.put("port", Integer.valueOf(Nxt.myPort));

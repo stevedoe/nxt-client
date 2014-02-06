@@ -407,8 +407,10 @@ public final class Block
     for (Transaction localTransaction : this.blockTransactions)
     {
       localTransaction.setHeight(this.height);
+      localTransaction.setBlockId(getId());
       localTransaction.apply();
     }
+    Blockchain.purgeExpiredHashes(this.timestamp);
   }
   
   private void calculateBaseTarget()
@@ -461,5 +463,8 @@ public final class Block
   {
     paramObjectInputStream.defaultReadObject();
     this.blockTransactions = (this.transactionIds.length == 0 ? emptyTransactions : new Transaction[this.transactionIds.length]);
+    for (int i = 0; i < this.transactionIds.length; i++) {
+      this.blockTransactions[i] = Blockchain.getTransaction(this.transactionIds[i]);
+    }
   }
 }

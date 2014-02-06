@@ -42,7 +42,7 @@ public final class Alias
     }
     else
     {
-      localAlias2.aliasURI = paramString2;
+      localAlias2.aliasURI = paramString2.intern();
       localAlias2.timestamp = paramInt;
     }
   }
@@ -57,8 +57,8 @@ public final class Alias
   {
     this.account = paramAccount;
     this.id = paramLong;
-    this.aliasName = paramString1;
-    this.aliasURI = paramString2;
+    this.aliasName = paramString1.intern();
+    this.aliasURI = paramString2.intern();
     this.timestamp = paramInt;
   }
   
