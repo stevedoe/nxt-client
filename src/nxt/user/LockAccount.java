@@ -9,7 +9,7 @@ final class LockAccount
 {
   static final LockAccount instance = new LockAccount();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws IOException
   {
     paramUser.deinitializeKeyPair();

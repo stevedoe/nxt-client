@@ -7,12 +7,12 @@ import nxt.util.JSON;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAccountPublicKey
+public final class GetAccountPublicKey
   extends HttpRequestHandler
 {
   static final GetAccountPublicKey instance = new GetAccountPublicKey();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("account");
     if (str == null) {

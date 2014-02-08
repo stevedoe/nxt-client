@@ -7,12 +7,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAskOrder
+public final class GetAskOrder
   extends HttpRequestHandler
 {
   static final GetAskOrder instance = new GetAskOrder();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("order");
     if (str == null) {

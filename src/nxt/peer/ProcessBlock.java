@@ -1,7 +1,7 @@
 package nxt.peer;
 
 import nxt.Blockchain;
-import nxt.NxtException.ValidationException;
+import nxt.NxtException;
 import nxt.util.JSON;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -27,16 +27,17 @@ final class ProcessBlock
     NOT_ACCEPTED = JSON.prepare(localJSONObject);
   }
   
-  public JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     try
     {
-      return Blockchain.pushBlock(paramJSONObject) ? ACCEPTED : NOT_ACCEPTED;
+      boolean bool = Blockchain.pushBlock(paramJSONObject);
+      return bool ? ACCEPTED : NOT_ACCEPTED;
     }
-    catch (NxtException.ValidationException localValidationException)
+    catch (NxtException localNxtException)
     {
       if (paramPeer != null) {
-        paramPeer.blacklist(localValidationException);
+        paramPeer.blacklist(localNxtException);
       }
     }
     return NOT_ACCEPTED;

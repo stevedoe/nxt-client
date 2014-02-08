@@ -10,7 +10,7 @@ final class GetUnconfirmedTransactions
 {
   static final GetUnconfirmedTransactions instance = new GetUnconfirmedTransactions();
   
-  public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     

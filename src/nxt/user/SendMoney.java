@@ -15,7 +15,7 @@ final class SendMoney
 {
   static final SendMoney instance = new SendMoney();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws NxtException.ValidationException, IOException
   {
     if (paramUser.getSecretPhrase() == null) {

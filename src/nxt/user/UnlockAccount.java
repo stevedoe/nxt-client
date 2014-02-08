@@ -25,7 +25,7 @@ final class UnlockAccount
 {
   static final UnlockAccount instance = new UnlockAccount();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws IOException
   {
     String str = paramHttpServletRequest.getParameter("secretPhrase");

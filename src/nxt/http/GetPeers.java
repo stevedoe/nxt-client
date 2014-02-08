@@ -8,12 +8,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetPeers
+public final class GetPeers
   extends HttpRequestHandler
 {
   static final GetPeers instance = new GetPeers();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     JSONArray localJSONArray = new JSONArray();
     for (Object localObject = Peer.getAllPeers().iterator(); ((Iterator)localObject).hasNext();)

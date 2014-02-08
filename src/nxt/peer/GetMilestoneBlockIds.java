@@ -11,7 +11,7 @@ final class GetMilestoneBlockIds
 {
   static final GetMilestoneBlockIds instance = new GetMilestoneBlockIds();
   
-  public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     

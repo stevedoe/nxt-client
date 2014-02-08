@@ -11,7 +11,7 @@ final class ProcessTransactions
 {
   static final ProcessTransactions instance = new ProcessTransactions();
   
-  public JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     try
     {

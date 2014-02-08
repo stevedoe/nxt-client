@@ -9,16 +9,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,11 +33,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import nxt.Account;
+import nxt.Blockchain.BlockOutOfOrderException;
 import nxt.Nxt;
-import nxt.NxtException.ValidationException;
+import nxt.NxtException;
 import nxt.ThreadPools;
 import nxt.Transaction.NotYetEnabledException;
-import nxt.crypto.Crypto;
 import nxt.user.User;
 import nxt.util.Convert;
 import nxt.util.CountingInputStream;
@@ -163,6 +163,7 @@ public final class Peer
   private final int index;
   private final String peerAddress;
   private String announcedAddress;
+  private int port;
   private boolean shareAddress;
   private String hallmark;
   private String platform;
@@ -189,36 +190,22 @@ public final class Peer
   
   public static Peer addPeer(String paramString1, String paramString2)
   {
-    try
-    {
-      new URL("http://" + paramString1);
-    }
-    catch (MalformedURLException localMalformedURLException1)
-    {
-      Logger.logDebugMessage("malformed peer address " + paramString1, localMalformedURLException1);
+    Object localObject = parseHostAndPort(paramString1);
+    if (localObject == null) {
       return null;
     }
-    try
-    {
-      new URL("http://" + paramString2);
-    }
-    catch (MalformedURLException localMalformedURLException2)
-    {
-      Logger.logDebugMessage("malformed peer announced address " + paramString2, localMalformedURLException2);
-      paramString2 = "";
-    }
-    if ((paramString1.equals("localhost")) || (paramString1.equals("127.0.0.1")) || (paramString1.equals("0:0:0:0:0:0:0:1"))) {
+    String str = parseHostAndPort(paramString2);
+    if ((Nxt.myAddress != null) && (Nxt.myAddress.length() > 0) && (Nxt.myAddress.equalsIgnoreCase(str))) {
       return null;
     }
-    if ((Nxt.myAddress != null) && (Nxt.myAddress.length() > 0) && (Nxt.myAddress.equalsIgnoreCase(paramString2))) {
-      return null;
+    if (str != null) {
+      localObject = str;
     }
-    String str = paramString2.length() > 0 ? paramString2 : paramString1;
-    Peer localPeer = (Peer)peers.get(str);
+    Peer localPeer = (Peer)peers.get(localObject);
     if (localPeer == null)
     {
-      localPeer = new Peer(str, paramString2);
-      peers.put(str, localPeer);
+      localPeer = new Peer((String)localObject, str);
+      peers.put(localObject, localPeer);
     }
     return localPeer;
   }
@@ -242,7 +229,7 @@ public final class Peer
       if ((!Nxt.enableHallmarkProtection) || (localPeer.getWeight() >= Nxt.pushThreshold))
       {
         Object localObject;
-        if ((localPeer.blacklistingTime == 0L) && (localPeer.state == State.CONNECTED) && (localPeer.announcedAddress.length() > 0))
+        if ((!localPeer.isBlacklisted()) && (localPeer.state == State.CONNECTED) && (localPeer.announcedAddress != null))
         {
           localObject = ThreadPools.sendInParallel(localPeer, localJSONStreamAware);
           localArrayList.add(localObject);
@@ -281,7 +268,7 @@ public final class Peer
   {
     ArrayList localArrayList = new ArrayList();
     for (Peer localPeer1 : peers.values()) {
-      if ((localPeer1.blacklistingTime <= 0L) && (localPeer1.state == paramState) && (localPeer1.announcedAddress.length() > 0) && ((!paramBoolean) || (!Nxt.enableHallmarkProtection) || (localPeer1.getWeight() >= Nxt.pullThreshold))) {
+      if ((!localPeer1.isBlacklisted()) && (localPeer1.state == paramState) && (localPeer1.announcedAddress != null) && ((!paramBoolean) || (!Nxt.enableHallmarkProtection) || (localPeer1.getWeight() >= Nxt.pullThreshold))) {
         localArrayList.add(localPeer1);
       }
     }
@@ -312,20 +299,35 @@ public final class Peer
     return null;
   }
   
+  private static String parseHostAndPort(String paramString)
+  {
+    try
+    {
+      URI localURI = new URI("http://" + paramString.trim());
+      String str = localURI.getHost();
+      if ((str == null) || (str.equals("")) || (str.equals("localhost")) || (str.equals("127.0.0.1")) || (str.equals("0:0:0:0:0:0:0:1"))) {
+        return null;
+      }
+      InetAddress localInetAddress = InetAddress.getByName(str);
+      if ((localInetAddress.isAnyLocalAddress()) || (localInetAddress.isLoopbackAddress()) || (localInetAddress.isLinkLocalAddress())) {
+        return null;
+      }
+      int i = localURI.getPort();
+      return str + ':' + i;
+    }
+    catch (URISyntaxException|UnknownHostException localURISyntaxException) {}
+    return null;
+  }
+  
   private static int getNumberOfConnectedPublicPeers()
   {
     int i = 0;
     for (Peer localPeer : peers.values()) {
-      if ((localPeer.state == State.CONNECTED) && (localPeer.announcedAddress.length() > 0)) {
+      if ((localPeer.state == State.CONNECTED) && (localPeer.announcedAddress != null)) {
         i++;
       }
     }
     return i;
-  }
-  
-  private static String truncate(String paramString, int paramInt, boolean paramBoolean)
-  {
-    return paramString.length() > paramInt ? paramString.substring(0, paramBoolean ? paramInt - 3 : paramInt) + (paramBoolean ? "..." : "") : paramString == null ? "?" : paramString;
   }
   
   private Peer(String paramString1, String paramString2)
@@ -349,11 +351,6 @@ public final class Peer
   public State getState()
   {
     return this.state;
-  }
-  
-  public long getBlacklistingTime()
-  {
-    return this.blacklistingTime;
   }
   
   public long getDownloadedVolume()
@@ -418,15 +415,26 @@ public final class Peer
   
   void setAnnouncedAddress(String paramString)
   {
-    try
+    String str = parseHostAndPort(paramString);
+    if (str != null)
     {
-      new URL("http://" + paramString);
+      this.announcedAddress = str;
+      try
+      {
+        this.port = new URL(str).getPort();
+      }
+      catch (MalformedURLException localMalformedURLException) {}
     }
-    catch (MalformedURLException localMalformedURLException)
-    {
-      paramString = "";
-    }
-    this.announcedAddress = paramString;
+  }
+  
+  public boolean isWellKnown()
+  {
+    return (this.announcedAddress != null) && (Nxt.wellKnownPeers.contains(this.announcedAddress));
+  }
+  
+  public boolean isBlacklisted()
+  {
+    return this.blacklistingTime > 0L;
   }
   
   public int compareTo(Peer paramPeer)
@@ -441,12 +449,14 @@ public final class Peer
     return this.index - paramPeer.index;
   }
   
-  public void blacklist(NxtException.ValidationException paramValidationException)
+  public void blacklist(NxtException paramNxtException)
   {
-    if ((paramValidationException instanceof Transaction.NotYetEnabledException)) {
+    if (((paramNxtException instanceof Transaction.NotYetEnabledException)) || ((paramNxtException instanceof Blockchain.BlockOutOfOrderException))) {
       return;
     }
-    Logger.logDebugMessage("Blacklisting " + this.peerAddress + " because of: " + paramValidationException.getMessage(), paramValidationException);
+    if (!isBlacklisted()) {
+      Logger.logDebugMessage("Blacklisting " + this.peerAddress + " because of: " + paramNxtException.getMessage());
+    }
     blacklist();
   }
   
@@ -466,8 +476,8 @@ public final class Peer
     JSONArray localJSONArray2 = new JSONArray();
     JSONObject localJSONObject3 = new JSONObject();
     localJSONObject3.put("index", Integer.valueOf(this.index));
-    localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 25, true));
-    if (Nxt.wellKnownPeers.contains(this.announcedAddress)) {
+    localJSONObject3.put("announcedAddress", Convert.truncate(this.announcedAddress, "", 25, true));
+    if (isWellKnown()) {
       localJSONObject3.put("wellKnown", Boolean.valueOf(true));
     }
     localJSONArray2.add(localJSONObject3);
@@ -491,13 +501,13 @@ public final class Peer
     localJSONObject2.put("index", Integer.valueOf(this.index));
     localJSONArray1.add(localJSONObject2);
     localJSONObject1.put("removedActivePeers", localJSONArray1);
-    if (this.announcedAddress.length() > 0)
+    if (this.announcedAddress != null)
     {
       JSONArray localJSONArray2 = new JSONArray();
       JSONObject localJSONObject3 = new JSONObject();
       localJSONObject3.put("index", Integer.valueOf(this.index));
-      localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 25, true));
-      if (Nxt.wellKnownPeers.contains(this.announcedAddress)) {
+      localJSONObject3.put("announcedAddress", Convert.truncate(this.announcedAddress, "", 25, true));
+      if (isWellKnown()) {
         localJSONObject3.put("wellKnown", Boolean.valueOf(true));
       }
       localJSONArray2.add(localJSONObject3);
@@ -521,11 +531,11 @@ public final class Peer
   public String getSoftware()
   {
     StringBuilder localStringBuilder = new StringBuilder();
-    localStringBuilder.append(truncate(this.application, 10, false));
+    localStringBuilder.append(Convert.truncate(this.application, "?", 10, false));
     localStringBuilder.append(" (");
-    localStringBuilder.append(truncate(this.version, 10, false));
+    localStringBuilder.append(Convert.truncate(this.version, "?", 10, false));
     localStringBuilder.append(")").append(" @ ");
-    localStringBuilder.append(truncate(this.platform, 10, false));
+    localStringBuilder.append(Convert.truncate(this.platform, "?", 10, false));
     return localStringBuilder.toString();
   }
   
@@ -546,8 +556,8 @@ public final class Peer
     JSONArray localJSONArray2 = new JSONArray();
     JSONObject localJSONObject3 = new JSONObject();
     localJSONObject3.put("index", Integer.valueOf(this.index));
-    localJSONObject3.put("announcedAddress", truncate(this.announcedAddress, 25, true));
-    if (Nxt.wellKnownPeers.contains(this.announcedAddress)) {
+    localJSONObject3.put("announcedAddress", Convert.truncate(this.announcedAddress, "", 25, true));
+    if (isWellKnown()) {
       localJSONObject3.put("wellKnown", Boolean.valueOf(true));
     }
     localJSONArray2.add(localJSONObject3);
@@ -587,7 +597,7 @@ public final class Peer
         paramJSONStreamAware.writeJSONString((Writer)localObject1);
         str = "\"" + this.announcedAddress + "\": " + ((StringWriter)localObject1).toString();
       }
-      Object localObject1 = new URL("http://" + this.announcedAddress + (new URL("http://" + this.announcedAddress).getPort() < 0 ? ":7874" : "") + "/nxt");
+      Object localObject1 = new URL("http://" + this.announcedAddress + (this.port <= 0 ? ":7874" : "") + "/nxt");
       
       localHttpURLConnection = (HttpURLConnection)((URL)localObject1).openConnection();
       localHttpURLConnection.setRequestMethod("POST");
@@ -743,81 +753,48 @@ public final class Peer
     }
     try
     {
-      byte[] arrayOfByte1;
-      try
-      {
-        arrayOfByte1 = Convert.convert(paramString2);
-      }
-      catch (NumberFormatException localNumberFormatException)
-      {
+      Hallmark localHallmark = Hallmark.parseHallmark(paramString2);
+      if ((!localHallmark.isValid()) || (!localHallmark.getHost().equals(paramString1))) {
         return false;
       }
-      ByteBuffer localByteBuffer = ByteBuffer.wrap(arrayOfByte1);
-      localByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-      byte[] arrayOfByte2 = new byte[32];
-      localByteBuffer.get(arrayOfByte2);
-      int i = localByteBuffer.getShort();
-      if (i > 300) {
-        return false;
-      }
-      byte[] arrayOfByte3 = new byte[i];
-      localByteBuffer.get(arrayOfByte3);
-      String str = new String(arrayOfByte3, "UTF-8");
-      if ((str.length() > 100) || (!str.equals(paramString1))) {
-        return false;
-      }
-      int j = localByteBuffer.getInt();
-      if ((j <= 0) || (j > 1000000000L)) {
-        return false;
-      }
-      int k = localByteBuffer.getInt();
-      localByteBuffer.get();
-      byte[] arrayOfByte4 = new byte[64];
-      localByteBuffer.get(arrayOfByte4);
-      
-      byte[] arrayOfByte5 = new byte[arrayOfByte1.length - 64];
-      System.arraycopy(arrayOfByte1, 0, arrayOfByte5, 0, arrayOfByte5.length);
-      if (Crypto.verify(arrayOfByte4, arrayOfByte5, arrayOfByte2))
-      {
-        this.hallmark = paramString2;
-        Long localLong = Account.getId(arrayOfByte2);
-        LinkedList localLinkedList = new LinkedList();
-        int m = 0;
-        this.accountId = localLong;
-        this.weight = j;
-        this.date = k;
-        for (Peer localPeer1 : peers.values()) {
-          if (localLong.equals(localPeer1.accountId))
-          {
-            localLinkedList.add(localPeer1);
-            if (localPeer1.date > m) {
-              m = localPeer1.date;
-            }
+      this.hallmark = paramString2;
+      Long localLong = Account.getId(localHallmark.getPublicKey());
+      LinkedList localLinkedList = new LinkedList();
+      int i = 0;
+      this.accountId = localLong;
+      this.weight = localHallmark.getWeight();
+      this.date = localHallmark.getDate();
+      for (Peer localPeer1 : peers.values()) {
+        if (localLong.equals(localPeer1.accountId))
+        {
+          localLinkedList.add(localPeer1);
+          if (localPeer1.date > i) {
+            i = localPeer1.date;
           }
         }
-        long l = 0L;
-        for (Iterator localIterator2 = localLinkedList.iterator(); localIterator2.hasNext();)
-        {
-          localPeer2 = (Peer)localIterator2.next();
-          if (localPeer2.date == m) {
-            l += localPeer2.weight;
-          } else {
-            localPeer2.weight = 0;
-          }
-        }
-        Peer localPeer2;
-        for (localIterator2 = localLinkedList.iterator(); localIterator2.hasNext();)
-        {
-          localPeer2 = (Peer)localIterator2.next();
-          localPeer2.adjustedWeight = (1000000000L * localPeer2.weight / l);
-          localPeer2.updateWeight();
-        }
-        return true;
       }
+      long l = 0L;
+      for (Iterator localIterator2 = localLinkedList.iterator(); localIterator2.hasNext();)
+      {
+        localPeer2 = (Peer)localIterator2.next();
+        if (localPeer2.date == i) {
+          l += localPeer2.weight;
+        } else {
+          localPeer2.weight = 0;
+        }
+      }
+      Peer localPeer2;
+      for (localIterator2 = localLinkedList.iterator(); localIterator2.hasNext();)
+      {
+        localPeer2 = (Peer)localIterator2.next();
+        localPeer2.adjustedWeight = (1000000000L * localPeer2.weight / l);
+        localPeer2.updateWeight();
+      }
+      return true;
     }
-    catch (RuntimeException|UnsupportedEncodingException localRuntimeException)
+    catch (RuntimeException localRuntimeException)
     {
-      Logger.logDebugMessage("Failed to analyze hallmark for peer " + paramString1, localRuntimeException);
+      Logger.logDebugMessage("Failed to analyze hallmark for peer " + paramString1 + ", " + localRuntimeException.toString());
     }
     return false;
   }
@@ -831,7 +808,7 @@ public final class Peer
     {
       localJSONObject1 = new JSONObject();
       localJSONObject1.put("response", "processNewData");
-      if (this.announcedAddress.length() > 0)
+      if (this.announcedAddress != null)
       {
         localJSONArray = new JSONArray();
         localJSONObject2 = new JSONObject();
@@ -845,15 +822,15 @@ public final class Peer
       if (paramState == State.DISCONNECTED) {
         localJSONObject2.put("disconnected", Boolean.valueOf(true));
       }
-      localJSONObject2.put("address", truncate(this.peerAddress, 25, true));
-      localJSONObject2.put("announcedAddress", truncate(this.announcedAddress, 25, true));
+      localJSONObject2.put("address", Convert.truncate(this.peerAddress, "", 25, true));
+      localJSONObject2.put("announcedAddress", Convert.truncate(this.announcedAddress, "", 25, true));
+      if (isWellKnown()) {
+        localJSONObject2.put("wellKnown", Boolean.valueOf(true));
+      }
       localJSONObject2.put("weight", Integer.valueOf(getWeight()));
       localJSONObject2.put("downloaded", Long.valueOf(this.downloadedVolume));
       localJSONObject2.put("uploaded", Long.valueOf(this.uploadedVolume));
       localJSONObject2.put("software", getSoftware());
-      if (Nxt.wellKnownPeers.contains(this.announcedAddress)) {
-        localJSONObject2.put("wellKnown", Boolean.valueOf(true));
-      }
       localJSONArray.add(localJSONObject2);
       localJSONObject1.put("addedActivePeers", localJSONArray);
       
@@ -921,7 +898,7 @@ public final class Peer
       localJSONObject1.put("hallmark", Nxt.myHallmark);
     }
     localJSONObject1.put("application", "NRS");
-    localJSONObject1.put("version", "0.7.0e");
+    localJSONObject1.put("version", "0.7.1");
     localJSONObject1.put("platform", Nxt.myPlatform);
     localJSONObject1.put("scheme", Nxt.myScheme);
     localJSONObject1.put("port", Integer.valueOf(Nxt.myPort));

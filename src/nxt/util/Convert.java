@@ -74,4 +74,9 @@ public final class Convert
   {
     return paramLong == null ? 0L : paramLong.longValue();
   }
+  
+  public static String truncate(String paramString1, String paramString2, int paramInt, boolean paramBoolean)
+  {
+    return paramString1.length() > paramInt ? paramString1.substring(0, paramBoolean ? paramInt - 3 : paramInt) + (paramBoolean ? "..." : "") : paramString1 == null ? paramString2 : paramString1;
+  }
 }

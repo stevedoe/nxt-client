@@ -9,12 +9,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAssetIds
+public final class GetAssetIds
   extends HttpRequestHandler
 {
   static final GetAssetIds instance = new GetAssetIds();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     JSONArray localJSONArray = new JSONArray();
     for (Object localObject = Asset.getAllAssets().iterator(); ((Iterator)localObject).hasNext();)

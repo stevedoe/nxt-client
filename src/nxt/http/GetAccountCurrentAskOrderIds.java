@@ -10,12 +10,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAccountCurrentAskOrderIds
+public final class GetAccountCurrentAskOrderIds
   extends HttpRequestHandler
 {
   static final GetAccountCurrentAskOrderIds instance = new GetAccountCurrentAskOrderIds();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("account");
     if (str == null) {

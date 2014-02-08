@@ -261,10 +261,16 @@ public final class Blockchain
                               for (int n = 0; n < arrayOfTransaction.length; n++) {
                                 arrayOfTransaction[n] = Transaction.getTransaction((JSONObject)localJSONArray3.get(n));
                               }
-                              if (!Blockchain.pushBlock(localBlock2, arrayOfTransaction))
+                              try
                               {
-                                Logger.logDebugMessage("Failed to accept block received from " + localPeer.getPeerAddress() + ", blacklisting");
-                                localPeer.blacklist();
+                                Blockchain.pushBlock(localBlock2, arrayOfTransaction);
+                              }
+                              catch (Blockchain.BlockNotAcceptedException localBlockNotAcceptedException2)
+                              {
+                                Logger.logDebugMessage("Failed to accept block " + localBlock2.getStringId() + " at height " + ((Block)Blockchain.lastBlock.get()).getHeight() + " received from " + localPeer.getPeerAddress() + ", blacklisting");
+                                
+
+                                localPeer.blacklist(localBlockNotAcceptedException2);
                                 return;
                               }
                             }
@@ -312,9 +318,18 @@ public final class Blockchain
                               for (??? = ((LinkedList)localObject4).iterator(); ((Iterator)???).hasNext();)
                               {
                                 localObject7 = (Block)((Iterator)???).next();
-                                if ((((Block)Blockchain.lastBlock.get()).getId().equals(((Block)localObject7).getPreviousBlockId())) && 
-                                  (!Blockchain.pushBlock((Block)localObject7, ((Block)localObject7).blockTransactions))) {
-                                  break;
+                                if (((Block)Blockchain.lastBlock.get()).getId().equals(((Block)localObject7).getPreviousBlockId())) {
+                                  try
+                                  {
+                                    Blockchain.pushBlock((Block)localObject7, ((Block)localObject7).blockTransactions);
+                                  }
+                                  catch (Blockchain.BlockNotAcceptedException localBlockNotAcceptedException1)
+                                  {
+                                    Logger.logDebugMessage("Failed to push future block " + ((Block)localObject7).getStringId() + " received from " + localPeer.getPeerAddress() + ", blacklisting");
+                                    
+                                    localPeer.blacklist(localBlockNotAcceptedException1);
+                                    break;
+                                  }
                                 }
                               }
                             }
@@ -646,16 +661,16 @@ public final class Blockchain
     //   215: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   218: athrow
     // Line number table:
-    //   Java source line #548	-> byte code offset #0
-    //   Java source line #549	-> byte code offset #17
-    //   Java source line #550	-> byte code offset #25
-    //   Java source line #551	-> byte code offset #33
-    //   Java source line #552	-> byte code offset #43
-    //   Java source line #548	-> byte code offset #114
-    //   Java source line #552	-> byte code offset #122
-    //   Java source line #548	-> byte code offset #161
-    //   Java source line #552	-> byte code offset #166
-    //   Java source line #553	-> byte code offset #206
+    //   Java source line #557	-> byte code offset #0
+    //   Java source line #558	-> byte code offset #17
+    //   Java source line #559	-> byte code offset #25
+    //   Java source line #560	-> byte code offset #33
+    //   Java source line #561	-> byte code offset #43
+    //   Java source line #557	-> byte code offset #114
+    //   Java source line #561	-> byte code offset #122
+    //   Java source line #557	-> byte code offset #161
+    //   Java source line #561	-> byte code offset #166
+    //   Java source line #562	-> byte code offset #206
     // Local variable table:
     //   start	length	slot	name	signature
     //   3	194	0	localConnection	Connection
@@ -869,16 +884,16 @@ public final class Blockchain
     //   215: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   218: athrow
     // Line number table:
-    //   Java source line #613	-> byte code offset #0
-    //   Java source line #614	-> byte code offset #17
-    //   Java source line #615	-> byte code offset #25
-    //   Java source line #616	-> byte code offset #33
-    //   Java source line #617	-> byte code offset #43
-    //   Java source line #613	-> byte code offset #114
-    //   Java source line #617	-> byte code offset #122
-    //   Java source line #613	-> byte code offset #161
-    //   Java source line #617	-> byte code offset #166
-    //   Java source line #618	-> byte code offset #206
+    //   Java source line #622	-> byte code offset #0
+    //   Java source line #623	-> byte code offset #17
+    //   Java source line #624	-> byte code offset #25
+    //   Java source line #625	-> byte code offset #33
+    //   Java source line #626	-> byte code offset #43
+    //   Java source line #622	-> byte code offset #114
+    //   Java source line #626	-> byte code offset #122
+    //   Java source line #622	-> byte code offset #161
+    //   Java source line #626	-> byte code offset #166
+    //   Java source line #627	-> byte code offset #206
     // Local variable table:
     //   start	length	slot	name	signature
     //   3	194	0	localConnection	Connection
@@ -1152,36 +1167,36 @@ public final class Blockchain
     //   577: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   580: athrow
     // Line number table:
-    //   Java source line #623	-> byte code offset #0
-    //   Java source line #624	-> byte code offset #7
-    //   Java source line #626	-> byte code offset #17
-    //   Java source line #627	-> byte code offset #23
-    //   Java source line #626	-> byte code offset #33
-    //   Java source line #628	-> byte code offset #36
-    //   Java source line #626	-> byte code offset #46
-    //   Java source line #629	-> byte code offset #49
-    //   Java source line #630	-> byte code offset #61
-    //   Java source line #631	-> byte code offset #70
-    //   Java source line #632	-> byte code offset #80
-    //   Java source line #633	-> byte code offset #87
-    //   Java source line #645	-> byte code offset #92
-    //   Java source line #635	-> byte code offset #207
-    //   Java source line #636	-> byte code offset #216
-    //   Java source line #637	-> byte code offset #227
-    //   Java source line #638	-> byte code offset #237
-    //   Java source line #639	-> byte code offset #246
-    //   Java source line #640	-> byte code offset #255
-    //   Java source line #641	-> byte code offset #265
-    //   Java source line #643	-> byte code offset #288
-    //   Java source line #644	-> byte code offset #295
-    //   Java source line #645	-> byte code offset #299
-    //   Java source line #626	-> byte code offset #414
-    //   Java source line #645	-> byte code offset #423
-    //   Java source line #626	-> byte code offset #467
-    //   Java source line #645	-> byte code offset #476
-    //   Java source line #626	-> byte code offset #520
-    //   Java source line #645	-> byte code offset #528
-    //   Java source line #646	-> byte code offset #568
+    //   Java source line #632	-> byte code offset #0
+    //   Java source line #633	-> byte code offset #7
+    //   Java source line #635	-> byte code offset #17
+    //   Java source line #636	-> byte code offset #23
+    //   Java source line #635	-> byte code offset #33
+    //   Java source line #637	-> byte code offset #36
+    //   Java source line #635	-> byte code offset #46
+    //   Java source line #638	-> byte code offset #49
+    //   Java source line #639	-> byte code offset #61
+    //   Java source line #640	-> byte code offset #70
+    //   Java source line #641	-> byte code offset #80
+    //   Java source line #642	-> byte code offset #87
+    //   Java source line #654	-> byte code offset #92
+    //   Java source line #644	-> byte code offset #207
+    //   Java source line #645	-> byte code offset #216
+    //   Java source line #646	-> byte code offset #227
+    //   Java source line #647	-> byte code offset #237
+    //   Java source line #648	-> byte code offset #246
+    //   Java source line #649	-> byte code offset #255
+    //   Java source line #650	-> byte code offset #265
+    //   Java source line #652	-> byte code offset #288
+    //   Java source line #653	-> byte code offset #295
+    //   Java source line #654	-> byte code offset #299
+    //   Java source line #635	-> byte code offset #414
+    //   Java source line #654	-> byte code offset #423
+    //   Java source line #635	-> byte code offset #467
+    //   Java source line #654	-> byte code offset #476
+    //   Java source line #635	-> byte code offset #520
+    //   Java source line #654	-> byte code offset #528
+    //   Java source line #655	-> byte code offset #568
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	581	0	paramLong	Long
@@ -1484,36 +1499,36 @@ public final class Blockchain
     //   571: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   574: athrow
     // Line number table:
-    //   Java source line #651	-> byte code offset #0
-    //   Java source line #652	-> byte code offset #7
-    //   Java source line #654	-> byte code offset #17
-    //   Java source line #655	-> byte code offset #23
-    //   Java source line #654	-> byte code offset #33
-    //   Java source line #656	-> byte code offset #36
-    //   Java source line #654	-> byte code offset #46
-    //   Java source line #657	-> byte code offset #49
-    //   Java source line #658	-> byte code offset #61
-    //   Java source line #659	-> byte code offset #70
-    //   Java source line #660	-> byte code offset #80
-    //   Java source line #661	-> byte code offset #87
-    //   Java source line #673	-> byte code offset #92
-    //   Java source line #663	-> byte code offset #207
-    //   Java source line #664	-> byte code offset #216
-    //   Java source line #665	-> byte code offset #227
-    //   Java source line #666	-> byte code offset #237
-    //   Java source line #667	-> byte code offset #246
-    //   Java source line #668	-> byte code offset #255
-    //   Java source line #669	-> byte code offset #265
-    //   Java source line #671	-> byte code offset #282
-    //   Java source line #672	-> byte code offset #289
-    //   Java source line #673	-> byte code offset #293
-    //   Java source line #654	-> byte code offset #408
-    //   Java source line #673	-> byte code offset #417
-    //   Java source line #654	-> byte code offset #461
-    //   Java source line #673	-> byte code offset #470
-    //   Java source line #654	-> byte code offset #514
-    //   Java source line #673	-> byte code offset #522
-    //   Java source line #674	-> byte code offset #562
+    //   Java source line #660	-> byte code offset #0
+    //   Java source line #661	-> byte code offset #7
+    //   Java source line #663	-> byte code offset #17
+    //   Java source line #664	-> byte code offset #23
+    //   Java source line #663	-> byte code offset #33
+    //   Java source line #665	-> byte code offset #36
+    //   Java source line #663	-> byte code offset #46
+    //   Java source line #666	-> byte code offset #49
+    //   Java source line #667	-> byte code offset #61
+    //   Java source line #668	-> byte code offset #70
+    //   Java source line #669	-> byte code offset #80
+    //   Java source line #670	-> byte code offset #87
+    //   Java source line #682	-> byte code offset #92
+    //   Java source line #672	-> byte code offset #207
+    //   Java source line #673	-> byte code offset #216
+    //   Java source line #674	-> byte code offset #227
+    //   Java source line #675	-> byte code offset #237
+    //   Java source line #676	-> byte code offset #246
+    //   Java source line #677	-> byte code offset #255
+    //   Java source line #678	-> byte code offset #265
+    //   Java source line #680	-> byte code offset #282
+    //   Java source line #681	-> byte code offset #289
+    //   Java source line #682	-> byte code offset #293
+    //   Java source line #663	-> byte code offset #408
+    //   Java source line #682	-> byte code offset #417
+    //   Java source line #663	-> byte code offset #461
+    //   Java source line #682	-> byte code offset #470
+    //   Java source line #663	-> byte code offset #514
+    //   Java source line #682	-> byte code offset #522
+    //   Java source line #683	-> byte code offset #562
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	575	0	paramLong	Long
@@ -1727,23 +1742,23 @@ public final class Blockchain
     //   285: invokespecial 22	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   288: athrow
     // Line number table:
-    //   Java source line #690	-> byte code offset #0
-    //   Java source line #691	-> byte code offset #24
-    //   Java source line #693	-> byte code offset #34
-    //   Java source line #694	-> byte code offset #40
-    //   Java source line #693	-> byte code offset #49
-    //   Java source line #695	-> byte code offset #52
-    //   Java source line #696	-> byte code offset #60
-    //   Java source line #697	-> byte code offset #68
-    //   Java source line #698	-> byte code offset #77
-    //   Java source line #699	-> byte code offset #87
-    //   Java source line #701	-> byte code offset #104
-    //   Java source line #702	-> byte code offset #108
-    //   Java source line #693	-> byte code offset #181
-    //   Java source line #702	-> byte code offset #190
-    //   Java source line #693	-> byte code offset #231
-    //   Java source line #702	-> byte code offset #236
-    //   Java source line #703	-> byte code offset #276
+    //   Java source line #699	-> byte code offset #0
+    //   Java source line #700	-> byte code offset #24
+    //   Java source line #702	-> byte code offset #34
+    //   Java source line #703	-> byte code offset #40
+    //   Java source line #702	-> byte code offset #49
+    //   Java source line #704	-> byte code offset #52
+    //   Java source line #705	-> byte code offset #60
+    //   Java source line #706	-> byte code offset #68
+    //   Java source line #707	-> byte code offset #77
+    //   Java source line #708	-> byte code offset #87
+    //   Java source line #710	-> byte code offset #104
+    //   Java source line #711	-> byte code offset #108
+    //   Java source line #702	-> byte code offset #181
+    //   Java source line #711	-> byte code offset #190
+    //   Java source line #702	-> byte code offset #231
+    //   Java source line #711	-> byte code offset #236
+    //   Java source line #712	-> byte code offset #276
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	289	0	paramInt	int
@@ -1832,7 +1847,7 @@ public final class Blockchain
   }
   
   public static boolean pushBlock(JSONObject paramJSONObject)
-    throws NxtException.ValidationException
+    throws NxtException
   {
     Block localBlock = Block.getBlock(paramJSONObject);
     if (!((Block)lastBlock.get()).getId().equals(localBlock.getPreviousBlockId())) {
@@ -1843,7 +1858,16 @@ public final class Blockchain
     for (int i = 0; i < arrayOfTransaction.length; i++) {
       arrayOfTransaction[i] = Transaction.getTransaction((JSONObject)localJSONArray.get(i));
     }
-    return pushBlock(localBlock, arrayOfTransaction);
+    try
+    {
+      pushBlock(localBlock, arrayOfTransaction);
+      return true;
+    }
+    catch (BlockNotAcceptedException localBlockNotAcceptedException)
+    {
+      Logger.logDebugMessage("Block " + localBlock.getStringId() + " not accepted: " + localBlockNotAcceptedException.getMessage());
+      throw localBlockNotAcceptedException;
+    }
   }
   
   static void addBlock(Block paramBlock)
@@ -2070,7 +2094,8 @@ public final class Blockchain
     return ((MessageDigest)localObject1).digest();
   }
   
-  private static boolean pushBlock(Block paramBlock, Transaction[] paramArrayOfTransaction)
+  private static void pushBlock(Block paramBlock, Transaction[] paramArrayOfTransaction)
+    throws Blockchain.BlockNotAcceptedException
   {
     int i = Convert.getEpochTime();
     JSONArray localJSONArray1;
@@ -2080,8 +2105,11 @@ public final class Blockchain
       try
       {
         Block localBlock = (Block)lastBlock.get();
+        if (!localBlock.getId().equals(paramBlock.getPreviousBlockId())) {
+          throw new BlockOutOfOrderException("Previous block id doesn't match", null);
+        }
         if (paramBlock.getVersion() != (localBlock.getHeight() < 30000 ? 1 : 2)) {
-          return false;
+          throw new BlockNotAcceptedException("Invalid version " + paramBlock.getVersion(), null);
         }
         if (localBlock.getHeight() == 30000)
         {
@@ -2095,39 +2123,39 @@ public final class Blockchain
             if (!Arrays.equals((byte[])localObject1, CHECKSUM_TRANSPARENT_FORGING))
             {
               Logger.logMessage("Checksum failed at block 30000");
-              return false;
+              throw new BlockNotAcceptedException("Checksum failed", null);
             }
             Logger.logMessage("Checksum passed at block 30000");
           }
         }
         if ((paramBlock.getVersion() != 1) && (!Arrays.equals(Crypto.sha256().digest(localBlock.getBytes()), paramBlock.getPreviousBlockHash()))) {
-          return false;
+          throw new BlockNotAcceptedException("Previos block hash doesn't match", null);
         }
         if ((paramBlock.getTimestamp() > i + 15) || (paramBlock.getTimestamp() <= localBlock.getTimestamp())) {
-          return false;
+          throw new BlockNotAcceptedException("Invalid timestamp: " + paramBlock.getTimestamp() + " current time is " + i + ", previous block timestamp is " + localBlock.getTimestamp(), null);
         }
-        if ((!localBlock.getId().equals(paramBlock.getPreviousBlockId())) || (paramBlock.getId().equals(Long.valueOf(0L))) || (Block.hasBlock(paramBlock.getId())) || (!paramBlock.verifyGenerationSignature()) || (!paramBlock.verifyBlockSignature())) {
-          return false;
+        if ((paramBlock.getId().equals(Long.valueOf(0L))) || (Block.hasBlock(paramBlock.getId()))) {
+          throw new BlockNotAcceptedException("Duplicate block or invalid id", null);
+        }
+        if ((!paramBlock.verifyGenerationSignature()) || (!paramBlock.verifyBlockSignature())) {
+          throw new BlockNotAcceptedException("Signature verification failed", null);
         }
         paramBlock.setIndex(blockCounter.incrementAndGet());
         
         localObject1 = new HashMap();
-        HashMap localHashMap1 = new HashMap();
         for (int j = 0; j < paramBlock.transactionIds.length; j++)
         {
           localObject2 = paramArrayOfTransaction[j];
           ((Transaction)localObject2).setIndex(transactionCounter.incrementAndGet());
           if (((Map)localObject1).put(paramBlock.transactionIds[j] =  = ((Transaction)localObject2).getId(), localObject2) != null) {
-            return false;
-          }
-          if (((Transaction)localObject2).isDuplicate(localHashMap1)) {
-            return false;
+            throw new BlockNotAcceptedException("Block contains duplicate transactions: " + ((Transaction)localObject2).getStringId(), null);
           }
         }
         Arrays.sort(paramBlock.transactionIds);
         
-        HashMap localHashMap2 = new HashMap();
+        HashMap localHashMap1 = new HashMap();
         Object localObject2 = new HashMap();
+        HashMap localHashMap2 = new HashMap();
         int k = 0;int m = 0;
         MessageDigest localMessageDigest = Crypto.sha256();
         Object localObject5;
@@ -2135,44 +2163,59 @@ public final class Blockchain
         {
           localObject4 = paramBlock.transactionIds[n];
           localObject5 = (Transaction)((Map)localObject1).get(localObject4);
-          if ((((Transaction)localObject5).getTimestamp() > i + 15) || ((((Transaction)localObject5).getExpiration() < paramBlock.getTimestamp()) && (localBlock.getHeight() > 303)) || (Transaction.hasTransaction((Long)localObject4)) || ((((Transaction)localObject5).getReferencedTransactionId() != null) && (!Transaction.hasTransaction(((Transaction)localObject5).getReferencedTransactionId())) && (((Map)localObject1).get(((Transaction)localObject5).getReferencedTransactionId()) == null)) || ((unconfirmedTransactions.get(localObject4) == null) && (!((Transaction)localObject5).verify())) || (((Transaction)localObject5).getId().equals(Long.valueOf(0L)))) {
-            return false;
+          if ((((Transaction)localObject5).getTimestamp() > i + 15) || (((Transaction)localObject5).getTimestamp() > paramBlock.getTimestamp() + 15) || ((((Transaction)localObject5).getExpiration() < paramBlock.getTimestamp()) && (localBlock.getHeight() != 303))) {
+            throw new BlockNotAcceptedException("Invalid transaction timestamp " + ((Transaction)localObject5).getTimestamp() + " for transaction " + ((Transaction)localObject5).getStringId() + ", current time is " + i + ", block timestamp is " + paramBlock.getTimestamp(), null);
+          }
+          if (Transaction.hasTransaction((Long)localObject4)) {
+            throw new BlockNotAcceptedException("Transaction " + ((Transaction)localObject5).getStringId() + " is already in the blockchain", null);
+          }
+          if ((((Transaction)localObject5).getReferencedTransactionId() != null) && (!Transaction.hasTransaction(((Transaction)localObject5).getReferencedTransactionId())) && (((Map)localObject1).get(((Transaction)localObject5).getReferencedTransactionId()) == null)) {
+            throw new BlockNotAcceptedException("Missing referenced transaction " + Convert.convert(((Transaction)localObject5).getReferencedTransactionId()) + " for transaction " + ((Transaction)localObject5).getStringId(), null);
+          }
+          if ((unconfirmedTransactions.get(localObject4) == null) && (!((Transaction)localObject5).verify())) {
+            throw new BlockNotAcceptedException("Signature verification failed for transaction " + ((Transaction)localObject5).getStringId(), null);
+          }
+          if (((Transaction)localObject5).getId().equals(Long.valueOf(0L))) {
+            throw new BlockNotAcceptedException("Invalid transaction id", null);
+          }
+          if (((Transaction)localObject5).isDuplicate(localHashMap1)) {
+            throw new BlockNotAcceptedException("Transaction is a duplicate: " + ((Transaction)localObject5).getStringId(), null);
           }
           paramBlock.blockTransactions[n] = localObject5;
           
           k += ((Transaction)localObject5).getAmount();
           
-          ((Transaction)localObject5).updateTotals(localHashMap2, (Map)localObject2);
+          ((Transaction)localObject5).updateTotals((Map)localObject2, localHashMap2);
           
           m += ((Transaction)localObject5).getFee();
           
           localMessageDigest.update(((Transaction)localObject5).getBytes());
         }
         if ((k != paramBlock.getTotalAmount()) || (m != paramBlock.getTotalFee())) {
-          return false;
+          throw new BlockNotAcceptedException("Total amount or fee don't match transaction totals", null);
         }
         if (!Arrays.equals(localMessageDigest.digest(), paramBlock.getPayloadHash())) {
-          return false;
+          throw new BlockNotAcceptedException("Payload hash doesn't match", null);
         }
-        for (Object localObject3 = localHashMap2.entrySet().iterator(); ((Iterator)localObject3).hasNext();)
+        for (Object localObject3 = ((Map)localObject2).entrySet().iterator(); ((Iterator)localObject3).hasNext();)
         {
           localObject4 = (Map.Entry)((Iterator)localObject3).next();
           localObject5 = Account.getAccount((Long)((Map.Entry)localObject4).getKey());
           if (((Account)localObject5).getBalance() < ((Long)((Map.Entry)localObject4).getValue()).longValue()) {
-            return false;
+            throw new BlockNotAcceptedException("Not enough funds in sender account: " + Convert.convert(((Account)localObject5).getId()), null);
           }
         }
-        for (localObject3 = ((Map)localObject2).entrySet().iterator(); ((Iterator)localObject3).hasNext();)
+        for (localObject3 = localHashMap2.entrySet().iterator(); ((Iterator)localObject3).hasNext();)
         {
           localObject4 = (Map.Entry)((Iterator)localObject3).next();
           localObject5 = Account.getAccount((Long)((Map.Entry)localObject4).getKey());
           for (localIterator = ((Map)((Map.Entry)localObject4).getValue()).entrySet().iterator(); localIterator.hasNext();)
           {
             localObject6 = (Map.Entry)localIterator.next();
-            long l1 = ((Long)((Map.Entry)localObject6).getKey()).longValue();
-            long l2 = ((Long)((Map.Entry)localObject6).getValue()).longValue();
-            if (((Account)localObject5).getAssetBalance(Long.valueOf(l1)).intValue() < l2) {
-              return false;
+            localObject7 = (Long)((Map.Entry)localObject6).getKey();
+            localObject8 = (Long)((Map.Entry)localObject6).getValue();
+            if (((Account)localObject5).getAssetBalance((Long)localObject7).intValue() < ((Long)localObject8).longValue()) {
+              throw new BlockNotAcceptedException("Asset balance not sufficient in sender account " + Convert.convert(((Account)localObject5).getId()), null);
             }
           }
         }
@@ -2194,13 +2237,13 @@ public final class Blockchain
           for (localObject6 : paramBlock.blockTransactions) {
             if (!((Transaction)localObject6).equals(localObject3))
             {
-              localTransaction2 = (Transaction)transactionHashes.get(((Transaction)localObject6).getHash());
-              if ((localTransaction2 != null) && (localTransaction2.equals(localObject6))) {
+              localObject7 = (Transaction)transactionHashes.get(((Transaction)localObject6).getHash());
+              if ((localObject7 != null) && (((Transaction)localObject7).equals(localObject6))) {
                 transactionHashes.remove(((Transaction)localObject6).getHash());
               }
             }
           }
-          return false;
+          throw new BlockNotAcceptedException("Duplicate hash of transaction " + ((Transaction)localObject3).getStringId(), null);
         }
         paramBlock.calculateBaseTarget();
         
@@ -2214,28 +2257,28 @@ public final class Blockchain
         {
           Map.Entry localEntry = (Map.Entry)((Iterator)localObject4).next();
           
-          Transaction localTransaction1 = (Transaction)localEntry.getValue();
+          Transaction localTransaction = (Transaction)localEntry.getValue();
           
           localObject6 = new JSONObject();
-          ((JSONObject)localObject6).put("index", Integer.valueOf(localTransaction1.getIndex()));
+          ((JSONObject)localObject6).put("index", Integer.valueOf(localTransaction.getIndex()));
           ((JSONObject)localObject6).put("blockTimestamp", Integer.valueOf(paramBlock.getTimestamp()));
-          ((JSONObject)localObject6).put("transactionTimestamp", Integer.valueOf(localTransaction1.getTimestamp()));
-          ((JSONObject)localObject6).put("sender", Convert.convert(localTransaction1.getSenderAccountId()));
-          ((JSONObject)localObject6).put("recipient", Convert.convert(localTransaction1.getRecipientId()));
-          ((JSONObject)localObject6).put("amount", Integer.valueOf(localTransaction1.getAmount()));
-          ((JSONObject)localObject6).put("fee", Integer.valueOf(localTransaction1.getFee()));
-          ((JSONObject)localObject6).put("id", localTransaction1.getStringId());
+          ((JSONObject)localObject6).put("transactionTimestamp", Integer.valueOf(localTransaction.getTimestamp()));
+          ((JSONObject)localObject6).put("sender", Convert.convert(localTransaction.getSenderAccountId()));
+          ((JSONObject)localObject6).put("recipient", Convert.convert(localTransaction.getRecipientId()));
+          ((JSONObject)localObject6).put("amount", Integer.valueOf(localTransaction.getAmount()));
+          ((JSONObject)localObject6).put("fee", Integer.valueOf(localTransaction.getFee()));
+          ((JSONObject)localObject6).put("id", localTransaction.getStringId());
           localJSONArray1.add(localObject6);
           
-          localTransaction2 = (Transaction)unconfirmedTransactions.remove(localEntry.getKey());
-          if (localTransaction2 != null)
+          localObject7 = (Transaction)unconfirmedTransactions.remove(localEntry.getKey());
+          if (localObject7 != null)
           {
-            JSONObject localJSONObject2 = new JSONObject();
-            localJSONObject2.put("index", Integer.valueOf(localTransaction2.getIndex()));
-            localJSONArray2.add(localJSONObject2);
+            localObject8 = new JSONObject();
+            ((JSONObject)localObject8).put("index", Integer.valueOf(((Transaction)localObject7).getIndex()));
+            localJSONArray2.add(localObject8);
             
-            Account localAccount = Account.getAccount(localTransaction2.getSenderAccountId());
-            localAccount.addToUnconfirmedBalance((localTransaction2.getAmount() + localTransaction2.getFee()) * 100L);
+            Account localAccount = Account.getAccount(((Transaction)localObject7).getSenderAccountId());
+            localAccount.addToUnconfirmedBalance((((Transaction)localObject7).getAmount() + ((Transaction)localObject7).getFee()) * 100L);
           }
         }
       }
@@ -2243,9 +2286,10 @@ public final class Blockchain
       {
         Object localObject4;
         Object localObject6;
-        Transaction localTransaction2;
+        Object localObject7;
+        Object localObject8;
         Logger.logMessage("Error pushing block", localRuntimeException);
-        return false;
+        throw new BlockNotAcceptedException(localRuntimeException.toString(), null);
       }
     }
     if (paramBlock.getTimestamp() >= i - 15)
@@ -2256,19 +2300,19 @@ public final class Blockchain
       Peer.sendToSomePeers((JSONObject)???);
     }
     ??? = new JSONArray();
-    JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("index", Integer.valueOf(paramBlock.getIndex()));
-    localJSONObject1.put("timestamp", Integer.valueOf(paramBlock.getTimestamp()));
-    localJSONObject1.put("numberOfTransactions", Integer.valueOf(paramBlock.transactionIds.length));
-    localJSONObject1.put("totalAmount", Integer.valueOf(paramBlock.getTotalAmount()));
-    localJSONObject1.put("totalFee", Integer.valueOf(paramBlock.getTotalFee()));
-    localJSONObject1.put("payloadLength", Integer.valueOf(paramBlock.getPayloadLength()));
-    localJSONObject1.put("generator", Convert.convert(paramBlock.getGeneratorAccountId()));
-    localJSONObject1.put("height", Integer.valueOf(paramBlock.getHeight()));
-    localJSONObject1.put("version", Integer.valueOf(paramBlock.getVersion()));
-    localJSONObject1.put("block", paramBlock.getStringId());
-    localJSONObject1.put("baseTarget", BigInteger.valueOf(paramBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
-    ((JSONArray)???).add(localJSONObject1);
+    JSONObject localJSONObject = new JSONObject();
+    localJSONObject.put("index", Integer.valueOf(paramBlock.getIndex()));
+    localJSONObject.put("timestamp", Integer.valueOf(paramBlock.getTimestamp()));
+    localJSONObject.put("numberOfTransactions", Integer.valueOf(paramBlock.transactionIds.length));
+    localJSONObject.put("totalAmount", Integer.valueOf(paramBlock.getTotalAmount()));
+    localJSONObject.put("totalFee", Integer.valueOf(paramBlock.getTotalFee()));
+    localJSONObject.put("payloadLength", Integer.valueOf(paramBlock.getPayloadLength()));
+    localJSONObject.put("generator", Convert.convert(paramBlock.getGeneratorAccountId()));
+    localJSONObject.put("height", Integer.valueOf(paramBlock.getHeight()));
+    localJSONObject.put("version", Integer.valueOf(paramBlock.getVersion()));
+    localJSONObject.put("block", paramBlock.getStringId());
+    localJSONObject.put("baseTarget", BigInteger.valueOf(paramBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
+    ((JSONArray)???).add(localJSONObject);
     
     Object localObject1 = new JSONObject();
     ((JSONObject)localObject1).put("response", "processNewData");
@@ -2279,8 +2323,6 @@ public final class Blockchain
     ((JSONObject)localObject1).put("addedRecentBlocks", ???);
     
     User.sendToAll((JSONStreamAware)localObject1);
-    
-    return true;
   }
   
   private static boolean popLastBlock()
@@ -2296,6 +2338,8 @@ public final class Blockchain
       synchronized (Blockchain.class)
       {
         localBlock = (Block)lastBlock.get();
+        
+        Logger.logDebugMessage("Will pop block " + localBlock.getStringId() + " at height " + localBlock.getHeight());
         if (localBlock.getId().equals(Genesis.GENESIS_BLOCK_ID)) {
           return false;
         }
@@ -2446,16 +2490,18 @@ public final class Blockchain
     int i = 0;
     int j = 0;
     int k = 0;
+    
+    int m = Convert.getEpochTime();
     Object localObject3;
     while (k <= 32640)
     {
-      int m = ((Map)localObject1).size();
+      int n = ((Map)localObject1).size();
       for (localObject3 = localTreeSet.iterator(); ((Iterator)localObject3).hasNext();)
       {
         localObject4 = (Transaction)((Iterator)localObject3).next();
         
-        int n = ((Transaction)localObject4).getSize();
-        if ((((Map)localObject1).get(((Transaction)localObject4).getId()) == null) && (k + n <= 32640))
+        int i1 = ((Transaction)localObject4).getSize();
+        if ((((Map)localObject1).get(((Transaction)localObject4).getId()) == null) && (k + i1 <= 32640))
         {
           localObject5 = ((Transaction)localObject4).getSenderAccountId();
           localObject6 = (Long)localHashMap.get(localObject5);
@@ -2464,19 +2510,23 @@ public final class Blockchain
           }
           long l = (((Transaction)localObject4).getAmount() + ((Transaction)localObject4).getFee()) * 100L;
           if (((Long)localObject6).longValue() + l <= Account.getAccount((Long)localObject5).getBalance()) {
-            if (!((Transaction)localObject4).isDuplicate((Map)localObject2))
+            if ((((Transaction)localObject4).getTimestamp() <= m + 15) && (((Transaction)localObject4).getExpiration() >= m) && 
+            
+
+
+              (!((Transaction)localObject4).isDuplicate((Map)localObject2)))
             {
               localHashMap.put(localObject5, Long.valueOf(((Long)localObject6).longValue() + l));
               
               ((Map)localObject1).put(((Transaction)localObject4).getId(), localObject4);
-              k += n;
+              k += i1;
               i += ((Transaction)localObject4).getAmount();
               j += ((Transaction)localObject4).getFee();
             }
           }
         }
       }
-      if (((Map)localObject1).size() == m) {
+      if (((Map)localObject1).size() == n) {
         break;
       }
     }
@@ -2488,12 +2538,12 @@ public final class Blockchain
     {
       if (((Block)localObject4).getHeight() < 30000)
       {
-        localObject3 = new Block(1, Convert.getEpochTime(), ((Block)localObject4).getId(), ((Map)localObject1).size(), i, j, k, null, arrayOfByte1, null, new byte[64]);
+        localObject3 = new Block(1, m, ((Block)localObject4).getId(), ((Map)localObject1).size(), i, j, k, null, arrayOfByte1, null, new byte[64]);
       }
       else
       {
         byte[] arrayOfByte2 = Crypto.sha256().digest(((Block)localObject4).getBytes());
-        localObject3 = new Block(2, Convert.getEpochTime(), ((Block)localObject4).getId(), ((Map)localObject1).size(), i, j, k, null, arrayOfByte1, null, new byte[64], arrayOfByte2);
+        localObject3 = new Block(2, m, ((Block)localObject4).getId(), ((Map)localObject1).size(), i, j, k, null, arrayOfByte1, null, new byte[64], arrayOfByte2);
       }
     }
     catch (NxtException.ValidationException localValidationException)
@@ -2501,19 +2551,19 @@ public final class Blockchain
       Logger.logMessage("Error generating block", localValidationException);
       return;
     }
-    int i1 = 0;
+    int i2 = 0;
     for (Object localObject5 = ((Map)localObject1).keySet().iterator(); ((Iterator)localObject5).hasNext();)
     {
       localObject6 = (Long)((Iterator)localObject5).next();
-      ((Block)localObject3).transactionIds[(i1++)] = localObject6;
+      ((Block)localObject3).transactionIds[(i2++)] = localObject6;
     }
     Arrays.sort(((Block)localObject3).transactionIds);
     localObject5 = Crypto.sha256();
-    for (i1 = 0; i1 < ((Block)localObject3).transactionIds.length; i1++)
+    for (i2 = 0; i2 < ((Block)localObject3).transactionIds.length; i2++)
     {
-      localObject6 = (Transaction)((Map)localObject1).get(localObject3.transactionIds[i1]);
+      localObject6 = (Transaction)((Map)localObject1).get(localObject3.transactionIds[i2]);
       ((MessageDigest)localObject5).update(((Transaction)localObject6).getBytes());
-      ((Block)localObject3).blockTransactions[i1] = localObject6;
+      ((Block)localObject3).blockTransactions[i2] = localObject6;
     }
     ((Block)localObject3).setPayloadHash(((MessageDigest)localObject5).digest());
     if (((Block)localObject4).getHeight() < 30000)
@@ -2548,6 +2598,24 @@ public final class Blockchain
       if (((Transaction)((Map.Entry)localIterator.next()).getValue()).getExpiration() < paramInt) {
         localIterator.remove();
       }
+    }
+  }
+  
+  public static class BlockNotAcceptedException
+    extends NxtException
+  {
+    private BlockNotAcceptedException(String paramString)
+    {
+      super();
+    }
+  }
+  
+  public static class BlockOutOfOrderException
+    extends Blockchain.BlockNotAcceptedException
+  {
+    private BlockOutOfOrderException(String paramString)
+    {
+      super(null);
     }
   }
 }

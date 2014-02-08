@@ -6,12 +6,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAsset
+public final class GetAsset
   extends HttpRequestHandler
 {
   static final GetAsset instance = new GetAsset();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("asset");
     if (str == null) {

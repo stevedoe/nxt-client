@@ -6,12 +6,12 @@ import nxt.peer.Peer.State;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetPeer
+public final class GetPeer
   extends HttpRequestHandler
 {
   static final GetPeer instance = new GetPeer();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("peer");
     if (str == null) {

@@ -145,7 +145,9 @@ public abstract class Order
     static Ask removeOrder(Long paramLong)
     {
       Ask localAsk = (Ask)askOrders.remove(paramLong);
-      ((SortedSet)sortedAskOrders.get(localAsk.getAssetId())).remove(localAsk);
+      if (localAsk != null) {
+        ((SortedSet)sortedAskOrders.get(localAsk.getAssetId())).remove(localAsk);
+      }
       return localAsk;
     }
     
@@ -216,7 +218,9 @@ public abstract class Order
     static Bid removeOrder(Long paramLong)
     {
       Bid localBid = (Bid)bidOrders.remove(paramLong);
-      ((SortedSet)sortedBidOrders.get(localBid.getAssetId())).remove(localBid);
+      if (localBid != null) {
+        ((SortedSet)sortedBidOrders.get(localBid.getAssetId())).remove(localBid);
+      }
       return localBid;
     }
     

@@ -17,16 +17,16 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetState
+public final class GetState
   extends HttpRequestHandler
 {
   static final GetState instance = new GetState();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     JSONObject localJSONObject = new JSONObject();
     
-    localJSONObject.put("version", "0.7.0e");
+    localJSONObject.put("version", "0.7.1");
     localJSONObject.put("time", Integer.valueOf(Convert.getEpochTime()));
     localJSONObject.put("lastBlock", Blockchain.getLastBlock().getStringId());
     localJSONObject.put("cumulativeDifficulty", Blockchain.getLastBlock().getCumulativeDifficulty().toString());

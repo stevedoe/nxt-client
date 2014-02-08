@@ -7,12 +7,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAccountId
+public final class GetAccountId
   extends HttpRequestHandler
 {
   static final GetAccountId instance = new GetAccountId();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("secretPhrase");
     if (str == null) {

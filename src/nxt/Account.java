@@ -258,9 +258,15 @@ public final class Account
     for (int k = 0; k < this.guaranteedBalances.size(); k++)
     {
       GuaranteedBalance localGuaranteedBalance3 = (GuaranteedBalance)this.guaranteedBalances.get(k);
-      if ((localGuaranteedBalance3.height < i - 2881) && (k < this.guaranteedBalances.size() - 1) && (((GuaranteedBalance)this.guaranteedBalances.get(k + 1)).height >= i - 2881)) {
+      if ((localGuaranteedBalance3.height < i - 2881) && (k < this.guaranteedBalances.size() - 1) && (((GuaranteedBalance)this.guaranteedBalances.get(k + 1)).height >= i - 2881))
+      {
         j = k;
-      } else if (paramLong < 0L) {
+        if (i >= 64000) {
+          localGuaranteedBalance3.balance += paramLong;
+        }
+      }
+      else if (paramLong < 0L)
+      {
         localGuaranteedBalance3.balance += paramLong;
       }
     }

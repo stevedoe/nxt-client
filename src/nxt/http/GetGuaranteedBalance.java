@@ -6,12 +6,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetGuaranteedBalance
+public final class GetGuaranteedBalance
   extends HttpRequestHandler
 {
   static final GetGuaranteedBalance instance = new GetGuaranteedBalance();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str1 = paramHttpServletRequest.getParameter("account");
     String str2 = paramHttpServletRequest.getParameter("numberOfConfirmations");

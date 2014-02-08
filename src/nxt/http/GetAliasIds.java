@@ -9,12 +9,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAliasIds
+public final class GetAliasIds
   extends HttpRequestHandler
 {
   static final GetAliasIds instance = new GetAliasIds();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("timestamp");
     if (str == null) {
