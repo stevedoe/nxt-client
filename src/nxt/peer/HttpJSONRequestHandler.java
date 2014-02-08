@@ -65,7 +65,7 @@ public abstract class HttpJSONRequestHandler
     throws ServletException, IOException
   {
     Peer localPeer = null;
-    Object localObject1 = null;
+    Object localObject1;
     try
     {
       localObject2 = new CountingInputStream(paramHttpServletRequest.getInputStream());
@@ -102,6 +102,9 @@ public abstract class HttpJSONRequestHandler
       localPeer = Peer.addPeer(paramHttpServletRequest.getRemoteHost(), "");
       if (localPeer != null)
       {
+        if (localPeer.isBlacklisted()) {
+          return;
+        }
         if (localPeer.getState() == Peer.State.DISCONNECTED) {
           localPeer.setState(Peer.State.CONNECTED);
         }

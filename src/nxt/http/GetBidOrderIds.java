@@ -10,12 +10,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetBidOrderIds
+public final class GetBidOrderIds
   extends HttpRequestHandler
 {
   static final GetBidOrderIds instance = new GetBidOrderIds();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("asset");
     if (str == null) {

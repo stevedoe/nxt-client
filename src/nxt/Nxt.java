@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nxt.http.HttpRequestHandler;
+import nxt.peer.Hallmark;
 import nxt.peer.HttpJSONRequestHandler;
 import nxt.peer.Peer;
 import nxt.user.User;
 import nxt.user.UserRequestHandler;
-import nxt.util.Convert;
 import nxt.util.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
 public final class Nxt
   extends HttpServlet
 {
-  public static final String VERSION = "0.6.1";
+  public static final String VERSION = "0.6.2";
   public static final int BLOCK_HEADER_LENGTH = 224;
   public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
   public static final int MAX_PAYLOAD_LENGTH = 32640;
@@ -35,6 +35,7 @@ public final class Nxt
   public static final int ARBITRARY_MESSAGES_BLOCK = 40000;
   public static final int TRANSPARENT_FORGING_BLOCK_2 = 47000;
   public static final int TRANSPARENT_FORGING_BLOCK_3 = 51000;
+  public static final int TRANSPARENT_FORGING_BLOCK_4 = 64000;
   public static final long MAX_BALANCE = 1000000000L;
   public static final long initialBaseTarget = 153722867L;
   public static final long maxBaseTarget = 153722867000000000L;
@@ -82,7 +83,7 @@ public final class Nxt
   public void init(ServletConfig paramServletConfig)
     throws ServletException
   {
-    Logger.logMessage("NRS 0.6.1 starting...");
+    Logger.logMessage("NRS 0.6.2 starting...");
     if (Logger.debug) {
       Logger.logMessage("DEBUG logging enabled");
     }
@@ -127,14 +128,15 @@ public final class Nxt
       
       myHallmark = paramServletConfig.getInitParameter("myHallmark");
       Logger.logMessage("\"myHallmark\" = \"" + myHallmark + "\"");
-      if (myHallmark != null)
-      {
-        myHallmark = myHallmark.trim();
+      if ((myHallmark != null) && ((Nxt.myHallmark = myHallmark.trim()).length() > 0)) {
         try
         {
-          Convert.convert(myHallmark);
+          Hallmark localHallmark = Hallmark.parseHallmark(myHallmark);
+          if (!localHallmark.isValid()) {
+            throw new RuntimeException();
+          }
         }
-        catch (NumberFormatException localNumberFormatException2)
+        catch (RuntimeException localRuntimeException)
         {
           Logger.logMessage("Your hallmark is invalid: " + myHallmark);
           System.exit(1);
@@ -167,7 +169,7 @@ public final class Nxt
       {
         maxNumberOfConnectedPublicPeers = Integer.parseInt((String)localObject1);
       }
-      catch (NumberFormatException localNumberFormatException3)
+      catch (NumberFormatException localNumberFormatException2)
       {
         maxNumberOfConnectedPublicPeers = 10;
         Logger.logMessage("Invalid value for maxNumberOfConnectedPublicPeers " + (String)localObject1 + ", using default " + maxNumberOfConnectedPublicPeers);
@@ -178,7 +180,7 @@ public final class Nxt
       {
         connectTimeout = Integer.parseInt(str4);
       }
-      catch (NumberFormatException localNumberFormatException4)
+      catch (NumberFormatException localNumberFormatException3)
       {
         connectTimeout = 1000;
         Logger.logMessage("Invalid value for connectTimeout " + str4 + ", using default " + connectTimeout);
@@ -189,7 +191,7 @@ public final class Nxt
       {
         readTimeout = Integer.parseInt(str5);
       }
-      catch (NumberFormatException localNumberFormatException5)
+      catch (NumberFormatException localNumberFormatException4)
       {
         readTimeout = 1000;
         Logger.logMessage("Invalid value for readTimeout " + str5 + ", using default " + readTimeout);
@@ -204,7 +206,7 @@ public final class Nxt
       {
         pushThreshold = Integer.parseInt(str7);
       }
-      catch (NumberFormatException localNumberFormatException6)
+      catch (NumberFormatException localNumberFormatException5)
       {
         pushThreshold = 0;
         Logger.logMessage("Invalid value for pushThreshold " + str7 + ", using default " + pushThreshold);
@@ -215,7 +217,7 @@ public final class Nxt
       {
         pullThreshold = Integer.parseInt(str8);
       }
-      catch (NumberFormatException localNumberFormatException7)
+      catch (NumberFormatException localNumberFormatException6)
       {
         pullThreshold = 0;
         Logger.logMessage("Invalid value for pullThreshold " + str8 + ", using default " + pullThreshold);
@@ -258,7 +260,7 @@ public final class Nxt
       {
         blacklistingPeriod = Integer.parseInt((String)???);
       }
-      catch (NumberFormatException localNumberFormatException8)
+      catch (NumberFormatException localNumberFormatException7)
       {
         blacklistingPeriod = 300000;
         Logger.logMessage("Invalid value for blacklistingPeriod " + (String)??? + ", using default " + blacklistingPeriod);
@@ -269,7 +271,7 @@ public final class Nxt
       {
         communicationLoggingMask = Integer.parseInt(str10);
       }
-      catch (NumberFormatException localNumberFormatException9)
+      catch (NumberFormatException localNumberFormatException8)
       {
         Logger.logMessage("Invalid value for communicationLogginMask " + str10 + ", using default 0");
       }
@@ -279,7 +281,7 @@ public final class Nxt
       {
         sendToPeersLimit = Integer.parseInt(str11);
       }
-      catch (NumberFormatException localNumberFormatException10)
+      catch (NumberFormatException localNumberFormatException9)
       {
         sendToPeersLimit = 10;
         Logger.logMessage("Invalid value for sendToPeersLimit " + str11 + ", using default " + sendToPeersLimit);
@@ -288,7 +290,7 @@ public final class Nxt
       
       ThreadPools.start();
       
-      Logger.logMessage("NRS 0.6.1 started successfully.");
+      Logger.logMessage("NRS 0.6.2 started successfully.");
     }
     catch (Exception localException)
     {
@@ -378,6 +380,6 @@ public final class Nxt
     
     Blockchain.shutdown();
     
-    Logger.logMessage("NRS 0.6.1 stopped.");
+    Logger.logMessage("NRS 0.6.2 stopped.");
   }
 }

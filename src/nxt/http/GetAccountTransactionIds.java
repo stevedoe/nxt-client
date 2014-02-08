@@ -15,12 +15,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAccountTransactionIds
+public final class GetAccountTransactionIds
   extends HttpRequestHandler
 {
   static final GetAccountTransactionIds instance = new GetAccountTransactionIds();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str1 = paramHttpServletRequest.getParameter("account");
     String str2 = paramHttpServletRequest.getParameter("timestamp");

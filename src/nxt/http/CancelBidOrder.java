@@ -13,12 +13,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class CancelBidOrder
+public final class CancelBidOrder
   extends HttpRequestHandler
 {
   static final CancelBidOrder instance = new CancelBidOrder();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
     throws NxtException.ValidationException
   {
     String str1 = paramHttpServletRequest.getParameter("secretPhrase");

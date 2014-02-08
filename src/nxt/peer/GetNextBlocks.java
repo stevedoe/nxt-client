@@ -13,7 +13,7 @@ final class GetNextBlocks
 {
   static final GetNextBlocks instance = new GetNextBlocks();
   
-  public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     

@@ -12,12 +12,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class PlaceAskOrder
+public final class PlaceAskOrder
   extends HttpRequestHandler
 {
   static final PlaceAskOrder instance = new PlaceAskOrder();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
     throws NxtException.ValidationException
   {
     String str1 = paramHttpServletRequest.getParameter("secretPhrase");

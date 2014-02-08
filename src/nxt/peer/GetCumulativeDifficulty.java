@@ -10,7 +10,7 @@ final class GetCumulativeDifficulty
 {
   static final GetCumulativeDifficulty instance = new GetCumulativeDifficulty();
   
-  public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     

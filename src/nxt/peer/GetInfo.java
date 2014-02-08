@@ -11,7 +11,7 @@ final class GetInfo
 {
   static final GetInfo instance = new GetInfo();
   
-  public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     if (paramPeer != null)
@@ -25,46 +25,22 @@ final class GetInfo
         }
       }
       String str2 = (String)paramJSONObject.get("application");
-      if (str2 == null)
-      {
+      if (str2 == null) {
         str2 = "?";
       }
-      else
-      {
-        str2 = str2.trim();
-        if (str2.length() > 20) {
-          str2 = str2.substring(0, 20) + "...";
-        }
-      }
-      paramPeer.setApplication(str2);
+      paramPeer.setApplication(str2.trim());
       
       String str3 = (String)paramJSONObject.get("version");
-      if (str3 == null)
-      {
+      if (str3 == null) {
         str3 = "?";
       }
-      else
-      {
-        str3 = str3.trim();
-        if (str3.length() > 10) {
-          str3 = str3.substring(0, 10) + "...";
-        }
-      }
-      paramPeer.setVersion(str3);
+      paramPeer.setVersion(str3.trim());
       
       String str4 = (String)paramJSONObject.get("platform");
-      if (str4 == null)
-      {
+      if (str4 == null) {
         str4 = "?";
       }
-      else
-      {
-        str4 = str4.trim();
-        if (str4.length() > 10) {
-          str4 = str4.substring(0, 10) + "...";
-        }
-      }
-      paramPeer.setPlatform(str4);
+      paramPeer.setPlatform(str4.trim());
       
       paramPeer.setShareAddress(Boolean.TRUE.equals(paramJSONObject.get("shareAddress")));
     }
@@ -72,7 +48,7 @@ final class GetInfo
       localJSONObject.put("hallmark", Nxt.myHallmark);
     }
     localJSONObject.put("application", "NRS");
-    localJSONObject.put("version", "0.6.1");
+    localJSONObject.put("version", "0.6.2");
     localJSONObject.put("platform", Nxt.myPlatform);
     localJSONObject.put("shareAddress", Boolean.valueOf(Nxt.shareMyAddress));
     

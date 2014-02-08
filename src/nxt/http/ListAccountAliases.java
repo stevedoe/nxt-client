@@ -10,12 +10,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class ListAccountAliases
+public final class ListAccountAliases
   extends HttpRequestHandler
 {
   static final ListAccountAliases instance = new ListAccountAliases();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("account");
     if (str == null) {

@@ -12,7 +12,7 @@ final class RemoveKnownPeer
 {
   static final RemoveKnownPeer instance = new RemoveKnownPeer();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws IOException
   {
     if ((Nxt.allowedUserHosts == null) && (!InetAddress.getByName(paramHttpServletRequest.getRemoteAddr()).isLoopbackAddress())) {

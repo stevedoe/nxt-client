@@ -9,7 +9,7 @@ final class GetNewData
 {
   static final GetNewData instance = new GetNewData();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws IOException
   {
     return null;

@@ -11,7 +11,7 @@ final class GetNextBlockIds
 {
   static final GetNextBlockIds instance = new GetNextBlockIds();
   
-  public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     

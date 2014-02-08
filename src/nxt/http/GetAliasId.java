@@ -6,12 +6,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAliasId
+public final class GetAliasId
   extends HttpRequestHandler
 {
   static final GetAliasId instance = new GetAliasId();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str = paramHttpServletRequest.getParameter("alias");
     if (str == null) {

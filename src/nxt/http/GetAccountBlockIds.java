@@ -13,12 +13,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAccountBlockIds
+public final class GetAccountBlockIds
   extends HttpRequestHandler
 {
   static final GetAccountBlockIds instance = new GetAccountBlockIds();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     String str1 = paramHttpServletRequest.getParameter("account");
     String str2 = paramHttpServletRequest.getParameter("timestamp");

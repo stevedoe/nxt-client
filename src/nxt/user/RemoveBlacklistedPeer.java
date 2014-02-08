@@ -12,7 +12,7 @@ final class RemoveBlacklistedPeer
 {
   static final RemoveBlacklistedPeer instance = new RemoveBlacklistedPeer();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws IOException
   {
     if ((Nxt.allowedUserHosts == null) && (!InetAddress.getByName(paramHttpServletRequest.getRemoteAddr()).isLoopbackAddress())) {
@@ -22,7 +22,7 @@ final class RemoveBlacklistedPeer
     for (Peer localPeer : Peer.getAllPeers()) {
       if (localPeer.getIndex() == i)
       {
-        if (localPeer.getBlacklistingTime() <= 0L) {
+        if (!localPeer.isBlacklisted()) {
           break;
         }
         localPeer.removeBlacklistedStatus(); break;

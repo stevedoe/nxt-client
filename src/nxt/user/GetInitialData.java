@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Block;
 import nxt.Blockchain;
 import nxt.Genesis;
-import nxt.Nxt;
 import nxt.Transaction;
 import nxt.peer.Peer;
 import nxt.peer.Peer.State;
@@ -23,7 +21,7 @@ final class GetInitialData
 {
   static final GetInitialData instance = new GetInitialData();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws IOException
   {
     JSONArray localJSONArray1 = new JSONArray();
@@ -50,24 +48,24 @@ final class GetInitialData
       localObject2 = (Peer)((Iterator)localObject1).next();
       
       localObject3 = ((Peer)localObject2).getPeerAddress();
-      if (((Peer)localObject2).getBlacklistingTime() > 0L)
+      if (((Peer)localObject2).isBlacklisted())
       {
         localJSONObject = new JSONObject();
         localJSONObject.put("index", Integer.valueOf(((Peer)localObject2).getIndex()));
-        localJSONObject.put("announcedAddress", ((Peer)localObject2).getAnnouncedAddress().length() > 0 ? ((Peer)localObject2).getAnnouncedAddress() : ((Peer)localObject2).getAnnouncedAddress().length() > 30 ? ((Peer)localObject2).getAnnouncedAddress().substring(0, 30) + "..." : localObject3);
-        if (Nxt.wellKnownPeers.contains(((Peer)localObject2).getAnnouncedAddress())) {
+        localJSONObject.put("announcedAddress", Convert.truncate(((Peer)localObject2).getAnnouncedAddress(), (String)localObject3, 25, true));
+        if (((Peer)localObject2).isWellKnown()) {
           localJSONObject.put("wellKnown", Boolean.valueOf(true));
         }
         localJSONArray4.add(localJSONObject);
       }
       else if (((Peer)localObject2).getState() == Peer.State.NON_CONNECTED)
       {
-        if (((Peer)localObject2).getAnnouncedAddress().length() > 0)
+        if (((Peer)localObject2).getAnnouncedAddress() != null)
         {
           localJSONObject = new JSONObject();
           localJSONObject.put("index", Integer.valueOf(((Peer)localObject2).getIndex()));
-          localJSONObject.put("announcedAddress", ((Peer)localObject2).getAnnouncedAddress().length() > 30 ? ((Peer)localObject2).getAnnouncedAddress().substring(0, 30) + "..." : ((Peer)localObject2).getAnnouncedAddress());
-          if (Nxt.wellKnownPeers.contains(((Peer)localObject2).getAnnouncedAddress())) {
+          localJSONObject.put("announcedAddress", Convert.truncate(((Peer)localObject2).getAnnouncedAddress(), "", 25, true));
+          if (((Peer)localObject2).isWellKnown()) {
             localJSONObject.put("wellKnown", Boolean.valueOf(true));
           }
           localJSONArray3.add(localJSONObject);
@@ -80,13 +78,13 @@ final class GetInitialData
         if (((Peer)localObject2).getState() == Peer.State.DISCONNECTED) {
           localJSONObject.put("disconnected", Boolean.valueOf(true));
         }
-        localJSONObject.put("address", ((String)localObject3).length() > 30 ? ((String)localObject3).substring(0, 30) + "..." : localObject3);
-        localJSONObject.put("announcedAddress", ((Peer)localObject2).getAnnouncedAddress().length() > 30 ? ((Peer)localObject2).getAnnouncedAddress().substring(0, 30) + "..." : ((Peer)localObject2).getAnnouncedAddress());
+        localJSONObject.put("address", Convert.truncate((String)localObject3, "", 25, true));
+        localJSONObject.put("announcedAddress", Convert.truncate(((Peer)localObject2).getAnnouncedAddress(), "", 25, true));
         localJSONObject.put("weight", Integer.valueOf(((Peer)localObject2).getWeight()));
         localJSONObject.put("downloaded", Long.valueOf(((Peer)localObject2).getDownloadedVolume()));
         localJSONObject.put("uploaded", Long.valueOf(((Peer)localObject2).getUploadedVolume()));
         localJSONObject.put("software", ((Peer)localObject2).getSoftware());
-        if (Nxt.wellKnownPeers.contains(((Peer)localObject2).getAnnouncedAddress())) {
+        if (((Peer)localObject2).isWellKnown()) {
           localJSONObject.put("wellKnown", Boolean.valueOf(true));
         }
         localJSONArray2.add(localJSONObject);
@@ -122,7 +120,7 @@ final class GetInitialData
     }
     Object localObject3 = new JSONObject();
     ((JSONObject)localObject3).put("response", "processInitialData");
-    ((JSONObject)localObject3).put("version", "0.6.1");
+    ((JSONObject)localObject3).put("version", "0.6.2");
     if (localJSONArray1.size() > 0) {
       ((JSONObject)localObject3).put("unconfirmedTransactions", localJSONArray1);
     }

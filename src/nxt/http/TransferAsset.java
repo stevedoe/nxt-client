@@ -11,12 +11,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class TransferAsset
+public final class TransferAsset
   extends HttpRequestHandler
 {
   static final TransferAsset instance = new TransferAsset();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
     throws NxtException.ValidationException
   {
     String str1 = paramHttpServletRequest.getParameter("secretPhrase");

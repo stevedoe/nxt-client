@@ -12,7 +12,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetConstants
+public final class GetConstants
   extends HttpRequestHandler
 {
   static final GetConstants instance = new GetConstants();
@@ -101,7 +101,7 @@ final class GetConstants
     CONSTANTS = JSON.prepare(localJSONObject1);
   }
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     return CONSTANTS;
   }

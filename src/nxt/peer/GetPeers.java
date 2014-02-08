@@ -8,13 +8,13 @@ final class GetPeers
 {
   static final GetPeers instance = new GetPeers();
   
-  public JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     
     JSONArray localJSONArray = new JSONArray();
     for (Peer localPeer : Peer.getAllPeers()) {
-      if ((localPeer.getBlacklistingTime() == 0L) && (localPeer.getAnnouncedAddress().length() > 0) && (localPeer.getState() == Peer.State.CONNECTED) && (localPeer.shareAddress())) {
+      if ((!localPeer.isBlacklisted()) && (localPeer.getAnnouncedAddress() != null) && (localPeer.getState() == Peer.State.CONNECTED) && (localPeer.shareAddress())) {
         localJSONArray.add(localPeer.getAnnouncedAddress());
       }
     }

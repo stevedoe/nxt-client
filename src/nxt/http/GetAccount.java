@@ -9,7 +9,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetAccount
+public final class GetAccount
   extends HttpRequestHandler
 {
   static final GetAccount instance = new GetAccount();

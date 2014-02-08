@@ -13,7 +13,7 @@ final class RemoveActivePeer
 {
   static final RemoveActivePeer instance = new RemoveActivePeer();
   
-  public JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+  JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws IOException
   {
     if ((Nxt.allowedUserHosts == null) && (!InetAddress.getByName(paramHttpServletRequest.getRemoteAddr()).isLoopbackAddress())) {
@@ -23,7 +23,7 @@ final class RemoveActivePeer
     for (Peer localPeer : Peer.getAllPeers()) {
       if (localPeer.getIndex() == i)
       {
-        if ((localPeer.getBlacklistingTime() != 0L) || (localPeer.getState() == Peer.State.NON_CONNECTED)) {
+        if ((localPeer.isBlacklisted()) || (localPeer.getState() == Peer.State.NON_CONNECTED)) {
           break;
         }
         localPeer.deactivate(); break;
