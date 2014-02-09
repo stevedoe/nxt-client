@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
 public final class Nxt
   extends HttpServlet
 {
-  public static final String VERSION = "0.7.1";
+  public static final String VERSION = "0.7.2";
   public static final int BLOCK_HEADER_LENGTH = 224;
   public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
   public static final int MAX_PAYLOAD_LENGTH = 32640;
@@ -83,7 +83,7 @@ public final class Nxt
   public void init(ServletConfig paramServletConfig)
     throws ServletException
   {
-    Logger.logMessage("NRS 0.7.1 starting...");
+    Logger.logMessage("NRS 0.7.2 starting...");
     if (Logger.debug) {
       Logger.logMessage("DEBUG logging enabled");
     }
@@ -292,7 +292,7 @@ public final class Nxt
       
       ThreadPools.start();
       
-      Logger.logMessage("NRS 0.7.1 started successfully.");
+      Logger.logMessage("NRS 0.7.2 started successfully.");
     }
     catch (Exception localException)
     {
@@ -382,6 +382,6 @@ public final class Nxt
     
     Db.shutdown();
     
-    Logger.logMessage("NRS 0.7.1 stopped.");
+    Logger.logMessage("NRS 0.7.2 stopped.");
   }
 }

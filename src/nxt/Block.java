@@ -633,6 +633,7 @@ public final class Block
         Transaction localTransaction = (Transaction)localList.get(i3);
         localBlock.transactionIds[i3] = localTransaction.getId();
         localBlock.blockTransactions[i3] = localTransaction;
+        localTransaction.setBlock(localBlock);
       }
       localBlock.cumulativeDifficulty = localBigInteger;
       localBlock.baseTarget = l;

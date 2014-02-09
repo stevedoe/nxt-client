@@ -26,7 +26,7 @@ public final class GetState
   {
     JSONObject localJSONObject = new JSONObject();
     
-    localJSONObject.put("version", "0.7.1");
+    localJSONObject.put("version", "0.7.2");
     localJSONObject.put("time", Integer.valueOf(Convert.getEpochTime()));
     localJSONObject.put("lastBlock", Blockchain.getLastBlock().getStringId());
     localJSONObject.put("cumulativeDifficulty", Blockchain.getLastBlock().getCumulativeDifficulty().toString());
