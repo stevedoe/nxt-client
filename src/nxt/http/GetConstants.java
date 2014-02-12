@@ -13,7 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetConstants
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final GetConstants instance = new GetConstants();
   private static final JSONStreamAware CONSTANTS;

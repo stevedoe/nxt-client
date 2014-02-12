@@ -41,9 +41,9 @@ public final class ThreadPools
     
     scheduledThreadPool.scheduleWithFixedDelay(Blockchain.getMoreBlocksThread, 0L, 1L, TimeUnit.SECONDS);
     
-    scheduledThreadPool.scheduleWithFixedDelay(Blockchain.generateBlockThread, 0L, 1L, TimeUnit.SECONDS);
-    
     scheduledThreadPool.scheduleWithFixedDelay(Blockchain.rebroadcastTransactionsThread, 0L, 60L, TimeUnit.SECONDS);
+    
+    scheduledThreadPool.scheduleWithFixedDelay(Generator.generateBlockThread, 0L, 1L, TimeUnit.SECONDS);
   }
   
   static void shutdown()

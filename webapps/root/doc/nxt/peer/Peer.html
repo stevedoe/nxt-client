@@ -34,7 +34,7 @@
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../nxt/peer/HttpJSONRequestHandler.html" title="class in nxt.peer"><span class="strong">Prev Class</span></a></li>
-<li><a href="../../nxt/peer/Peer.State.html" title="enum in nxt.peer"><span class="strong">Next Class</span></a></li>
+<li><a href="../../nxt/peer/Peer.Event.html" title="enum in nxt.peer"><span class="strong">Next Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../index.html?nxt/peer/Peer.html" target="_top">Frames</a></li>
@@ -120,6 +120,10 @@ implements java.lang.Comparable&lt;<a href="../../nxt/peer/Peer.html" title="cla
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/peer/Peer.Event.html" title="enum in nxt.peer">Peer.Event</a></strong></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.State.html" title="enum in nxt.peer">Peer.State</a></strong></code>&nbsp;</td>
 </tr>
 </table>
@@ -165,98 +169,108 @@ implements java.lang.Comparable&lt;<a href="../../nxt/peer/Peer.html" title="cla
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#addListener(nxt.util.Listener, nxt.peer.Peer.Event)">addListener</a></strong>(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;<a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a>&gt;&nbsp;listener,
+           <a href="../../nxt/peer/Peer.Event.html" title="enum in nxt.peer">Peer.Event</a>&nbsp;eventType)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>static <a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a></code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#addPeer(java.lang.String, java.lang.String)">addPeer</a></strong>(java.lang.String&nbsp;address,
        java.lang.String&nbsp;announcedAddress)</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#blacklist()">blacklist</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#blacklist(nxt.NxtException)">blacklist</a></strong>(<a href="../../nxt/NxtException.html" title="class in nxt">NxtException</a>&nbsp;cause)</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#compareTo(nxt.peer.Peer)">compareTo</a></strong>(<a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a>&nbsp;o)</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#deactivate()">deactivate</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.util.Collection&lt;<a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a>&gt;</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getAllPeers()">getAllPeers</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getAnnouncedAddress()">getAnnouncedAddress</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static <a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a></code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getAnyPeer(nxt.peer.Peer.State, boolean)">getAnyPeer</a></strong>(<a href="../../nxt/peer/Peer.State.html" title="enum in nxt.peer">Peer.State</a>&nbsp;state,
           boolean&nbsp;applyPullThreshold)</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getApplication()">getApplication</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getDownloadedVolume()">getDownloadedVolume</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getHallmark()">getHallmark</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getIndex()">getIndex</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static <a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a></code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getPeer(java.lang.String)">getPeer</a></strong>(java.lang.String&nbsp;peerAddress)</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getPeerAddress()">getPeerAddress</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getPlatform()">getPlatform</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getSoftware()">getSoftware</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../nxt/peer/Peer.State.html" title="enum in nxt.peer">Peer.State</a></code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getState()">getState</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getUploadedVolume()">getUploadedVolume</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getVersion()">getVersion</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#getWeight()">getWeight</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#isBlacklisted()">isBlacklisted</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#isWellKnown()">isWellKnown</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#removeBlacklistedStatus()">removeBlacklistedStatus</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#removeListener(nxt.util.Listener, nxt.peer.Peer.Event)">removeListener</a></strong>(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;<a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a>&gt;&nbsp;listener,
+              <a href="../../nxt/peer/Peer.Event.html" title="enum in nxt.peer">Peer.Event</a>&nbsp;eventType)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
@@ -273,10 +287,6 @@ implements java.lang.Comparable&lt;<a href="../../nxt/peer/Peer.html" title="cla
 <tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#shareAddress()">shareAddress</a></strong>()</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><strong><a href="../../nxt/peer/Peer.html#updatePeerWeights(nxt.Account)">updatePeerWeights</a></strong>(<a href="../../nxt/Account.html" title="class in nxt">Account</a>&nbsp;account)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -335,6 +345,26 @@ implements java.lang.Comparable&lt;<a href="../../nxt/peer/Peer.html" title="cla
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="addListener(nxt.util.Listener, nxt.peer.Peer.Event)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addListener</h4>
+<pre>public static&nbsp;boolean&nbsp;addListener(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;<a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a>&gt;&nbsp;listener,
+                  <a href="../../nxt/peer/Peer.Event.html" title="enum in nxt.peer">Peer.Event</a>&nbsp;eventType)</pre>
+</li>
+</ul>
+<a name="removeListener(nxt.util.Listener, nxt.peer.Peer.Event)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeListener</h4>
+<pre>public static&nbsp;boolean&nbsp;removeListener(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;<a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a>&gt;&nbsp;listener,
+                     <a href="../../nxt/peer/Peer.Event.html" title="enum in nxt.peer">Peer.Event</a>&nbsp;eventType)</pre>
+</li>
+</ul>
 <a name="getAllPeers()">
 <!--   -->
 </a>
@@ -361,15 +391,6 @@ implements java.lang.Comparable&lt;<a href="../../nxt/peer/Peer.html" title="cla
 <h4>addPeer</h4>
 <pre>public static&nbsp;<a href="../../nxt/peer/Peer.html" title="class in nxt.peer">Peer</a>&nbsp;addPeer(java.lang.String&nbsp;address,
            java.lang.String&nbsp;announcedAddress)</pre>
-</li>
-</ul>
-<a name="updatePeerWeights(nxt.Account)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>updatePeerWeights</h4>
-<pre>public static&nbsp;void&nbsp;updatePeerWeights(<a href="../../nxt/Account.html" title="class in nxt">Account</a>&nbsp;account)</pre>
 </li>
 </ul>
 <a name="sendToSomePeers(org.json.simple.JSONObject)">
@@ -619,7 +640,7 @@ implements java.lang.Comparable&lt;<a href="../../nxt/peer/Peer.html" title="cla
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../nxt/peer/HttpJSONRequestHandler.html" title="class in nxt.peer"><span class="strong">Prev Class</span></a></li>
-<li><a href="../../nxt/peer/Peer.State.html" title="enum in nxt.peer"><span class="strong">Next Class</span></a></li>
+<li><a href="../../nxt/peer/Peer.Event.html" title="enum in nxt.peer"><span class="strong">Next Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../index.html?nxt/peer/Peer.html" target="_top">Frames</a></li>

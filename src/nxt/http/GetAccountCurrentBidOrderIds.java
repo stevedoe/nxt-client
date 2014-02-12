@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetAccountCurrentBidOrderIds
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final GetAccountCurrentBidOrderIds instance = new GetAccountCurrentBidOrderIds();
   

@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,62 +35,21 @@ public final class Transaction
   private static final byte SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT = 3;
   private static final byte SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION = 4;
   private static final byte SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION = 5;
-  public static final Comparator<Transaction> timestampComparator = new Comparator()
-  {
-    public int compare(Transaction paramAnonymousTransaction1, Transaction paramAnonymousTransaction2)
-    {
-      return paramAnonymousTransaction1.timestamp > paramAnonymousTransaction2.timestamp ? 1 : paramAnonymousTransaction1.timestamp < paramAnonymousTransaction2.timestamp ? -1 : 0;
-    }
-  };
   private final short deadline;
   private final byte[] senderPublicKey;
   private final Long recipientId;
   private final int amount;
   private final int fee;
   private final Long referencedTransactionId;
+  private final Type type;
   private int index;
   private int height;
   private Long blockId;
   private volatile Block block;
   private byte[] signature;
   private int timestamp;
-  private final Type type;
   private Attachment attachment;
   private volatile Long id;
-  
-  public static Transaction getTransaction(byte[] paramArrayOfByte)
-    throws NxtException.ValidationException
-  {
-    try
-    {
-      ByteBuffer localByteBuffer = ByteBuffer.wrap(paramArrayOfByte);
-      localByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-      
-      byte b1 = localByteBuffer.get();
-      byte b2 = localByteBuffer.get();
-      int i = localByteBuffer.getInt();
-      short s = localByteBuffer.getShort();
-      byte[] arrayOfByte1 = new byte[32];
-      localByteBuffer.get(arrayOfByte1);
-      Long localLong1 = Long.valueOf(localByteBuffer.getLong());
-      int j = localByteBuffer.getInt();
-      int k = localByteBuffer.getInt();
-      Long localLong2 = Convert.zeroToNull(localByteBuffer.getLong());
-      byte[] arrayOfByte2 = new byte[64];
-      localByteBuffer.get(arrayOfByte2);
-      
-      Type localType = findTransactionType(b1, b2);
-      Transaction localTransaction = new Transaction(localType, i, s, arrayOfByte1, localLong1, j, k, localLong2, arrayOfByte2);
-      if (!localType.loadAttachment(localTransaction, localByteBuffer)) {
-        throw new NxtException.ValidationException("Invalid transaction attachment:\n" + localTransaction.attachment.getJSON());
-      }
-      return localTransaction;
-    }
-    catch (RuntimeException localRuntimeException)
-    {
-      throw new NxtException.ValidationException(localRuntimeException.toString());
-    }
-  }
   
   public static Transaction newTransaction(int paramInt1, short paramShort, byte[] paramArrayOfByte, Long paramLong1, int paramInt2, int paramInt3, Long paramLong2)
     throws NxtException.ValidationException
@@ -118,35 +76,35 @@ public final class Transaction
   static Transaction findTransaction(Long paramLong)
   {
     // Byte code:
-    //   0: invokestatic 34	nxt/Db:getConnection	()Ljava/sql/Connection;
+    //   0: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
     //   3: astore_1
     //   4: aconst_null
     //   5: astore_2
     //   6: aload_1
-    //   7: ldc 35
-    //   9: invokeinterface 36 2 0
+    //   7: ldc 11
+    //   9: invokeinterface 12 2 0
     //   14: astore_3
     //   15: aconst_null
     //   16: astore 4
     //   18: aload_3
     //   19: iconst_1
     //   20: aload_0
-    //   21: invokevirtual 37	java/lang/Long:longValue	()J
-    //   24: invokeinterface 38 4 0
+    //   21: invokevirtual 13	java/lang/Long:longValue	()J
+    //   24: invokeinterface 14 4 0
     //   29: aload_3
-    //   30: invokeinterface 39 1 0
+    //   30: invokeinterface 15 1 0
     //   35: astore 5
     //   37: aconst_null
     //   38: astore 6
     //   40: aload 5
-    //   42: invokeinterface 40 1 0
+    //   42: invokeinterface 16 1 0
     //   47: ifeq +11 -> 58
     //   50: aload_1
     //   51: aload 5
-    //   53: invokestatic 41	nxt/Transaction:getTransaction	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Transaction;
+    //   53: invokestatic 17	nxt/Transaction:getTransaction	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Transaction;
     //   56: astore 6
     //   58: aload 5
-    //   60: invokeinterface 42 1 0
+    //   60: invokeinterface 18 1 0
     //   65: aload 6
     //   67: astore 7
     //   69: aload_3
@@ -154,29 +112,29 @@ public final class Transaction
     //   73: aload 4
     //   75: ifnull +24 -> 99
     //   78: aload_3
-    //   79: invokeinterface 43 1 0
+    //   79: invokeinterface 19 1 0
     //   84: goto +21 -> 105
     //   87: astore 8
     //   89: aload 4
     //   91: aload 8
-    //   93: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   93: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   96: goto +9 -> 105
     //   99: aload_3
-    //   100: invokeinterface 43 1 0
+    //   100: invokeinterface 19 1 0
     //   105: aload_1
     //   106: ifnull +33 -> 139
     //   109: aload_2
     //   110: ifnull +23 -> 133
     //   113: aload_1
-    //   114: invokeinterface 46 1 0
+    //   114: invokeinterface 22 1 0
     //   119: goto +20 -> 139
     //   122: astore 8
     //   124: aload_2
     //   125: aload 8
-    //   127: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   127: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   130: goto +9 -> 139
     //   133: aload_1
-    //   134: invokeinterface 46 1 0
+    //   134: invokeinterface 22 1 0
     //   139: aload 7
     //   141: areturn
     //   142: astore 5
@@ -190,15 +148,15 @@ public final class Transaction
     //   157: aload 4
     //   159: ifnull +24 -> 183
     //   162: aload_3
-    //   163: invokeinterface 43 1 0
+    //   163: invokeinterface 19 1 0
     //   168: goto +21 -> 189
     //   171: astore 10
     //   173: aload 4
     //   175: aload 10
-    //   177: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   177: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   180: goto +9 -> 189
     //   183: aload_3
-    //   184: invokeinterface 43 1 0
+    //   184: invokeinterface 19 1 0
     //   189: aload 9
     //   191: athrow
     //   192: astore_3
@@ -212,59 +170,59 @@ public final class Transaction
     //   203: aload_2
     //   204: ifnull +23 -> 227
     //   207: aload_1
-    //   208: invokeinterface 46 1 0
+    //   208: invokeinterface 22 1 0
     //   213: goto +20 -> 233
     //   216: astore 12
     //   218: aload_2
     //   219: aload 12
-    //   221: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   221: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   224: goto +9 -> 233
     //   227: aload_1
-    //   228: invokeinterface 46 1 0
+    //   228: invokeinterface 22 1 0
     //   233: aload 11
     //   235: athrow
     //   236: astore_1
-    //   237: new 30	java/lang/RuntimeException
+    //   237: new 24	java/lang/RuntimeException
     //   240: dup
     //   241: aload_1
-    //   242: invokevirtual 48	java/sql/SQLException:getMessage	()Ljava/lang/String;
+    //   242: invokevirtual 25	java/sql/SQLException:getMessage	()Ljava/lang/String;
     //   245: aload_1
-    //   246: invokespecial 49	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
+    //   246: invokespecial 26	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   249: athrow
     //   250: astore_1
-    //   251: new 30	java/lang/RuntimeException
+    //   251: new 24	java/lang/RuntimeException
     //   254: dup
-    //   255: new 22	java/lang/StringBuilder
+    //   255: new 28	java/lang/StringBuilder
     //   258: dup
-    //   259: invokespecial 23	java/lang/StringBuilder:<init>	()V
-    //   262: ldc 50
-    //   264: invokevirtual 25	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    //   259: invokespecial 29	java/lang/StringBuilder:<init>	()V
+    //   262: ldc 30
+    //   264: invokevirtual 31	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
     //   267: aload_0
-    //   268: invokevirtual 27	java/lang/StringBuilder:append	(Ljava/lang/Object;)Ljava/lang/StringBuilder;
-    //   271: ldc 51
-    //   273: invokevirtual 25	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   276: invokevirtual 28	java/lang/StringBuilder:toString	()Ljava/lang/String;
-    //   279: invokespecial 52	java/lang/RuntimeException:<init>	(Ljava/lang/String;)V
+    //   268: invokevirtual 32	java/lang/StringBuilder:append	(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+    //   271: ldc 33
+    //   273: invokevirtual 31	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    //   276: invokevirtual 34	java/lang/StringBuilder:toString	()Ljava/lang/String;
+    //   279: invokespecial 35	java/lang/RuntimeException:<init>	(Ljava/lang/String;)V
     //   282: athrow
     // Line number table:
-    //   Java source line #105	-> byte code offset #0
-    //   Java source line #106	-> byte code offset #6
-    //   Java source line #105	-> byte code offset #15
-    //   Java source line #107	-> byte code offset #18
-    //   Java source line #108	-> byte code offset #29
-    //   Java source line #109	-> byte code offset #37
-    //   Java source line #110	-> byte code offset #40
-    //   Java source line #111	-> byte code offset #50
-    //   Java source line #113	-> byte code offset #58
-    //   Java source line #114	-> byte code offset #65
-    //   Java source line #115	-> byte code offset #69
-    //   Java source line #105	-> byte code offset #142
-    //   Java source line #115	-> byte code offset #151
-    //   Java source line #105	-> byte code offset #192
-    //   Java source line #115	-> byte code offset #197
-    //   Java source line #116	-> byte code offset #237
-    //   Java source line #117	-> byte code offset #250
-    //   Java source line #118	-> byte code offset #251
+    //   Java source line #64	-> byte code offset #0
+    //   Java source line #65	-> byte code offset #6
+    //   Java source line #64	-> byte code offset #15
+    //   Java source line #66	-> byte code offset #18
+    //   Java source line #67	-> byte code offset #29
+    //   Java source line #68	-> byte code offset #37
+    //   Java source line #69	-> byte code offset #40
+    //   Java source line #70	-> byte code offset #50
+    //   Java source line #72	-> byte code offset #58
+    //   Java source line #73	-> byte code offset #65
+    //   Java source line #74	-> byte code offset #69
+    //   Java source line #64	-> byte code offset #142
+    //   Java source line #74	-> byte code offset #151
+    //   Java source line #64	-> byte code offset #192
+    //   Java source line #74	-> byte code offset #197
+    //   Java source line #75	-> byte code offset #237
+    //   Java source line #76	-> byte code offset #250
+    //   Java source line #77	-> byte code offset #251
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	283	0	paramLong	Long
@@ -307,55 +265,55 @@ public final class Transaction
   static boolean hasTransaction(Long paramLong)
   {
     // Byte code:
-    //   0: invokestatic 34	nxt/Db:getConnection	()Ljava/sql/Connection;
+    //   0: invokestatic 10	nxt/Db:getConnection	()Ljava/sql/Connection;
     //   3: astore_1
     //   4: aconst_null
     //   5: astore_2
     //   6: aload_1
-    //   7: ldc 53
-    //   9: invokeinterface 36 2 0
+    //   7: ldc 36
+    //   9: invokeinterface 12 2 0
     //   14: astore_3
     //   15: aconst_null
     //   16: astore 4
     //   18: aload_3
     //   19: iconst_1
     //   20: aload_0
-    //   21: invokevirtual 37	java/lang/Long:longValue	()J
-    //   24: invokeinterface 38 4 0
+    //   21: invokevirtual 13	java/lang/Long:longValue	()J
+    //   24: invokeinterface 14 4 0
     //   29: aload_3
-    //   30: invokeinterface 39 1 0
+    //   30: invokeinterface 15 1 0
     //   35: astore 5
     //   37: aload 5
-    //   39: invokeinterface 40 1 0
+    //   39: invokeinterface 16 1 0
     //   44: istore 6
     //   46: aload_3
     //   47: ifnull +35 -> 82
     //   50: aload 4
     //   52: ifnull +24 -> 76
     //   55: aload_3
-    //   56: invokeinterface 43 1 0
+    //   56: invokeinterface 19 1 0
     //   61: goto +21 -> 82
     //   64: astore 7
     //   66: aload 4
     //   68: aload 7
-    //   70: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   70: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   73: goto +9 -> 82
     //   76: aload_3
-    //   77: invokeinterface 43 1 0
+    //   77: invokeinterface 19 1 0
     //   82: aload_1
     //   83: ifnull +33 -> 116
     //   86: aload_2
     //   87: ifnull +23 -> 110
     //   90: aload_1
-    //   91: invokeinterface 46 1 0
+    //   91: invokeinterface 22 1 0
     //   96: goto +20 -> 116
     //   99: astore 7
     //   101: aload_2
     //   102: aload 7
-    //   104: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   104: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   107: goto +9 -> 116
     //   110: aload_1
-    //   111: invokeinterface 46 1 0
+    //   111: invokeinterface 22 1 0
     //   116: iload 6
     //   118: ireturn
     //   119: astore 5
@@ -369,15 +327,15 @@ public final class Transaction
     //   134: aload 4
     //   136: ifnull +24 -> 160
     //   139: aload_3
-    //   140: invokeinterface 43 1 0
+    //   140: invokeinterface 19 1 0
     //   145: goto +21 -> 166
     //   148: astore 9
     //   150: aload 4
     //   152: aload 9
-    //   154: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   154: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   157: goto +9 -> 166
     //   160: aload_3
-    //   161: invokeinterface 43 1 0
+    //   161: invokeinterface 19 1 0
     //   166: aload 8
     //   168: athrow
     //   169: astore_3
@@ -391,38 +349,38 @@ public final class Transaction
     //   180: aload_2
     //   181: ifnull +23 -> 204
     //   184: aload_1
-    //   185: invokeinterface 46 1 0
+    //   185: invokeinterface 22 1 0
     //   190: goto +20 -> 210
     //   193: astore 11
     //   195: aload_2
     //   196: aload 11
-    //   198: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   198: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   201: goto +9 -> 210
     //   204: aload_1
-    //   205: invokeinterface 46 1 0
+    //   205: invokeinterface 22 1 0
     //   210: aload 10
     //   212: athrow
     //   213: astore_1
-    //   214: new 30	java/lang/RuntimeException
+    //   214: new 24	java/lang/RuntimeException
     //   217: dup
     //   218: aload_1
-    //   219: invokevirtual 48	java/sql/SQLException:getMessage	()Ljava/lang/String;
+    //   219: invokevirtual 25	java/sql/SQLException:getMessage	()Ljava/lang/String;
     //   222: aload_1
-    //   223: invokespecial 49	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
+    //   223: invokespecial 26	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   226: athrow
     // Line number table:
-    //   Java source line #123	-> byte code offset #0
-    //   Java source line #124	-> byte code offset #6
-    //   Java source line #123	-> byte code offset #15
-    //   Java source line #125	-> byte code offset #18
-    //   Java source line #126	-> byte code offset #29
-    //   Java source line #127	-> byte code offset #37
-    //   Java source line #128	-> byte code offset #46
-    //   Java source line #123	-> byte code offset #119
-    //   Java source line #128	-> byte code offset #128
-    //   Java source line #123	-> byte code offset #169
-    //   Java source line #128	-> byte code offset #174
-    //   Java source line #129	-> byte code offset #214
+    //   Java source line #82	-> byte code offset #0
+    //   Java source line #83	-> byte code offset #6
+    //   Java source line #82	-> byte code offset #15
+    //   Java source line #84	-> byte code offset #18
+    //   Java source line #85	-> byte code offset #29
+    //   Java source line #86	-> byte code offset #37
+    //   Java source line #87	-> byte code offset #46
+    //   Java source line #82	-> byte code offset #119
+    //   Java source line #87	-> byte code offset #128
+    //   Java source line #82	-> byte code offset #169
+    //   Java source line #87	-> byte code offset #174
+    //   Java source line #88	-> byte code offset #214
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	227	0	paramLong	Long
@@ -455,6 +413,40 @@ public final class Transaction
     //   184	190	193	java/lang/Throwable
     //   0	116	213	java/sql/SQLException
     //   119	213	213	java/sql/SQLException
+  }
+  
+  public static Transaction getTransaction(byte[] paramArrayOfByte)
+    throws NxtException.ValidationException
+  {
+    try
+    {
+      ByteBuffer localByteBuffer = ByteBuffer.wrap(paramArrayOfByte);
+      localByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+      
+      byte b1 = localByteBuffer.get();
+      byte b2 = localByteBuffer.get();
+      int i = localByteBuffer.getInt();
+      short s = localByteBuffer.getShort();
+      byte[] arrayOfByte1 = new byte[32];
+      localByteBuffer.get(arrayOfByte1);
+      Long localLong1 = Long.valueOf(localByteBuffer.getLong());
+      int j = localByteBuffer.getInt();
+      int k = localByteBuffer.getInt();
+      Long localLong2 = Convert.zeroToNull(localByteBuffer.getLong());
+      byte[] arrayOfByte2 = new byte[64];
+      localByteBuffer.get(arrayOfByte2);
+      
+      Type localType = findTransactionType(b1, b2);
+      Transaction localTransaction = new Transaction(localType, i, s, arrayOfByte1, localLong1, j, k, localLong2, arrayOfByte2);
+      if (!localType.loadAttachment(localTransaction, localByteBuffer)) {
+        throw new NxtException.ValidationException("Invalid transaction attachment:\n" + localTransaction.attachment.getJSON());
+      }
+      return localTransaction;
+    }
+    catch (RuntimeException localRuntimeException)
+    {
+      throw new NxtException.ValidationException(localRuntimeException.toString());
+    }
   }
   
   static Transaction getTransaction(JSONObject paramJSONObject)
@@ -518,7 +510,7 @@ public final class Transaction
       localTransaction.index = paramResultSet.getInt("index");
       localTransaction.height = paramResultSet.getInt("height");
       localTransaction.id = Long.valueOf(paramResultSet.getLong("id"));
-      localTransaction.senderAccountId = Long.valueOf(paramResultSet.getLong("sender_account_id"));
+      localTransaction.senderId = Long.valueOf(paramResultSet.getLong("sender_id"));
       
       localTransaction.attachment = ((Attachment)paramResultSet.getObject("attachment"));
       
@@ -534,36 +526,36 @@ public final class Transaction
   static java.util.List<Transaction> findBlockTransactions(Connection paramConnection, Long paramLong)
   {
     // Byte code:
-    //   0: new 98	java/util/ArrayList
+    //   0: new 97	java/util/ArrayList
     //   3: dup
-    //   4: invokespecial 99	java/util/ArrayList:<init>	()V
+    //   4: invokespecial 98	java/util/ArrayList:<init>	()V
     //   7: astore_2
     //   8: aload_0
-    //   9: ldc 100
-    //   11: invokeinterface 36 2 0
+    //   9: ldc 99
+    //   11: invokeinterface 12 2 0
     //   16: astore_3
     //   17: aconst_null
     //   18: astore 4
     //   20: aload_3
     //   21: iconst_1
     //   22: aload_1
-    //   23: invokevirtual 37	java/lang/Long:longValue	()J
-    //   26: invokeinterface 38 4 0
+    //   23: invokevirtual 13	java/lang/Long:longValue	()J
+    //   26: invokeinterface 14 4 0
     //   31: aload_3
-    //   32: invokeinterface 39 1 0
+    //   32: invokeinterface 15 1 0
     //   37: astore 5
     //   39: aload 5
-    //   41: invokeinterface 40 1 0
+    //   41: invokeinterface 16 1 0
     //   46: ifeq +19 -> 65
     //   49: aload_2
     //   50: aload_0
     //   51: aload 5
-    //   53: invokestatic 41	nxt/Transaction:getTransaction	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Transaction;
-    //   56: invokeinterface 101 2 0
+    //   53: invokestatic 17	nxt/Transaction:getTransaction	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Transaction;
+    //   56: invokeinterface 100 2 0
     //   61: pop
     //   62: goto -23 -> 39
     //   65: aload 5
-    //   67: invokeinterface 42 1 0
+    //   67: invokeinterface 18 1 0
     //   72: aload_2
     //   73: astore 6
     //   75: aload_3
@@ -571,15 +563,15 @@ public final class Transaction
     //   79: aload 4
     //   81: ifnull +24 -> 105
     //   84: aload_3
-    //   85: invokeinterface 43 1 0
+    //   85: invokeinterface 19 1 0
     //   90: goto +21 -> 111
     //   93: astore 7
     //   95: aload 4
     //   97: aload 7
-    //   99: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   99: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   102: goto +9 -> 111
     //   105: aload_3
-    //   106: invokeinterface 43 1 0
+    //   106: invokeinterface 19 1 0
     //   111: aload 6
     //   113: areturn
     //   114: astore 5
@@ -593,55 +585,55 @@ public final class Transaction
     //   129: aload 4
     //   131: ifnull +24 -> 155
     //   134: aload_3
-    //   135: invokeinterface 43 1 0
+    //   135: invokeinterface 19 1 0
     //   140: goto +21 -> 161
     //   143: astore 9
     //   145: aload 4
     //   147: aload 9
-    //   149: invokevirtual 45	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
+    //   149: invokevirtual 21	java/lang/Throwable:addSuppressed	(Ljava/lang/Throwable;)V
     //   152: goto +9 -> 161
     //   155: aload_3
-    //   156: invokeinterface 43 1 0
+    //   156: invokeinterface 19 1 0
     //   161: aload 8
     //   163: athrow
     //   164: astore_3
-    //   165: new 30	java/lang/RuntimeException
+    //   165: new 24	java/lang/RuntimeException
     //   168: dup
     //   169: aload_3
-    //   170: invokevirtual 97	java/sql/SQLException:toString	()Ljava/lang/String;
+    //   170: invokevirtual 96	java/sql/SQLException:toString	()Ljava/lang/String;
     //   173: aload_3
-    //   174: invokespecial 49	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
+    //   174: invokespecial 26	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   177: athrow
     //   178: astore_3
-    //   179: new 30	java/lang/RuntimeException
+    //   179: new 24	java/lang/RuntimeException
     //   182: dup
-    //   183: new 22	java/lang/StringBuilder
+    //   183: new 28	java/lang/StringBuilder
     //   186: dup
-    //   187: invokespecial 23	java/lang/StringBuilder:<init>	()V
-    //   190: ldc 102
-    //   192: invokevirtual 25	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    //   187: invokespecial 29	java/lang/StringBuilder:<init>	()V
+    //   190: ldc 101
+    //   192: invokevirtual 31	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
     //   195: aload_1
-    //   196: invokevirtual 27	java/lang/StringBuilder:append	(Ljava/lang/Object;)Ljava/lang/StringBuilder;
-    //   199: ldc 103
-    //   201: invokevirtual 25	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   204: invokevirtual 28	java/lang/StringBuilder:toString	()Ljava/lang/String;
-    //   207: invokespecial 52	java/lang/RuntimeException:<init>	(Ljava/lang/String;)V
+    //   196: invokevirtual 32	java/lang/StringBuilder:append	(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+    //   199: ldc 102
+    //   201: invokevirtual 31	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    //   204: invokevirtual 34	java/lang/StringBuilder:toString	()Ljava/lang/String;
+    //   207: invokespecial 35	java/lang/RuntimeException:<init>	(Ljava/lang/String;)V
     //   210: athrow
     // Line number table:
-    //   Java source line #202	-> byte code offset #0
-    //   Java source line #203	-> byte code offset #8
-    //   Java source line #204	-> byte code offset #20
-    //   Java source line #205	-> byte code offset #31
-    //   Java source line #206	-> byte code offset #39
-    //   Java source line #207	-> byte code offset #49
-    //   Java source line #209	-> byte code offset #65
-    //   Java source line #210	-> byte code offset #72
-    //   Java source line #211	-> byte code offset #75
-    //   Java source line #203	-> byte code offset #114
-    //   Java source line #211	-> byte code offset #123
-    //   Java source line #212	-> byte code offset #165
-    //   Java source line #213	-> byte code offset #178
-    //   Java source line #214	-> byte code offset #179
+    //   Java source line #195	-> byte code offset #0
+    //   Java source line #196	-> byte code offset #8
+    //   Java source line #197	-> byte code offset #20
+    //   Java source line #198	-> byte code offset #31
+    //   Java source line #199	-> byte code offset #39
+    //   Java source line #200	-> byte code offset #49
+    //   Java source line #202	-> byte code offset #65
+    //   Java source line #203	-> byte code offset #72
+    //   Java source line #204	-> byte code offset #75
+    //   Java source line #196	-> byte code offset #114
+    //   Java source line #204	-> byte code offset #123
+    //   Java source line #205	-> byte code offset #165
+    //   Java source line #206	-> byte code offset #178
+    //   Java source line #207	-> byte code offset #179
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	211	0	paramConnection	Connection
@@ -675,7 +667,7 @@ public final class Transaction
     {
       for (Transaction localTransaction : paramVarArgs)
       {
-        PreparedStatement localPreparedStatement = paramConnection.prepareStatement("INSERT INTO transaction (id, deadline, sender_public_key, recipient_id, amount, fee, referenced_transaction_id, index, height, block_id, signature, timestamp, type, subtype, sender_account_id, attachment)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");Object localObject1 = null;
+        PreparedStatement localPreparedStatement = paramConnection.prepareStatement("INSERT INTO transaction (id, deadline, sender_public_key, recipient_id, amount, fee, referenced_transaction_id, index, height, block_id, signature, timestamp, type, subtype, sender_id, attachment)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");Object localObject1 = null;
         try
         {
           localPreparedStatement.setLong(1, localTransaction.getId().longValue());
@@ -696,7 +688,7 @@ public final class Transaction
           localPreparedStatement.setInt(12, localTransaction.timestamp);
           localPreparedStatement.setByte(13, localTransaction.type.getType());
           localPreparedStatement.setByte(14, localTransaction.type.getSubtype());
-          localPreparedStatement.setLong(15, localTransaction.getSenderAccountId().longValue());
+          localPreparedStatement.setLong(15, localTransaction.getSenderId().longValue());
           if (localTransaction.attachment != null) {
             localPreparedStatement.setObject(16, localTransaction.attachment);
           } else {
@@ -734,7 +726,7 @@ public final class Transaction
   }
   
   private volatile String stringId = null;
-  private volatile Long senderAccountId;
+  private volatile Long senderId;
   private volatile String hash;
   private static final int TRANSACTION_BYTES_LENGTH = 128;
   
@@ -816,11 +808,6 @@ public final class Transaction
     this.height = paramBlock.getHeight();
   }
   
-  void setHeight(int paramInt)
-  {
-    this.height = paramInt;
-  }
-  
   public int getIndex()
   {
     return this.index;
@@ -850,6 +837,9 @@ public final class Transaction
   {
     if (this.id == null)
     {
+      if (this.signature == null) {
+        throw new IllegalStateException("Transaction is not signed yet");
+      }
       byte[] arrayOfByte = Crypto.sha256().digest(getBytes());
       BigInteger localBigInteger = new BigInteger(1, new byte[] { arrayOfByte[7], arrayOfByte[6], arrayOfByte[5], arrayOfByte[4], arrayOfByte[3], arrayOfByte[2], arrayOfByte[1], arrayOfByte[0] });
       this.id = Long.valueOf(localBigInteger.longValue());
@@ -870,12 +860,12 @@ public final class Transaction
     return this.stringId;
   }
   
-  public Long getSenderAccountId()
+  public Long getSenderId()
   {
-    if (this.senderAccountId == null) {
-      this.senderAccountId = Account.getId(this.senderPublicKey);
+    if (this.senderId == null) {
+      this.senderId = Account.getId(this.senderPublicKey);
     }
-    return this.senderAccountId;
+    return this.senderId;
   }
   
   public int compareTo(Transaction paramTransaction)
@@ -970,6 +960,19 @@ public final class Transaction
     }
   }
   
+  public String getHash()
+  {
+    if (this.hash == null)
+    {
+      byte[] arrayOfByte = getBytes();
+      for (int i = 64; i < 128; i++) {
+        arrayOfByte[i] = 0;
+      }
+      this.hash = Convert.convert(Crypto.sha256().digest(arrayOfByte));
+    }
+    return this.hash;
+  }
+  
   public boolean equals(Object paramObject)
   {
     return ((paramObject instanceof Transaction)) && (getId().equals(((Transaction)paramObject).getId()));
@@ -982,7 +985,7 @@ public final class Transaction
   
   boolean verify()
   {
-    Account localAccount = Account.getAccount(getSenderAccountId());
+    Account localAccount = Account.getAccount(getSenderId());
     if (localAccount == null) {
       return false;
     }
@@ -995,7 +998,7 @@ public final class Transaction
   
   boolean isDoubleSpending()
   {
-    Account localAccount = Account.getAccount(getSenderAccountId());
+    Account localAccount = Account.getAccount(getSenderId());
     if (localAccount == null) {
       return true;
     }
@@ -1007,7 +1010,7 @@ public final class Transaction
   
   void apply()
   {
-    Account localAccount1 = Account.getAccount(getSenderAccountId());
+    Account localAccount1 = Account.getAccount(getSenderId());
     if (!localAccount1.setOrVerify(this.senderPublicKey)) {
       throw new RuntimeException("sender public key mismatch");
     }
@@ -1023,7 +1026,7 @@ public final class Transaction
   void undo()
     throws Transaction.UndoNotSupportedException
   {
-    Account localAccount1 = Account.getAccount(this.senderAccountId);
+    Account localAccount1 = Account.getAccount(this.senderId);
     localAccount1.addToBalance((this.amount + this.fee) * 100L);
     Account localAccount2 = Account.getAccount(this.recipientId);
     this.type.undo(this, localAccount1, localAccount2);
@@ -1031,7 +1034,7 @@ public final class Transaction
   
   void updateTotals(Map<Long, Long> paramMap, Map<Long, Map<Long, Long>> paramMap1)
   {
-    Long localLong1 = getSenderAccountId();
+    Long localLong1 = getSenderId();
     Long localLong2 = (Long)paramMap.get(localLong1);
     if (localLong2 == null) {
       localLong2 = Long.valueOf(0L);
@@ -1048,19 +1051,6 @@ public final class Transaction
   int getSize()
   {
     return 128 + (this.attachment == null ? 0 : this.attachment.getSize());
-  }
-  
-  String getHash()
-  {
-    if (this.hash == null)
-    {
-      byte[] arrayOfByte = getBytes();
-      for (int i = 64; i < 128; i++) {
-        arrayOfByte[i] = 0;
-      }
-      this.hash = Convert.convert(Crypto.sha256().digest(arrayOfByte));
-    }
-    return this.hash;
   }
   
   public static Type findTransactionType(byte paramByte1, byte paramByte2)
@@ -1415,7 +1405,7 @@ public final class Transaction
         {
           Attachment.ColoredCoinsAssetIssuance localColoredCoinsAssetIssuance = (Attachment.ColoredCoinsAssetIssuance)paramAnonymousTransaction.attachment;
           Long localLong = paramAnonymousTransaction.getId();
-          Asset.addAsset(localLong, paramAnonymousTransaction.getSenderAccountId(), localColoredCoinsAssetIssuance.getName(), localColoredCoinsAssetIssuance.getDescription(), localColoredCoinsAssetIssuance.getQuantity());
+          Asset.addAsset(localLong, paramAnonymousTransaction.getSenderId(), localColoredCoinsAssetIssuance.getName(), localColoredCoinsAssetIssuance.getDescription(), localColoredCoinsAssetIssuance.getQuantity());
           paramAnonymousAccount1.addToAssetAndUnconfirmedAssetBalance(localLong, localColoredCoinsAssetIssuance.getQuantity());
         }
         
@@ -1505,11 +1495,11 @@ public final class Transaction
         void updateTotals(Transaction paramAnonymousTransaction, Map<Long, Long> paramAnonymousMap, Map<Long, Map<Long, Long>> paramAnonymousMap1, Long paramAnonymousLong)
         {
           Attachment.ColoredCoinsAssetTransfer localColoredCoinsAssetTransfer = (Attachment.ColoredCoinsAssetTransfer)paramAnonymousTransaction.attachment;
-          Object localObject = (Map)paramAnonymousMap1.get(paramAnonymousTransaction.getSenderAccountId());
+          Object localObject = (Map)paramAnonymousMap1.get(paramAnonymousTransaction.getSenderId());
           if (localObject == null)
           {
             localObject = new HashMap();
-            paramAnonymousMap1.put(paramAnonymousTransaction.getSenderAccountId(), localObject);
+            paramAnonymousMap1.put(paramAnonymousTransaction.getSenderId(), localObject);
           }
           Long localLong = (Long)((Map)localObject).get(localColoredCoinsAssetTransfer.getAssetId());
           if (localLong == null) {
@@ -1601,11 +1591,11 @@ public final class Transaction
         void updateTotals(Transaction paramAnonymousTransaction, Map<Long, Long> paramAnonymousMap, Map<Long, Map<Long, Long>> paramAnonymousMap1, Long paramAnonymousLong)
         {
           Attachment.ColoredCoinsAskOrderPlacement localColoredCoinsAskOrderPlacement = (Attachment.ColoredCoinsAskOrderPlacement)paramAnonymousTransaction.attachment;
-          Object localObject = (Map)paramAnonymousMap1.get(paramAnonymousTransaction.getSenderAccountId());
+          Object localObject = (Map)paramAnonymousMap1.get(paramAnonymousTransaction.getSenderId());
           if (localObject == null)
           {
             localObject = new HashMap();
-            paramAnonymousMap1.put(paramAnonymousTransaction.getSenderAccountId(), localObject);
+            paramAnonymousMap1.put(paramAnonymousTransaction.getSenderId(), localObject);
           }
           Long localLong = (Long)((Map)localObject).get(localColoredCoinsAskOrderPlacement.getAssetId());
           if (localLong == null) {
@@ -1659,7 +1649,7 @@ public final class Transaction
         void updateTotals(Transaction paramAnonymousTransaction, Map<Long, Long> paramAnonymousMap, Map<Long, Map<Long, Long>> paramAnonymousMap1, Long paramAnonymousLong)
         {
           Attachment.ColoredCoinsBidOrderPlacement localColoredCoinsBidOrderPlacement = (Attachment.ColoredCoinsBidOrderPlacement)paramAnonymousTransaction.attachment;
-          paramAnonymousMap.put(paramAnonymousTransaction.getSenderAccountId(), Long.valueOf(paramAnonymousLong.longValue() + localColoredCoinsBidOrderPlacement.getQuantity() * localColoredCoinsBidOrderPlacement.getPrice()));
+          paramAnonymousMap.put(paramAnonymousTransaction.getSenderId(), Long.valueOf(paramAnonymousLong.longValue() + localColoredCoinsBidOrderPlacement.getQuantity() * localColoredCoinsBidOrderPlacement.getPrice()));
         }
       };
       

@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetBlock
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final GetBlock instance = new GetBlock();
   
@@ -33,7 +33,7 @@ public final class GetBlock
     }
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("height", Integer.valueOf(localBlock.getHeight()));
-    localJSONObject.put("generator", Convert.convert(localBlock.getGeneratorAccountId()));
+    localJSONObject.put("generator", Convert.convert(localBlock.getGeneratorId()));
     localJSONObject.put("timestamp", Integer.valueOf(localBlock.getTimestamp()));
     localJSONObject.put("numberOfTransactions", Integer.valueOf(localBlock.getTransactionIds().length));
     localJSONObject.put("totalAmount", Integer.valueOf(localBlock.getTotalAmount()));

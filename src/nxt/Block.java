@@ -39,8 +39,11 @@ public final class Block
   private final int totalAmount;
   private final int totalFee;
   private final int payloadLength;
+  private final byte[] generationSignature;
+  private final byte[] payloadHash;
   final Long[] transactionIds;
   final Transaction[] blockTransactions;
+  private byte[] blockSignature;
   
   /* Error */
   static Block findBlock(Long paramLong)
@@ -628,6 +631,14 @@ public final class Block
       List localList = Transaction.findBlockTransactions(paramConnection, localLong3);
       
       Block localBlock = new Block(i, j, localLong1, localList.size(), k, m, n, arrayOfByte5, arrayOfByte1, arrayOfByte3, arrayOfByte4, arrayOfByte2);
+      
+
+      localBlock.cumulativeDifficulty = localBigInteger;
+      localBlock.baseTarget = l;
+      localBlock.nextBlockId = localLong2;
+      localBlock.index = i1;
+      localBlock.height = i2;
+      localBlock.id = localLong3;
       for (int i3 = 0; i3 < localList.size(); i3++)
       {
         Transaction localTransaction = (Transaction)localList.get(i3);
@@ -635,13 +646,6 @@ public final class Block
         localBlock.blockTransactions[i3] = localTransaction;
         localTransaction.setBlock(localBlock);
       }
-      localBlock.cumulativeDifficulty = localBigInteger;
-      localBlock.baseTarget = l;
-      localBlock.nextBlockId = localLong2;
-      localBlock.index = i1;
-      localBlock.height = i2;
-      localBlock.id = localLong3;
-      
       return localBlock;
     }
     catch (SQLException localSQLException)
@@ -654,7 +658,7 @@ public final class Block
   {
     try
     {
-      PreparedStatement localPreparedStatement = paramConnection.prepareStatement("INSERT INTO block (id, version, timestamp, previous_block_id, total_amount, total_fee, payload_length, generator_public_key, previous_block_hash, cumulative_difficulty, base_target, next_block_id, index, height, generation_signature, block_signature, payload_hash, generator_account_id)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");Object localObject1 = null;
+      PreparedStatement localPreparedStatement = paramConnection.prepareStatement("INSERT INTO block (id, version, timestamp, previous_block_id, total_amount, total_fee, payload_length, generator_public_key, previous_block_hash, cumulative_difficulty, base_target, next_block_id, index, height, generation_signature, block_signature, payload_hash, generator_id)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");Object localObject1 = null;
       try
       {
         localPreparedStatement.setLong(1, paramBlock.getId().longValue());
@@ -682,7 +686,7 @@ public final class Block
         localPreparedStatement.setBytes(15, paramBlock.generationSignature);
         localPreparedStatement.setBytes(16, paramBlock.blockSignature);
         localPreparedStatement.setBytes(17, paramBlock.payloadHash);
-        localPreparedStatement.setLong(18, paramBlock.getGeneratorAccountId().longValue());
+        localPreparedStatement.setLong(18, paramBlock.getGeneratorId().longValue());
         localPreparedStatement.executeUpdate();
         Transaction.saveTransactions(paramConnection, paramBlock.blockTransactions);
       }
@@ -806,19 +810,10 @@ public final class Block
   private volatile Long nextBlockId;
   private int index;
   private int height;
-  private byte[] generationSignature;
-  private byte[] blockSignature;
-  private byte[] payloadHash;
   private volatile Long id;
   private volatile String stringId = null;
-  private volatile Long generatorAccountId;
+  private volatile Long generatorId;
   private SoftReference<JSONStreamAware> jsonRef;
-  
-  Block(int paramInt1, int paramInt2, Long paramLong, int paramInt3, int paramInt4, int paramInt5, int paramInt6, byte[] paramArrayOfByte1, byte[] paramArrayOfByte2, byte[] paramArrayOfByte3, byte[] paramArrayOfByte4)
-    throws NxtException.ValidationException
-  {
-    this(paramInt1, paramInt2, paramLong, paramInt3, paramInt4, paramInt5, paramInt6, paramArrayOfByte1, paramArrayOfByte2, paramArrayOfByte3, paramArrayOfByte4, null);
-  }
   
   Block(int paramInt1, int paramInt2, Long paramLong, int paramInt3, int paramInt4, int paramInt5, int paramInt6, byte[] paramArrayOfByte1, byte[] paramArrayOfByte2, byte[] paramArrayOfByte3, byte[] paramArrayOfByte4, byte[] paramArrayOfByte5)
     throws NxtException.ValidationException
@@ -843,6 +838,7 @@ public final class Block
     this.previousBlockHash = paramArrayOfByte5;
     this.transactionIds = (paramInt3 == 0 ? emptyLong : new Long[paramInt3]);
     this.blockTransactions = (paramInt3 == 0 ? emptyTransactions : new Transaction[paramInt3]);
+    this.height = (paramInt1 == -1 ? 0 : -1);
   }
   
   public int getVersion()
@@ -895,29 +891,14 @@ public final class Block
     return this.payloadHash;
   }
   
-  void setPayloadHash(byte[] paramArrayOfByte)
-  {
-    this.payloadHash = paramArrayOfByte;
-  }
-  
   public byte[] getGenerationSignature()
   {
     return this.generationSignature;
   }
   
-  void setGenerationSignature(byte[] paramArrayOfByte)
-  {
-    this.generationSignature = paramArrayOfByte;
-  }
-  
   public byte[] getBlockSignature()
   {
     return this.blockSignature;
-  }
-  
-  void setBlockSignature(byte[] paramArrayOfByte)
-  {
-    this.blockSignature = paramArrayOfByte;
   }
   
   public Transaction[] getTransactions()
@@ -952,18 +933,19 @@ public final class Block
   
   public int getHeight()
   {
+    if (this.height == -1) {
+      throw new IllegalStateException("Block height not yet set");
+    }
     return this.height;
-  }
-  
-  void setHeight(int paramInt)
-  {
-    this.height = paramInt;
   }
   
   public Long getId()
   {
     if (this.id == null)
     {
+      if (this.blockSignature == null) {
+        throw new IllegalStateException("Block is not signed yet");
+      }
       byte[] arrayOfByte = Crypto.sha256().digest(getBytes());
       BigInteger localBigInteger = new BigInteger(1, new byte[] { arrayOfByte[7], arrayOfByte[6], arrayOfByte[5], arrayOfByte[4], arrayOfByte[3], arrayOfByte[2], arrayOfByte[1], arrayOfByte[0] });
       this.id = Long.valueOf(localBigInteger.longValue());
@@ -984,12 +966,12 @@ public final class Block
     return this.stringId;
   }
   
-  public Long getGeneratorAccountId()
+  public Long getGeneratorId()
   {
-    if (this.generatorAccountId == null) {
-      this.generatorAccountId = Account.getId(this.generatorPublicKey);
+    if (this.generatorId == null) {
+      this.generatorId = Account.getId(this.generatorPublicKey);
     }
-    return this.generatorAccountId;
+    return this.generatorId;
   }
   
   public synchronized JSONStreamAware getJSON()
@@ -1065,9 +1047,21 @@ public final class Block
     return localJSONObject;
   }
   
+  void sign(String paramString)
+  {
+    if (this.blockSignature != null) {
+      throw new IllegalStateException("Block already singed");
+    }
+    this.blockSignature = new byte[64];
+    byte[] arrayOfByte1 = getBytes();
+    byte[] arrayOfByte2 = new byte[arrayOfByte1.length - 64];
+    System.arraycopy(arrayOfByte1, 0, arrayOfByte2, 0, arrayOfByte2.length);
+    this.blockSignature = Crypto.sign(arrayOfByte2, paramString);
+  }
+  
   boolean verifyBlockSignature()
   {
-    Account localAccount = Account.getAccount(getGeneratorAccountId());
+    Account localAccount = Account.getAccount(getGeneratorId());
     if (localAccount == null) {
       return false;
     }
@@ -1079,17 +1073,18 @@ public final class Block
   }
   
   boolean verifyGenerationSignature()
+    throws Blockchain.BlockOutOfOrderException
   {
     try
     {
       Block localBlock = Blockchain.getBlock(this.previousBlockId);
       if (localBlock == null) {
-        return false;
+        throw new Blockchain.BlockOutOfOrderException("Can't verify signature because previous block is missing");
       }
       if ((this.version == 1) && (!Crypto.verify(this.generationSignature, localBlock.generationSignature, this.generatorPublicKey))) {
         return false;
       }
-      Account localAccount = Account.getAccount(getGeneratorAccountId());
+      Account localAccount = Account.getAccount(getGeneratorId());
       if ((localAccount == null) || (localAccount.getEffectiveBalance() <= 0)) {
         return false;
       }
@@ -1123,7 +1118,7 @@ public final class Block
   
   void apply()
   {
-    Account localAccount = Account.addOrGetAccount(getGeneratorAccountId());
+    Account localAccount = Account.addOrGetAccount(getGeneratorId());
     if (!localAccount.setOrVerify(this.generatorPublicKey)) {
       throw new IllegalStateException("Generator public key mismatch");
     }
@@ -1134,7 +1129,16 @@ public final class Block
     Blockchain.purgeExpiredHashes(this.timestamp);
   }
   
-  void calculateBaseTarget()
+  void setPrevious(Block paramBlock)
+  {
+    if (!paramBlock.getId().equals(getPreviousBlockId())) {
+      throw new IllegalStateException("Previous block id doesn't match");
+    }
+    this.height = (paramBlock.getHeight() + 1);
+    calculateBaseTarget(paramBlock);
+  }
+  
+  private void calculateBaseTarget(Block paramBlock)
   {
     if ((getId().equals(Genesis.GENESIS_BLOCK_ID)) && (this.previousBlockId == null))
     {
@@ -1143,9 +1147,8 @@ public final class Block
     }
     else
     {
-      Block localBlock = Blockchain.getBlock(this.previousBlockId);
-      long l1 = localBlock.baseTarget;
-      long l2 = BigInteger.valueOf(l1).multiply(BigInteger.valueOf(this.timestamp - localBlock.timestamp)).divide(BigInteger.valueOf(60L)).longValue();
+      long l1 = paramBlock.baseTarget;
+      long l2 = BigInteger.valueOf(l1).multiply(BigInteger.valueOf(this.timestamp - paramBlock.timestamp)).divide(BigInteger.valueOf(60L)).longValue();
       if ((l2 < 0L) || (l2 > 153722867000000000L)) {
         l2 = 153722867000000000L;
       }
@@ -1163,7 +1166,7 @@ public final class Block
         l2 = l3;
       }
       this.baseTarget = l2;
-      this.cumulativeDifficulty = localBlock.cumulativeDifficulty.add(Convert.two64.divide(BigInteger.valueOf(this.baseTarget)));
+      this.cumulativeDifficulty = paramBlock.cumulativeDifficulty.add(Convert.two64.divide(BigInteger.valueOf(this.baseTarget)));
     }
   }
 }

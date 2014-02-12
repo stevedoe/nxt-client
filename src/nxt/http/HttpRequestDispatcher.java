@@ -13,9 +13,9 @@ import nxt.Nxt;
 import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
-public abstract class HttpRequestHandler
+public class HttpRequestDispatcher
 {
-  private static final Map<String, HttpRequestHandler> httpGetHandlers;
+  private static final Map<String, HttpRequestHandler> handlers;
   
   static
   {
@@ -58,6 +58,8 @@ public abstract class HttpRequestHandler
     localHashMap.put("markHost", MarkHost.instance);
     localHashMap.put("sendMessage", SendMessage.instance);
     localHashMap.put("sendMoney", SendMoney.instance);
+    localHashMap.put("startForging", StartForging.instance);
+    localHashMap.put("stopForging", StopForging.instance);
     
 
 
@@ -67,11 +69,8 @@ public abstract class HttpRequestHandler
 
 
 
-    httpGetHandlers = Collections.unmodifiableMap(localHashMap);
+    handlers = Collections.unmodifiableMap(localHashMap);
   }
-  
-  abstract JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
-    throws NxtException, IOException;
   
   public static void process(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
     throws ServletException, IOException
@@ -90,7 +89,7 @@ public abstract class HttpRequestHandler
       }
       else
       {
-        localObject2 = (HttpRequestHandler)httpGetHandlers.get(localObject1);
+        localObject2 = (HttpRequestHandler)handlers.get(localObject1);
         if (localObject2 != null) {
           try
           {
@@ -133,5 +132,11 @@ public abstract class HttpRequestHandler
         }
       }
     }
+  }
+  
+  static abstract class HttpRequestHandler
+  {
+    abstract JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+      throws NxtException, IOException;
   }
 }

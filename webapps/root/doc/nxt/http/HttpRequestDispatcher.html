@@ -2,13 +2,13 @@
 <!-- NewPage -->
 <html lang="en">
 <head>
-<title>HttpRequestHandler</title>
+<title>HttpRequestDispatcher</title>
 <link rel="stylesheet" type="text/css" href="../../stylesheet.css" title="Style">
 </head>
 <body>
 <script type="text/javascript"><!--
     if (location.href.indexOf('is-external=true') == -1) {
-        parent.document.title="HttpRequestHandler";
+        parent.document.title="HttpRequestDispatcher";
     }
 //-->
 </script>
@@ -37,8 +37,8 @@
 <li><a href="../../nxt/http/IssueAsset.html" title="class in nxt.http"><span class="strong">Next Class</span></a></li>
 </ul>
 <ul class="navList">
-<li><a href="../../index.html?nxt/http/HttpRequestHandler.html" target="_top">Frames</a></li>
-<li><a href="HttpRequestHandler.html" target="_top">No Frames</a></li>
+<li><a href="../../index.html?nxt/http/HttpRequestDispatcher.html" target="_top">Frames</a></li>
+<li><a href="HttpRequestDispatcher.html" target="_top">No Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_top">
 <li><a href="../../allclasses-noframe.html">All Classes</a></li>
@@ -77,27 +77,23 @@
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
 <div class="subTitle">nxt.http</div>
-<h2 title="Class HttpRequestHandler" class="title">Class HttpRequestHandler</h2>
+<h2 title="Class HttpRequestDispatcher" class="title">Class HttpRequestDispatcher</h2>
 </div>
 <div class="contentContainer">
 <ul class="inheritance">
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>nxt.http.HttpRequestHandler</li>
+<li>nxt.http.HttpRequestDispatcher</li>
 </ul>
 </li>
 </ul>
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
-<dl>
-<dt>Direct Known Subclasses:</dt>
-<dd><a href="../../nxt/http/AssignAlias.html" title="class in nxt.http">AssignAlias</a>, <a href="../../nxt/http/BroadcastTransaction.html" title="class in nxt.http">BroadcastTransaction</a>, <a href="../../nxt/http/CancelAskOrder.html" title="class in nxt.http">CancelAskOrder</a>, <a href="../../nxt/http/CancelBidOrder.html" title="class in nxt.http">CancelBidOrder</a>, <a href="../../nxt/http/DecodeHallmark.html" title="class in nxt.http">DecodeHallmark</a>, <a href="../../nxt/http/DecodeToken.html" title="class in nxt.http">DecodeToken</a>, <a href="../../nxt/http/GetAccount.html" title="class in nxt.http">GetAccount</a>, <a href="../../nxt/http/GetAccountBlockIds.html" title="class in nxt.http">GetAccountBlockIds</a>, <a href="../../nxt/http/GetAccountCurrentAskOrderIds.html" title="class in nxt.http">GetAccountCurrentAskOrderIds</a>, <a href="../../nxt/http/GetAccountCurrentBidOrderIds.html" title="class in nxt.http">GetAccountCurrentBidOrderIds</a>, <a href="../../nxt/http/GetAccountId.html" title="class in nxt.http">GetAccountId</a>, <a href="../../nxt/http/GetAccountPublicKey.html" title="class in nxt.http">GetAccountPublicKey</a>, <a href="../../nxt/http/GetAccountTransactionIds.html" title="class in nxt.http">GetAccountTransactionIds</a>, <a href="../../nxt/http/GetAlias.html" title="class in nxt.http">GetAlias</a>, <a href="../../nxt/http/GetAliasId.html" title="class in nxt.http">GetAliasId</a>, <a href="../../nxt/http/GetAliasIds.html" title="class in nxt.http">GetAliasIds</a>, <a href="../../nxt/http/GetAliasURI.html" title="class in nxt.http">GetAliasURI</a>, <a href="../../nxt/http/GetAskOrder.html" title="class in nxt.http">GetAskOrder</a>, <a href="../../nxt/http/GetAskOrderIds.html" title="class in nxt.http">GetAskOrderIds</a>, <a href="../../nxt/http/GetAsset.html" title="class in nxt.http">GetAsset</a>, <a href="../../nxt/http/GetAssetIds.html" title="class in nxt.http">GetAssetIds</a>, <a href="../../nxt/http/GetBalance.html" title="class in nxt.http">GetBalance</a>, <a href="../../nxt/http/GetBidOrder.html" title="class in nxt.http">GetBidOrder</a>, <a href="../../nxt/http/GetBidOrderIds.html" title="class in nxt.http">GetBidOrderIds</a>, <a href="../../nxt/http/GetBlock.html" title="class in nxt.http">GetBlock</a>, <a href="../../nxt/http/GetConstants.html" title="class in nxt.http">GetConstants</a>, <a href="../../nxt/http/GetGuaranteedBalance.html" title="class in nxt.http">GetGuaranteedBalance</a>, <a href="../../nxt/http/GetMyInfo.html" title="class in nxt.http">GetMyInfo</a>, <a href="../../nxt/http/GetPeer.html" title="class in nxt.http">GetPeer</a>, <a href="../../nxt/http/GetPeers.html" title="class in nxt.http">GetPeers</a>, <a href="../../nxt/http/GetState.html" title="class in nxt.http">GetState</a>, <a href="../../nxt/http/GetTime.html" title="class in nxt.http">GetTime</a>, <a href="../../nxt/http/GetTransaction.html" title="class in nxt.http">GetTransaction</a>, <a href="../../nxt/http/GetTransactionBytes.html" title="class in nxt.http">GetTransactionBytes</a>, <a href="../../nxt/http/GetUnconfirmedTransactionIds.html" title="class in nxt.http">GetUnconfirmedTransactionIds</a>, <a href="../../nxt/http/IssueAsset.html" title="class in nxt.http">IssueAsset</a>, <a href="../../nxt/http/ListAccountAliases.html" title="class in nxt.http">ListAccountAliases</a>, <a href="../../nxt/http/MarkHost.html" title="class in nxt.http">MarkHost</a>, <a href="../../nxt/http/PlaceAskOrder.html" title="class in nxt.http">PlaceAskOrder</a>, <a href="../../nxt/http/PlaceBidOrder.html" title="class in nxt.http">PlaceBidOrder</a>, <a href="../../nxt/http/SendMessage.html" title="class in nxt.http">SendMessage</a>, <a href="../../nxt/http/SendMoney.html" title="class in nxt.http">SendMoney</a>, <a href="../../nxt/http/TransferAsset.html" title="class in nxt.http">TransferAsset</a></dd>
-</dl>
 <hr>
 <br>
-<pre>public abstract class <span class="strong">HttpRequestHandler</span>
+<pre>public class <span class="strong">HttpRequestDispatcher</span>
 extends java.lang.Object</pre>
 </li>
 </ul>
@@ -119,7 +115,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><strong><a href="../../nxt/http/HttpRequestHandler.html#process(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)">process</a></strong>(javax.servlet.http.HttpServletRequest&nbsp;req,
+<td class="colLast"><code><strong><a href="../../nxt/http/HttpRequestDispatcher.html#process(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)">process</a></strong>(javax.servlet.http.HttpServletRequest&nbsp;req,
        javax.servlet.http.HttpServletResponse&nbsp;resp)</code>&nbsp;</td>
 </tr>
 </table>
@@ -188,8 +184,8 @@ extends java.lang.Object</pre>
 <li><a href="../../nxt/http/IssueAsset.html" title="class in nxt.http"><span class="strong">Next Class</span></a></li>
 </ul>
 <ul class="navList">
-<li><a href="../../index.html?nxt/http/HttpRequestHandler.html" target="_top">Frames</a></li>
-<li><a href="HttpRequestHandler.html" target="_top">No Frames</a></li>
+<li><a href="../../index.html?nxt/http/HttpRequestDispatcher.html" target="_top">Frames</a></li>
+<li><a href="HttpRequestDispatcher.html" target="_top">No Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_bottom">
 <li><a href="../../allclasses-noframe.html">All Classes</a></li>

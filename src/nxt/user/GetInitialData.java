@@ -38,7 +38,7 @@ final class GetInitialData
       ((JSONObject)localObject2).put("recipient", Convert.convert(((Transaction)localObject1).getRecipientId()));
       ((JSONObject)localObject2).put("amount", Integer.valueOf(((Transaction)localObject1).getAmount()));
       ((JSONObject)localObject2).put("fee", Integer.valueOf(((Transaction)localObject1).getFee()));
-      ((JSONObject)localObject2).put("sender", Convert.convert(((Transaction)localObject1).getSenderAccountId()));
+      ((JSONObject)localObject2).put("sender", Convert.convert(((Transaction)localObject1).getSenderId()));
       
       localJSONArray1.add(localObject2);
     }
@@ -103,7 +103,7 @@ final class GetInitialData
       localJSONObject2.put("totalAmount", Integer.valueOf(((Block)localObject3).getTotalAmount()));
       localJSONObject2.put("totalFee", Integer.valueOf(((Block)localObject3).getTotalFee()));
       localJSONObject2.put("payloadLength", Integer.valueOf(((Block)localObject3).getPayloadLength()));
-      localJSONObject2.put("generator", Convert.convert(((Block)localObject3).getGeneratorAccountId()));
+      localJSONObject2.put("generator", Convert.convert(((Block)localObject3).getGeneratorId()));
       localJSONObject2.put("height", Integer.valueOf(((Block)localObject3).getHeight()));
       localJSONObject2.put("version", Integer.valueOf(((Block)localObject3).getVersion()));
       localJSONObject2.put("block", ((Block)localObject3).getStringId());
@@ -114,7 +114,7 @@ final class GetInitialData
     }
     JSONObject localJSONObject1 = new JSONObject();
     localJSONObject1.put("response", "processInitialData");
-    localJSONObject1.put("version", "0.7.2");
+    localJSONObject1.put("version", "0.7.3");
     if (localJSONArray1.size() > 0) {
       localJSONObject1.put("unconfirmedTransactions", localJSONArray1);
     }

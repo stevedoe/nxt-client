@@ -121,6 +121,10 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>static class&nbsp;</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.BlockOutOfOrderException.html" title="class in nxt">Blockchain.BlockOutOfOrderException</a></strong></code>&nbsp;</td>
 </tr>
+<tr class="altColor">
+<td class="colFirst"><code>static class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a></strong></code>&nbsp;</td>
+</tr>
 </table>
 </li>
 </ul>
@@ -135,6 +139,16 @@ extends java.lang.Object</pre>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#addBlockListener(nxt.util.Listener, nxt.Blockchain.Event)">addBlockListener</a></strong>(<a href="../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.util.List&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&gt;&nbsp;listener,
+                <a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a>&nbsp;eventType)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#addTransactionListener(nxt.util.Listener, nxt.Blockchain.Event)">addTransactionListener</a></strong>(<a href="../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.util.List&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;&gt;&nbsp;listener,
+                      <a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a>&nbsp;eventType)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static void</code></td>
@@ -211,12 +225,26 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#getUnconfirmedTransaction(java.lang.Long)">getUnconfirmedTransaction</a></strong>(java.lang.Long&nbsp;transactionId)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#hasBlock(java.lang.Long)">hasBlock</a></strong>(java.lang.Long&nbsp;blockId)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#processTransactions(org.json.simple.JSONObject)">processTransactions</a></strong>(org.json.simple.JSONObject&nbsp;request)</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Blockchain.html#pushBlock(org.json.simple.JSONObject)">pushBlock</a></strong>(org.json.simple.JSONObject&nbsp;request)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#removeBlockListener(nxt.util.Listener, nxt.Blockchain.Event)">removeBlockListener</a></strong>(<a href="../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.util.List&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&gt;&nbsp;listener,
+                   <a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a>&nbsp;eventType)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Blockchain.html#removeTransactionListener(nxt.util.Listener, nxt.Blockchain.Event)">removeTransactionListener</a></strong>(<a href="../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.util.List&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;&gt;&nbsp;listener,
+                         <a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a>&nbsp;eventType)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -240,6 +268,46 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="addTransactionListener(nxt.util.Listener, nxt.Blockchain.Event)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addTransactionListener</h4>
+<pre>public static&nbsp;boolean&nbsp;addTransactionListener(<a href="../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.util.List&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;&gt;&nbsp;listener,
+                             <a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a>&nbsp;eventType)</pre>
+</li>
+</ul>
+<a name="removeTransactionListener(nxt.util.Listener, nxt.Blockchain.Event)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeTransactionListener</h4>
+<pre>public static&nbsp;boolean&nbsp;removeTransactionListener(<a href="../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.util.List&lt;<a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>&gt;&gt;&nbsp;listener,
+                                <a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a>&nbsp;eventType)</pre>
+</li>
+</ul>
+<a name="addBlockListener(nxt.util.Listener, nxt.Blockchain.Event)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>addBlockListener</h4>
+<pre>public static&nbsp;boolean&nbsp;addBlockListener(<a href="../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.util.List&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&gt;&nbsp;listener,
+                       <a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a>&nbsp;eventType)</pre>
+</li>
+</ul>
+<a name="removeBlockListener(nxt.util.Listener, nxt.Blockchain.Event)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeBlockListener</h4>
+<pre>public static&nbsp;boolean&nbsp;removeBlockListener(<a href="../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.util.List&lt;<a href="../nxt/Block.html" title="class in nxt">Block</a>&gt;&gt;&nbsp;listener,
+                          <a href="../nxt/Blockchain.Event.html" title="enum in nxt">Blockchain.Event</a>&nbsp;eventType)</pre>
+</li>
+</ul>
 <a name="getAllBlocks()">
 <!--   -->
 </a>
@@ -361,6 +429,15 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>getBlock</h4>
 <pre>public static&nbsp;<a href="../nxt/Block.html" title="class in nxt">Block</a>&nbsp;getBlock(java.lang.Long&nbsp;blockId)</pre>
+</li>
+</ul>
+<a name="hasBlock(java.lang.Long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>hasBlock</h4>
+<pre>public static&nbsp;boolean&nbsp;hasBlock(java.lang.Long&nbsp;blockId)</pre>
 </li>
 </ul>
 <a name="getTransaction(java.lang.Long)">

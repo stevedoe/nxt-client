@@ -48,7 +48,7 @@ final class GetInfo
       localJSONObject.put("hallmark", Nxt.myHallmark);
     }
     localJSONObject.put("application", "NRS");
-    localJSONObject.put("version", "0.7.2");
+    localJSONObject.put("version", "0.7.3");
     localJSONObject.put("platform", Nxt.myPlatform);
     localJSONObject.put("shareAddress", Boolean.valueOf(Nxt.shareMyAddress));
     

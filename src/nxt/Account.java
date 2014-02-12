@@ -14,16 +14,35 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 import nxt.crypto.Crypto;
-import nxt.peer.Peer;
-import nxt.user.User;
+import nxt.util.Listener;
+import nxt.util.Listeners;
 
 public final class Account
 {
   private static final int maxTrackedBalanceConfirmations = 2881;
+  
+  public static enum Event
+  {
+    BALANCE,  UNCONFIRMED_BALANCE;
+    
+    private Event() {}
+  }
+  
   private static final ConcurrentMap<Long, Account> accounts = new ConcurrentHashMap();
   private static final Collection<Account> allAccounts = Collections.unmodifiableCollection(accounts.values());
+  private static final Listeners<Account, Event> listeners = new Listeners();
   private final Long id;
   private final int height;
+  
+  public static boolean addListener(Listener<Account> paramListener, Event paramEvent)
+  {
+    return listeners.addListener(paramListener, paramEvent);
+  }
+  
+  public static boolean removeListener(Listener<Account> paramListener, Event paramEvent)
+  {
+    return listeners.removeListener(paramListener, paramEvent);
+  }
   
   public static Collection<Account> getAllAccounts()
   {
@@ -212,7 +231,7 @@ public final class Account
       this.balance += paramLong;
       addToGuaranteedBalance(paramLong);
     }
-    Peer.updatePeerWeights(this);
+    listeners.notify(this, Event.BALANCE);
   }
   
   void addToUnconfirmedBalance(long paramLong)
@@ -221,7 +240,7 @@ public final class Account
     {
       this.unconfirmedBalance += paramLong;
     }
-    User.updateUserUnconfirmedBalance(this);
+    listeners.notify(this, Event.UNCONFIRMED_BALANCE);
   }
   
   void addToBalanceAndUnconfirmedBalance(long paramLong)
@@ -232,8 +251,8 @@ public final class Account
       this.unconfirmedBalance += paramLong;
       addToGuaranteedBalance(paramLong);
     }
-    Peer.updatePeerWeights(this);
-    User.updateUserUnconfirmedBalance(this);
+    listeners.notify(this, Event.BALANCE);
+    listeners.notify(this, Event.UNCONFIRMED_BALANCE);
   }
   
   private synchronized void addToGuaranteedBalance(long paramLong)

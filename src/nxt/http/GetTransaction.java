@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetTransaction
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final GetTransaction instance = new GetTransaction();
   
@@ -38,12 +38,12 @@ public final class GetTransaction
         return JSONResponses.UNKNOWN_TRANSACTION;
       }
       localJSONObject = localTransaction.getJSONObject();
-      localJSONObject.put("sender", Convert.convert(localTransaction.getSenderAccountId()));
+      localJSONObject.put("sender", Convert.convert(localTransaction.getSenderId()));
     }
     else
     {
       localJSONObject = localTransaction.getJSONObject();
-      localJSONObject.put("sender", Convert.convert(localTransaction.getSenderAccountId()));
+      localJSONObject.put("sender", Convert.convert(localTransaction.getSenderId()));
       Block localBlock = localTransaction.getBlock();
       localJSONObject.put("block", localBlock.getStringId());
       localJSONObject.put("confirmations", Integer.valueOf(Blockchain.getLastBlock().getHeight() - localBlock.getHeight() + 1));

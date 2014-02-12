@@ -150,7 +150,21 @@ final class DbVersion
     case 6: 
       apply("CREATE INDEX IF NOT EXISTS transaction_timestamp_idx ON transaction (timestamp)");
     case 7: 
-      return 7;
+      apply("CREATE INDEX IF NOT EXISTS block_generator_account_id_idx ON block (generator_account_id)");
+    case 8: 
+      apply("CREATE INDEX IF NOT EXISTS transaction_sender_account_id_idx ON transaction (sender_account_id)");
+    case 9: 
+      apply("CREATE INDEX IF NOT EXISTS transaction_recipient_id_idx ON transaction (recipient_id)");
+    case 10: 
+      apply("ALTER TABLE block ALTER COLUMN generator_account_id RENAME TO generator_id");
+    case 11: 
+      apply("ALTER TABLE transaction ALTER COLUMN sender_account_id RENAME TO sender_id");
+    case 12: 
+      apply("ALTER INDEX block_generator_account_id_idx RENAME TO block_generator_id_idx");
+    case 13: 
+      apply("ALTER INDEX transaction_sender_account_id_idx RENAME TO transaction_sender_id_idx");
+    case 14: 
+      return 14;
     }
     throw new RuntimeException("Database inconsistent with code, probably trying to run older code on newer database");
   }
