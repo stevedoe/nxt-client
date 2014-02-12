@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class ListAccountAliases
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final ListAccountAliases instance = new ListAccountAliases();
   

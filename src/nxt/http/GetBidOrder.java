@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetBidOrder
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final GetBidOrder instance = new GetBidOrder();
   

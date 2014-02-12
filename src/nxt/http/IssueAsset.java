@@ -14,7 +14,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class IssueAsset
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final IssueAsset instance = new IssueAsset();
   

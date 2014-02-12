@@ -7,7 +7,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetBalance
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final GetBalance instance = new GetBalance();
   

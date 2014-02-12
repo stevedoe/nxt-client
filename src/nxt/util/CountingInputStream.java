@@ -29,7 +29,7 @@ public class CountingInputStream
   {
     int i = super.read(paramArrayOfByte, paramInt1, paramInt2);
     if (i >= 0) {
-      this.count += 1L;
+      this.count += i;
     }
     return i;
   }

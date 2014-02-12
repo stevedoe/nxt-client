@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetUnconfirmedTransactionIds
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final GetUnconfirmedTransactionIds instance = new GetUnconfirmedTransactionIds();
   

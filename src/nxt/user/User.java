@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -19,8 +19,20 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nxt.Account;
+import nxt.Account.Event;
+import nxt.Block;
+import nxt.Blockchain;
+import nxt.Blockchain.Event;
+import nxt.Generator;
+import nxt.Generator.Event;
+import nxt.Transaction;
 import nxt.crypto.Crypto;
+import nxt.peer.Peer;
+import nxt.peer.Peer.Event;
+import nxt.peer.Peer.State;
+import nxt.util.Convert;
 import nxt.util.JSON;
+import nxt.util.Listener;
 import nxt.util.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -33,6 +45,406 @@ public final class User
   private volatile String secretPhrase;
   private volatile byte[] publicKey;
   private volatile boolean isInactive;
+  
+  static
+  {
+    Account.addListener(new Listener()
+    {
+      public void notify(Account paramAnonymousAccount)
+      {
+        JSONObject localJSONObject = new JSONObject();
+        localJSONObject.put("response", "setBalance");
+        localJSONObject.put("balance", Long.valueOf(paramAnonymousAccount.getUnconfirmedBalance()));
+        byte[] arrayOfByte = paramAnonymousAccount.getPublicKey();
+        for (User localUser : User.users.values()) {
+          if ((localUser.getSecretPhrase() != null) && (Arrays.equals(localUser.getPublicKey(), arrayOfByte))) {
+            localUser.send(localJSONObject);
+          }
+        }
+      }
+    }, Account.Event.UNCONFIRMED_BALANCE);
+    
+
+
+
+
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray1 = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONArray1.add(localJSONObject2);
+        localJSONObject1.put("removedKnownPeers", localJSONArray1);
+        JSONArray localJSONArray2 = new JSONArray();
+        JSONObject localJSONObject3 = new JSONObject();
+        localJSONObject3.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONObject3.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "", 25, true));
+        if (paramAnonymousPeer.isWellKnown()) {
+          localJSONObject3.put("wellKnown", Boolean.valueOf(true));
+        }
+        localJSONArray2.add(localJSONObject3);
+        localJSONObject1.put("addedBlacklistedPeers", localJSONArray2);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.BLACKLIST);
+    
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray1 = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONArray1.add(localJSONObject2);
+        localJSONObject1.put("removedActivePeers", localJSONArray1);
+        if (paramAnonymousPeer.getAnnouncedAddress() != null)
+        {
+          JSONArray localJSONArray2 = new JSONArray();
+          JSONObject localJSONObject3 = new JSONObject();
+          localJSONObject3.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+          localJSONObject3.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "", 25, true));
+          if (paramAnonymousPeer.isWellKnown()) {
+            localJSONObject3.put("wellKnown", Boolean.valueOf(true));
+          }
+          localJSONArray2.add(localJSONObject3);
+          localJSONObject1.put("addedKnownPeers", localJSONArray2);
+        }
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.DEACTIVATE);
+    
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray1 = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONArray1.add(localJSONObject2);
+        localJSONObject1.put("removedBlacklistedPeers", localJSONArray1);
+        JSONArray localJSONArray2 = new JSONArray();
+        JSONObject localJSONObject3 = new JSONObject();
+        localJSONObject3.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONObject3.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "", 25, true));
+        if (paramAnonymousPeer.isWellKnown()) {
+          localJSONObject3.put("wellKnown", Boolean.valueOf(true));
+        }
+        localJSONArray2.add(localJSONObject3);
+        localJSONObject1.put("addedKnownPeers", localJSONArray2);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.UNBLACKLIST);
+    
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONArray.add(localJSONObject2);
+        localJSONObject1.put("removedKnownPeers", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.REMOVE);
+    
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONObject2.put("downloaded", Long.valueOf(paramAnonymousPeer.getDownloadedVolume()));
+        localJSONArray.add(localJSONObject2);
+        localJSONObject1.put("changedActivePeers", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.DOWNLOADED_VOLUME);
+    
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONObject2.put("uploaded", Long.valueOf(paramAnonymousPeer.getUploadedVolume()));
+        localJSONArray.add(localJSONObject2);
+        localJSONObject1.put("changedActivePeers", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.UPLOADED_VOLUME);
+    
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONObject2.put("weight", Integer.valueOf(paramAnonymousPeer.getWeight()));
+        localJSONArray.add(localJSONObject2);
+        localJSONObject1.put("changedActivePeers", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.WEIGHT);
+    
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        if (paramAnonymousPeer.getAnnouncedAddress() != null)
+        {
+          localJSONArray = new JSONArray();
+          localJSONObject2 = new JSONObject();
+          localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+          localJSONArray.add(localJSONObject2);
+          localJSONObject1.put("removedKnownPeers", localJSONArray);
+        }
+        JSONArray localJSONArray = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        if (paramAnonymousPeer.getState() == Peer.State.DISCONNECTED) {
+          localJSONObject2.put("disconnected", Boolean.valueOf(true));
+        }
+        localJSONObject2.put("address", Convert.truncate(paramAnonymousPeer.getPeerAddress(), "", 25, true));
+        localJSONObject2.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "", 25, true));
+        if (paramAnonymousPeer.isWellKnown()) {
+          localJSONObject2.put("wellKnown", Boolean.valueOf(true));
+        }
+        localJSONObject2.put("weight", Integer.valueOf(paramAnonymousPeer.getWeight()));
+        localJSONObject2.put("downloaded", Long.valueOf(paramAnonymousPeer.getDownloadedVolume()));
+        localJSONObject2.put("uploaded", Long.valueOf(paramAnonymousPeer.getUploadedVolume()));
+        localJSONObject2.put("software", paramAnonymousPeer.getSoftware());
+        localJSONArray.add(localJSONObject2);
+        localJSONObject1.put("addedActivePeers", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.ADDED_ACTIVE_PEER);
+    
+
+
+    Peer.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(paramAnonymousPeer.getIndex()));
+        localJSONObject2.put(paramAnonymousPeer.getState() == Peer.State.CONNECTED ? "connected" : "disconnected", Boolean.valueOf(true));
+        localJSONArray.add(localJSONObject2);
+        localJSONObject1.put("changedActivePeers", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peer.Event.CHANGED_ACTIVE_PEER);
+    
+
+
+
+
+
+
+    Blockchain.addTransactionListener(new Listener()
+    {
+      public void notify(List<Transaction> paramAnonymousList)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        for (Transaction localTransaction : paramAnonymousList)
+        {
+          JSONObject localJSONObject2 = new JSONObject();
+          localJSONObject2.put("index", Integer.valueOf(localTransaction.getIndex()));
+          localJSONArray.add(localJSONObject2);
+        }
+        localJSONObject1.put("removedUnconfirmedTransactions", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Blockchain.Event.REMOVED_UNCONFIRMED_TRANSACTIONS);
+    
+
+
+    Blockchain.addTransactionListener(new Listener()
+    {
+      public void notify(List<Transaction> paramAnonymousList)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        for (Transaction localTransaction : paramAnonymousList)
+        {
+          JSONObject localJSONObject2 = new JSONObject();
+          localJSONObject2.put("index", Integer.valueOf(localTransaction.getIndex()));
+          localJSONObject2.put("timestamp", Integer.valueOf(localTransaction.getTimestamp()));
+          localJSONObject2.put("deadline", Short.valueOf(localTransaction.getDeadline()));
+          localJSONObject2.put("recipient", Convert.convert(localTransaction.getRecipientId()));
+          localJSONObject2.put("amount", Integer.valueOf(localTransaction.getAmount()));
+          localJSONObject2.put("fee", Integer.valueOf(localTransaction.getFee()));
+          localJSONObject2.put("sender", Convert.convert(localTransaction.getSenderId()));
+          localJSONObject2.put("id", localTransaction.getStringId());
+          localJSONArray.add(localJSONObject2);
+        }
+        localJSONObject1.put("addedUnconfirmedTransactions", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Blockchain.Event.ADDED_UNCONFIRMED_TRANSACTIONS);
+    
+
+
+    Blockchain.addTransactionListener(new Listener()
+    {
+      public void notify(List<Transaction> paramAnonymousList)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        for (Transaction localTransaction : paramAnonymousList)
+        {
+          JSONObject localJSONObject2 = new JSONObject();
+          localJSONObject2.put("index", Integer.valueOf(localTransaction.getIndex()));
+          localJSONObject2.put("blockTimestamp", Integer.valueOf(localTransaction.getBlock().getTimestamp()));
+          localJSONObject2.put("transactionTimestamp", Integer.valueOf(localTransaction.getTimestamp()));
+          localJSONObject2.put("sender", Convert.convert(localTransaction.getSenderId()));
+          localJSONObject2.put("recipient", Convert.convert(localTransaction.getRecipientId()));
+          localJSONObject2.put("amount", Integer.valueOf(localTransaction.getAmount()));
+          localJSONObject2.put("fee", Integer.valueOf(localTransaction.getFee()));
+          localJSONObject2.put("id", localTransaction.getStringId());
+          localJSONArray.add(localJSONObject2);
+        }
+        localJSONObject1.put("addedConfirmedTransactions", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Blockchain.Event.ADDED_CONFIRMED_TRANSACTIONS);
+    
+
+
+    Blockchain.addTransactionListener(new Listener()
+    {
+      public void notify(List<Transaction> paramAnonymousList)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        for (Transaction localTransaction : paramAnonymousList)
+        {
+          JSONObject localJSONObject2 = new JSONObject();
+          localJSONObject2.put("index", Integer.valueOf(localTransaction.getIndex()));
+          localJSONObject2.put("timestamp", Integer.valueOf(localTransaction.getTimestamp()));
+          localJSONObject2.put("deadline", Short.valueOf(localTransaction.getDeadline()));
+          localJSONObject2.put("recipient", Convert.convert(localTransaction.getRecipientId()));
+          localJSONObject2.put("amount", Integer.valueOf(localTransaction.getAmount()));
+          localJSONObject2.put("fee", Integer.valueOf(localTransaction.getFee()));
+          localJSONObject2.put("sender", Convert.convert(localTransaction.getSenderId()));
+          localJSONObject2.put("id", localTransaction.getStringId());
+          localJSONArray.add(localJSONObject2);
+        }
+        localJSONObject1.put("addedDoubleSpendingTransactions", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Blockchain.Event.ADDED_DOUBLESPENDING_TRANSACTIONS);
+    
+
+
+    Blockchain.addBlockListener(new Listener()
+    {
+      public void notify(List<Block> paramAnonymousList)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        for (Block localBlock : paramAnonymousList)
+        {
+          JSONObject localJSONObject2 = new JSONObject();
+          localJSONObject2.put("index", Integer.valueOf(localBlock.getIndex()));
+          localJSONObject2.put("timestamp", Integer.valueOf(localBlock.getTimestamp()));
+          localJSONObject2.put("numberOfTransactions", Integer.valueOf(localBlock.getTransactionIds().length));
+          localJSONObject2.put("totalAmount", Integer.valueOf(localBlock.getTotalAmount()));
+          localJSONObject2.put("totalFee", Integer.valueOf(localBlock.getTotalFee()));
+          localJSONObject2.put("payloadLength", Integer.valueOf(localBlock.getPayloadLength()));
+          localJSONObject2.put("generator", Convert.convert(localBlock.getGeneratorId()));
+          localJSONObject2.put("height", Integer.valueOf(localBlock.getHeight()));
+          localJSONObject2.put("version", Integer.valueOf(localBlock.getVersion()));
+          localJSONObject2.put("block", localBlock.getStringId());
+          localJSONObject2.put("baseTarget", BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
+          localJSONArray.add(localJSONObject2);
+        }
+        localJSONObject1.put("addedOrphanedBlocks", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Blockchain.Event.BLOCK_POPPED);
+    
+
+
+    Blockchain.addBlockListener(new Listener()
+    {
+      public void notify(List<Block> paramAnonymousList)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        for (Block localBlock : paramAnonymousList)
+        {
+          JSONObject localJSONObject2 = new JSONObject();
+          localJSONObject2.put("index", Integer.valueOf(localBlock.getIndex()));
+          localJSONObject2.put("timestamp", Integer.valueOf(localBlock.getTimestamp()));
+          localJSONObject2.put("numberOfTransactions", Integer.valueOf(localBlock.getTransactionIds().length));
+          localJSONObject2.put("totalAmount", Integer.valueOf(localBlock.getTotalAmount()));
+          localJSONObject2.put("totalFee", Integer.valueOf(localBlock.getTotalFee()));
+          localJSONObject2.put("payloadLength", Integer.valueOf(localBlock.getPayloadLength()));
+          localJSONObject2.put("generator", Convert.convert(localBlock.getGeneratorId()));
+          localJSONObject2.put("height", Integer.valueOf(localBlock.getHeight()));
+          localJSONObject2.put("version", Integer.valueOf(localBlock.getVersion()));
+          localJSONObject2.put("block", localBlock.getStringId());
+          localJSONObject2.put("baseTarget", BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
+          localJSONArray.add(localJSONObject2);
+        }
+        localJSONObject1.put("addedRecentBlocks", localJSONArray);
+        User.sendNewDataToAll(localJSONObject1);
+      }
+    }, Blockchain.Event.BLOCK_PUSHED);
+    
+
+
+
+
+
+    Generator.addListener(new Listener()
+    {
+      public void notify(Generator paramAnonymousGenerator)
+      {
+        JSONObject localJSONObject = new JSONObject();
+        localJSONObject.put("response", "setBlockGenerationDeadline");
+        localJSONObject.put("deadline", Long.valueOf(paramAnonymousGenerator.getDeadline()));
+        for (User localUser : User.allUsers) {
+          if (Arrays.equals(paramAnonymousGenerator.getPublicKey(), localUser.getPublicKey())) {
+            localUser.send(localJSONObject);
+          }
+        }
+      }
+    }, Generator.Event.GENERATION_DEADLINE);
+  }
   
   public static Collection<User> getAllUsers()
   {
@@ -59,37 +471,30 @@ public final class User
     return localObject;
   }
   
-  public static void sendToAll(JSONStreamAware paramJSONStreamAware)
+  private static void sendNewDataToAll(JSONObject paramJSONObject)
+  {
+    paramJSONObject.put("response", "processNewData");
+    sendToAll(paramJSONObject);
+  }
+  
+  private static void sendToAll(JSONStreamAware paramJSONStreamAware)
   {
     for (User localUser : users.values()) {
       localUser.send(paramJSONStreamAware);
     }
   }
   
-  public static void updateUserUnconfirmedBalance(Account paramAccount)
-  {
-    JSONObject localJSONObject = new JSONObject();
-    localJSONObject.put("response", "setBalance");
-    localJSONObject.put("balance", Long.valueOf(paramAccount.getUnconfirmedBalance()));
-    byte[] arrayOfByte = paramAccount.getPublicKey();
-    for (User localUser : users.values()) {
-      if ((localUser.secretPhrase != null) && (Arrays.equals(localUser.publicKey, arrayOfByte))) {
-        localUser.send(localJSONObject);
-      }
-    }
-  }
-  
   private final ConcurrentLinkedQueue<JSONStreamAware> pendingResponses = new ConcurrentLinkedQueue();
   private AsyncContext asyncContext;
-  
-  public String getSecretPhrase()
-  {
-    return this.secretPhrase;
-  }
   
   public byte[] getPublicKey()
   {
     return this.publicKey;
+  }
+  
+  String getSecretPhrase()
+  {
+    return this.secretPhrase;
   }
   
   boolean isInactive()
@@ -97,74 +502,23 @@ public final class User
     return this.isInactive;
   }
   
-  public synchronized void send(JSONStreamAware paramJSONStreamAware)
+  void enqueue(JSONStreamAware paramJSONStreamAware)
   {
-    if (this.asyncContext == null)
-    {
-      if (this.isInactive) {
-        return;
-      }
-      if (this.pendingResponses.size() > 1000)
-      {
-        this.pendingResponses.clear();
-        
-        this.isInactive = true;
-        if (this.secretPhrase == null) {
-          users.values().remove(this);
-        }
-        return;
-      }
-      this.pendingResponses.offer(paramJSONStreamAware);
-    }
-    else
-    {
-      JSONArray localJSONArray = new JSONArray();
-      JSONStreamAware localJSONStreamAware;
-      while ((localJSONStreamAware = (JSONStreamAware)this.pendingResponses.poll()) != null) {
-        localJSONArray.add(localJSONStreamAware);
-      }
-      localJSONArray.add(paramJSONStreamAware);
-      
-      JSONObject localJSONObject = new JSONObject();
-      localJSONObject.put("responses", localJSONArray);
-      
-      this.asyncContext.getResponse().setContentType("text/plain; charset=UTF-8");
-      try
-      {
-        PrintWriter localPrintWriter = this.asyncContext.getResponse().getWriter();Object localObject1 = null;
-        try
-        {
-          localJSONObject.writeJSONString(localPrintWriter);
-        }
-        catch (Throwable localThrowable2)
-        {
-          localObject1 = localThrowable2;throw localThrowable2;
-        }
-        finally
-        {
-          if (localPrintWriter != null) {
-            if (localObject1 != null) {
-              try
-              {
-                localPrintWriter.close();
-              }
-              catch (Throwable localThrowable3)
-              {
-                localObject1.addSuppressed(localThrowable3);
-              }
-            } else {
-              localPrintWriter.close();
-            }
-          }
-        }
-      }
-      catch (IOException localIOException)
-      {
-        Logger.logMessage("Error sending response to user", localIOException);
-      }
-      this.asyncContext.complete();
-      this.asyncContext = null;
-    }
+    this.pendingResponses.offer(paramJSONStreamAware);
+  }
+  
+  void lockAccount()
+  {
+    Generator.stopForging(this.secretPhrase);
+    this.secretPhrase = null;
+  }
+  
+  Long unlockAccount(String paramString)
+  {
+    this.publicKey = Crypto.getPublicKey(paramString);
+    this.secretPhrase = paramString;
+    Generator.startForging(paramString, this.publicKey);
+    return Account.getId(this.publicKey);
   }
   
   public synchronized void processPendingResponses(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
@@ -286,23 +640,74 @@ public final class User
     }
   }
   
-  void enqueue(JSONStreamAware paramJSONStreamAware)
+  private synchronized void send(JSONStreamAware paramJSONStreamAware)
   {
-    this.pendingResponses.offer(paramJSONStreamAware);
-  }
-  
-  void deinitializeKeyPair()
-  {
-    this.secretPhrase = null;
-    this.publicKey = null;
-  }
-  
-  BigInteger initializeKeyPair(String paramString)
-  {
-    this.publicKey = Crypto.getPublicKey(paramString);
-    this.secretPhrase = paramString;
-    byte[] arrayOfByte = Crypto.sha256().digest(this.publicKey);
-    return new BigInteger(1, new byte[] { arrayOfByte[7], arrayOfByte[6], arrayOfByte[5], arrayOfByte[4], arrayOfByte[3], arrayOfByte[2], arrayOfByte[1], arrayOfByte[0] });
+    if (this.asyncContext == null)
+    {
+      if (this.isInactive) {
+        return;
+      }
+      if (this.pendingResponses.size() > 1000)
+      {
+        this.pendingResponses.clear();
+        
+        this.isInactive = true;
+        if (this.secretPhrase == null) {
+          users.values().remove(this);
+        }
+        return;
+      }
+      this.pendingResponses.offer(paramJSONStreamAware);
+    }
+    else
+    {
+      JSONArray localJSONArray = new JSONArray();
+      JSONStreamAware localJSONStreamAware;
+      while ((localJSONStreamAware = (JSONStreamAware)this.pendingResponses.poll()) != null) {
+        localJSONArray.add(localJSONStreamAware);
+      }
+      localJSONArray.add(paramJSONStreamAware);
+      
+      JSONObject localJSONObject = new JSONObject();
+      localJSONObject.put("responses", localJSONArray);
+      
+      this.asyncContext.getResponse().setContentType("text/plain; charset=UTF-8");
+      try
+      {
+        PrintWriter localPrintWriter = this.asyncContext.getResponse().getWriter();Object localObject1 = null;
+        try
+        {
+          localJSONObject.writeJSONString(localPrintWriter);
+        }
+        catch (Throwable localThrowable2)
+        {
+          localObject1 = localThrowable2;throw localThrowable2;
+        }
+        finally
+        {
+          if (localPrintWriter != null) {
+            if (localObject1 != null) {
+              try
+              {
+                localPrintWriter.close();
+              }
+              catch (Throwable localThrowable3)
+              {
+                localObject1.addSuppressed(localThrowable3);
+              }
+            } else {
+              localPrintWriter.close();
+            }
+          }
+        }
+      }
+      catch (IOException localIOException)
+      {
+        Logger.logMessage("Error sending response to user", localIOException);
+      }
+      this.asyncContext.complete();
+      this.asyncContext = null;
+    }
   }
   
   private final class UserAsyncListener

@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetAccountPublicKey
-  extends HttpRequestHandler
+  extends HttpRequestDispatcher.HttpRequestHandler
 {
   static final GetAccountPublicKey instance = new GetAccountPublicKey();
   

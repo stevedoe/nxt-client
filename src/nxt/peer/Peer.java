@@ -33,16 +33,18 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import nxt.Account;
+import nxt.Account.Event;
 import nxt.Blockchain.BlockOutOfOrderException;
 import nxt.Nxt;
 import nxt.NxtException;
 import nxt.ThreadPools;
 import nxt.Transaction.NotYetEnabledException;
-import nxt.user.User;
 import nxt.util.Convert;
 import nxt.util.CountingInputStream;
 import nxt.util.CountingOutputStream;
 import nxt.util.JSON;
+import nxt.util.Listener;
+import nxt.util.Listeners;
 import nxt.util.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -59,9 +61,33 @@ public final class Peer
     private State() {}
   }
   
+  public static enum Event
+  {
+    BLACKLIST,  UNBLACKLIST,  DEACTIVATE,  REMOVE,  DOWNLOADED_VOLUME,  UPLOADED_VOLUME,  WEIGHT,  ADDED_ACTIVE_PEER,  CHANGED_ACTIVE_PEER;
+    
+    private Event() {}
+  }
+  
+  private static final Listeners<Peer, Event> listeners = new Listeners();
   private static final AtomicInteger peerCounter = new AtomicInteger();
   private static final ConcurrentMap<String, Peer> peers = new ConcurrentHashMap();
   private static final Collection<Peer> allPeers = Collections.unmodifiableCollection(peers.values());
+  
+  static
+  {
+    Account.addListener(new Listener()
+    {
+      public void notify(Account paramAnonymousAccount)
+      {
+        for (Peer localPeer : Peer.peers.values()) {
+          if ((paramAnonymousAccount.getId().equals(localPeer.accountId)) && (localPeer.adjustedWeight > 0L)) {
+            Peer.listeners.notify(localPeer, Peer.Event.WEIGHT);
+          }
+        }
+      }
+    }, Account.Event.BALANCE);
+  }
+  
   public static final Runnable peerConnectingThread = new Runnable()
   {
     public void run()
@@ -70,7 +96,7 @@ public final class Peer
       {
         try
         {
-          if (Peer.access$000() < Nxt.maxNumberOfConnectedPublicPeers)
+          if (Peer.access$400() < Nxt.maxNumberOfConnectedPublicPeers)
           {
             Peer localPeer = Peer.getAnyPeer(ThreadLocalRandom.current().nextInt(2) == 0 ? Peer.State.NON_CONNECTED : Peer.State.DISCONNECTED, false);
             if (localPeer != null) {
@@ -131,19 +157,19 @@ public final class Peer
         try
         {
           Peer localPeer = Peer.getAnyPeer(Peer.State.CONNECTED, true);
-          if (localPeer != null)
+          if (localPeer == null) {
+            return;
+          }
+          JSONObject localJSONObject = localPeer.send(this.getPeersRequest);
+          if (localJSONObject == null) {
+            return;
+          }
+          JSONArray localJSONArray = (JSONArray)localJSONObject.get("peers");
+          for (Object localObject : localJSONArray)
           {
-            JSONObject localJSONObject = localPeer.send(this.getPeersRequest);
-            if (localJSONObject != null)
-            {
-              JSONArray localJSONArray = (JSONArray)localJSONObject.get("peers");
-              for (Object localObject : localJSONArray)
-              {
-                String str = ((String)localObject).trim();
-                if (str.length() > 0) {
-                  Peer.addPeer(str, str);
-                }
-              }
+            String str = ((String)localObject).trim();
+            if (str.length() > 0) {
+              Peer.addPeer(str, str);
             }
           }
         }
@@ -178,6 +204,16 @@ public final class Peer
   private volatile long downloadedVolume;
   private volatile long uploadedVolume;
   
+  public static boolean addListener(Listener<Peer> paramListener, Event paramEvent)
+  {
+    return listeners.addListener(paramListener, paramEvent);
+  }
+  
+  public static boolean removeListener(Listener<Peer> paramListener, Event paramEvent)
+  {
+    return listeners.removeListener(paramListener, paramEvent);
+  }
+  
   public static Collection<Peer> getAllPeers()
   {
     return allPeers;
@@ -208,15 +244,6 @@ public final class Peer
       peers.put(localObject, localPeer);
     }
     return localPeer;
-  }
-  
-  public static void updatePeerWeights(Account paramAccount)
-  {
-    for (Peer localPeer : peers.values()) {
-      if ((paramAccount.getId().equals(localPeer.accountId)) && (localPeer.adjustedWeight > 0L)) {
-        localPeer.updateWeight();
-      }
-    }
   }
   
   public static void sendToSomePeers(JSONObject paramJSONObject)
@@ -463,27 +490,7 @@ public final class Peer
   public void blacklist()
   {
     this.blacklistingTime = System.currentTimeMillis();
-    
-    JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("response", "processNewData");
-    
-    JSONArray localJSONArray1 = new JSONArray();
-    JSONObject localJSONObject2 = new JSONObject();
-    localJSONObject2.put("index", Integer.valueOf(this.index));
-    localJSONArray1.add(localJSONObject2);
-    localJSONObject1.put("removedKnownPeers", localJSONArray1);
-    
-    JSONArray localJSONArray2 = new JSONArray();
-    JSONObject localJSONObject3 = new JSONObject();
-    localJSONObject3.put("index", Integer.valueOf(this.index));
-    localJSONObject3.put("announcedAddress", Convert.truncate(this.announcedAddress, "", 25, true));
-    if (isWellKnown()) {
-      localJSONObject3.put("wellKnown", Boolean.valueOf(true));
-    }
-    localJSONArray2.add(localJSONObject3);
-    localJSONObject1.put("addedBlacklistedPeers", localJSONArray2);
-    
-    User.sendToAll(localJSONObject1);
+    listeners.notify(this, Event.BLACKLIST);
   }
   
   public void deactivate()
@@ -492,28 +499,7 @@ public final class Peer
       setState(State.DISCONNECTED);
     }
     setState(State.NON_CONNECTED);
-    
-    JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("response", "processNewData");
-    
-    JSONArray localJSONArray1 = new JSONArray();
-    JSONObject localJSONObject2 = new JSONObject();
-    localJSONObject2.put("index", Integer.valueOf(this.index));
-    localJSONArray1.add(localJSONObject2);
-    localJSONObject1.put("removedActivePeers", localJSONArray1);
-    if (this.announcedAddress != null)
-    {
-      JSONArray localJSONArray2 = new JSONArray();
-      JSONObject localJSONObject3 = new JSONObject();
-      localJSONObject3.put("index", Integer.valueOf(this.index));
-      localJSONObject3.put("announcedAddress", Convert.truncate(this.announcedAddress, "", 25, true));
-      if (isWellKnown()) {
-        localJSONObject3.put("wellKnown", Boolean.valueOf(true));
-      }
-      localJSONArray2.add(localJSONObject3);
-      localJSONObject1.put("addedKnownPeers", localJSONArray2);
-    }
-    User.sendToAll(localJSONObject1);
+    listeners.notify(this, Event.DEACTIVATE);
   }
   
   public int getWeight()
@@ -543,50 +529,19 @@ public final class Peer
   {
     setState(State.NON_CONNECTED);
     this.blacklistingTime = 0L;
-    
-    JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("response", "processNewData");
-    
-    JSONArray localJSONArray1 = new JSONArray();
-    JSONObject localJSONObject2 = new JSONObject();
-    localJSONObject2.put("index", Integer.valueOf(this.index));
-    localJSONArray1.add(localJSONObject2);
-    localJSONObject1.put("removedBlacklistedPeers", localJSONArray1);
-    
-    JSONArray localJSONArray2 = new JSONArray();
-    JSONObject localJSONObject3 = new JSONObject();
-    localJSONObject3.put("index", Integer.valueOf(this.index));
-    localJSONObject3.put("announcedAddress", Convert.truncate(this.announcedAddress, "", 25, true));
-    if (isWellKnown()) {
-      localJSONObject3.put("wellKnown", Boolean.valueOf(true));
-    }
-    localJSONArray2.add(localJSONObject3);
-    localJSONObject1.put("addedKnownPeers", localJSONArray2);
-    
-    User.sendToAll(localJSONObject1);
+    listeners.notify(this, Event.UNBLACKLIST);
   }
   
   public void removePeer()
   {
     peers.values().remove(this);
-    
-    JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("response", "processNewData");
-    
-    JSONArray localJSONArray = new JSONArray();
-    JSONObject localJSONObject2 = new JSONObject();
-    localJSONObject2.put("index", Integer.valueOf(this.index));
-    localJSONArray.add(localJSONObject2);
-    localJSONObject1.put("removedKnownPeers", localJSONArray);
-    
-    User.sendToAll(localJSONObject1);
+    listeners.notify(this, Event.REMOVE);
   }
   
   public JSONObject send(JSONStreamAware paramJSONStreamAware)
   {
     String str = null;
     int i = 0;
-    
     HttpURLConnection localHttpURLConnection = null;
     JSONObject localJSONObject;
     try
@@ -678,7 +633,6 @@ public final class Peer
         else
         {
           localObject2 = new CountingInputStream(localHttpURLConnection.getInputStream());
-          
           localObject3 = new BufferedReader(new InputStreamReader((InputStream)localObject2, "UTF-8"));Object localObject4 = null;
           try
           {
@@ -716,7 +670,6 @@ public final class Peer
           i = 1;
         }
         setState(State.DISCONNECTED);
-        
         localJSONObject = null;
       }
     }
@@ -788,7 +741,7 @@ public final class Peer
       {
         localPeer2 = (Peer)localIterator2.next();
         localPeer2.adjustedWeight = (1000000000L * localPeer2.weight / l);
-        localPeer2.updateWeight();
+        listeners.notify(localPeer2, Event.WEIGHT);
       }
       return true;
     }
@@ -801,90 +754,25 @@ public final class Peer
   
   void setState(State paramState)
   {
-    JSONObject localJSONObject1;
-    JSONArray localJSONArray;
-    JSONObject localJSONObject2;
-    if ((this.state == State.NON_CONNECTED) && (paramState != State.NON_CONNECTED))
-    {
-      localJSONObject1 = new JSONObject();
-      localJSONObject1.put("response", "processNewData");
-      if (this.announcedAddress != null)
-      {
-        localJSONArray = new JSONArray();
-        localJSONObject2 = new JSONObject();
-        localJSONObject2.put("index", Integer.valueOf(this.index));
-        localJSONArray.add(localJSONObject2);
-        localJSONObject1.put("removedKnownPeers", localJSONArray);
-      }
-      localJSONArray = new JSONArray();
-      localJSONObject2 = new JSONObject();
-      localJSONObject2.put("index", Integer.valueOf(this.index));
-      if (paramState == State.DISCONNECTED) {
-        localJSONObject2.put("disconnected", Boolean.valueOf(true));
-      }
-      localJSONObject2.put("address", Convert.truncate(this.peerAddress, "", 25, true));
-      localJSONObject2.put("announcedAddress", Convert.truncate(this.announcedAddress, "", 25, true));
-      if (isWellKnown()) {
-        localJSONObject2.put("wellKnown", Boolean.valueOf(true));
-      }
-      localJSONObject2.put("weight", Integer.valueOf(getWeight()));
-      localJSONObject2.put("downloaded", Long.valueOf(this.downloadedVolume));
-      localJSONObject2.put("uploaded", Long.valueOf(this.uploadedVolume));
-      localJSONObject2.put("software", getSoftware());
-      localJSONArray.add(localJSONObject2);
-      localJSONObject1.put("addedActivePeers", localJSONArray);
-      
-      User.sendToAll(localJSONObject1);
-    }
-    else if ((this.state != State.NON_CONNECTED) && (paramState != State.NON_CONNECTED))
-    {
-      localJSONObject1 = new JSONObject();
-      localJSONObject1.put("response", "processNewData");
-      
-      localJSONArray = new JSONArray();
-      localJSONObject2 = new JSONObject();
-      localJSONObject2.put("index", Integer.valueOf(this.index));
-      localJSONObject2.put(paramState == State.CONNECTED ? "connected" : "disconnected", Boolean.valueOf(true));
-      localJSONArray.add(localJSONObject2);
-      localJSONObject1.put("changedActivePeers", localJSONArray);
-      
-      User.sendToAll(localJSONObject1);
-    }
+    State localState = this.state;
     this.state = paramState;
+    if ((localState == State.NON_CONNECTED) && (paramState != State.NON_CONNECTED)) {
+      listeners.notify(this, Event.ADDED_ACTIVE_PEER);
+    } else if ((localState != State.NON_CONNECTED) && (paramState != State.NON_CONNECTED)) {
+      listeners.notify(this, Event.CHANGED_ACTIVE_PEER);
+    }
   }
   
   void updateDownloadedVolume(long paramLong)
   {
     this.downloadedVolume += paramLong;
-    
-    JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("response", "processNewData");
-    
-    JSONArray localJSONArray = new JSONArray();
-    JSONObject localJSONObject2 = new JSONObject();
-    localJSONObject2.put("index", Integer.valueOf(this.index));
-    localJSONObject2.put("downloaded", Long.valueOf(this.downloadedVolume));
-    localJSONArray.add(localJSONObject2);
-    localJSONObject1.put("changedActivePeers", localJSONArray);
-    
-    User.sendToAll(localJSONObject1);
+    listeners.notify(this, Event.DOWNLOADED_VOLUME);
   }
   
   void updateUploadedVolume(long paramLong)
   {
     this.uploadedVolume += paramLong;
-    
-    JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("response", "processNewData");
-    
-    JSONArray localJSONArray = new JSONArray();
-    JSONObject localJSONObject2 = new JSONObject();
-    localJSONObject2.put("index", Integer.valueOf(this.index));
-    localJSONObject2.put("uploaded", Long.valueOf(this.uploadedVolume));
-    localJSONArray.add(localJSONObject2);
-    localJSONObject1.put("changedActivePeers", localJSONArray);
-    
-    User.sendToAll(localJSONObject1);
+    listeners.notify(this, Event.UPLOADED_VOLUME);
   }
   
   private void connect()
@@ -898,7 +786,7 @@ public final class Peer
       localJSONObject1.put("hallmark", Nxt.myHallmark);
     }
     localJSONObject1.put("application", "NRS");
-    localJSONObject1.put("version", "0.6.2");
+    localJSONObject1.put("version", "0.7.3");
     localJSONObject1.put("platform", Nxt.myPlatform);
     localJSONObject1.put("scheme", Nxt.myScheme);
     localJSONObject1.put("port", Integer.valueOf(Nxt.myPort));
@@ -914,20 +802,5 @@ public final class Peer
         setState(State.CONNECTED);
       }
     }
-  }
-  
-  private void updateWeight()
-  {
-    JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("response", "processNewData");
-    
-    JSONArray localJSONArray = new JSONArray();
-    JSONObject localJSONObject2 = new JSONObject();
-    localJSONObject2.put("index", Integer.valueOf(this.index));
-    localJSONObject2.put("weight", Integer.valueOf(getWeight()));
-    localJSONArray.add(localJSONObject2);
-    localJSONObject1.put("changedActivePeers", localJSONArray);
-    
-    User.sendToAll(localJSONObject1);
   }
 }

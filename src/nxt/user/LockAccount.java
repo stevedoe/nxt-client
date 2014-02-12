@@ -12,7 +12,7 @@ final class LockAccount
   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
     throws IOException
   {
-    paramUser.deinitializeKeyPair();
+    paramUser.lockAccount();
     
     return JSONResponses.LOCK_ACCOUNT;
   }
