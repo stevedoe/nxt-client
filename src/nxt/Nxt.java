@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
 public final class Nxt
   extends HttpServlet
 {
-  public static final String VERSION = "0.7.3";
+  public static final String VERSION = "0.7.4";
   public static final int BLOCK_HEADER_LENGTH = 224;
   public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
   public static final int MAX_PAYLOAD_LENGTH = 32640;
@@ -36,6 +36,7 @@ public final class Nxt
   public static final int TRANSPARENT_FORGING_BLOCK_2 = 47000;
   public static final int TRANSPARENT_FORGING_BLOCK_3 = 51000;
   public static final int TRANSPARENT_FORGING_BLOCK_4 = 64000;
+  public static final int TRANSPARENT_FORGING_BLOCK_5 = 67000;
   public static final long MAX_BALANCE = 1000000000L;
   public static final long initialBaseTarget = 153722867L;
   public static final long maxBaseTarget = 153722867000000000L;
@@ -83,7 +84,7 @@ public final class Nxt
   public void init(ServletConfig paramServletConfig)
     throws ServletException
   {
-    Logger.logMessage("NRS 0.7.3 starting...");
+    Logger.logMessage("NRS 0.7.4 starting...");
     if (Logger.debug) {
       Logger.logMessage("DEBUG logging enabled");
     }
@@ -292,7 +293,7 @@ public final class Nxt
       
       ThreadPools.start();
       
-      Logger.logMessage("NRS 0.7.3 started successfully.");
+      Logger.logMessage("NRS 0.7.4 started successfully.");
     }
     catch (Exception localException)
     {
@@ -382,6 +383,6 @@ public final class Nxt
     
     Db.shutdown();
     
-    Logger.logMessage("NRS 0.7.3 stopped.");
+    Logger.logMessage("NRS 0.7.4 stopped.");
   }
 }

@@ -280,7 +280,9 @@ public final class Account
       if ((localGuaranteedBalance3.height < i - 2881) && (k < this.guaranteedBalances.size() - 1) && (((GuaranteedBalance)this.guaranteedBalances.get(k + 1)).height >= i - 2881))
       {
         j = k;
-        if (i >= 64000) {
+        if ((i >= 64000) && (i < 67000)) {
+          localGuaranteedBalance3.balance += paramLong;
+        } else if ((i >= 67000) && (paramLong < 0L)) {
           localGuaranteedBalance3.balance += paramLong;
         }
       }

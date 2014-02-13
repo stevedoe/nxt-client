@@ -17,7 +17,9 @@ public final class StartForging
       return JSONResponses.MISSING_SECRET_PHRASE;
     }
     Generator localGenerator = Generator.startForging(str);
-    
+    if (localGenerator == null) {
+      return JSONResponses.UNKNOWN_ACCOUNT;
+    }
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("deadline", Long.valueOf(localGenerator.getDeadline()));
     return localJSONObject;

@@ -137,7 +137,7 @@ final class UnlockAccount
           }
         }
       }
-      localObject4 = Blockchain.getAllTransactions(localAccount, (byte)-1, (byte)-1, 0);localObject5 = null;
+      localObject4 = Blockchain.getAllTransactions(localAccount, (byte)-1, (byte)-1, 0, null);localObject5 = null;
       try
       {
         while (((DbIterator)localObject4).hasNext())

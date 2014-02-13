@@ -51,7 +51,7 @@ public final class Generator
       }
     }
   };
-  private final Long accountId;
+  private final Account account;
   private final String secretPhrase;
   private final byte[] publicKey;
   private volatile long deadline;
@@ -74,9 +74,24 @@ public final class Generator
   
   public static Generator startForging(String paramString, byte[] paramArrayOfByte)
   {
-    Generator localGenerator1 = new Generator(paramString, paramArrayOfByte);
+    Account localAccount = Account.getAccount(paramArrayOfByte);
+    if (localAccount == null) {
+      return null;
+    }
+    Generator localGenerator1 = new Generator(paramString, paramArrayOfByte, localAccount);
     Generator localGenerator2 = (Generator)generators.putIfAbsent(paramString, localGenerator1);
     return localGenerator2 != null ? localGenerator2 : localGenerator1;
+  }
+  
+  public static Generator stopForging(String paramString)
+  {
+    Generator localGenerator = (Generator)generators.remove(paramString);
+    if (localGenerator != null)
+    {
+      lastBlocks.remove(localGenerator.account);
+      hits.remove(localGenerator.account);
+    }
+    return localGenerator;
   }
   
   public static Collection<Generator> getAllGenerators()
@@ -84,16 +99,11 @@ public final class Generator
     return allGenerators;
   }
   
-  public static Generator stopForging(String paramString)
-  {
-    return (Generator)generators.remove(paramString);
-  }
-  
-  private Generator(String paramString, byte[] paramArrayOfByte)
+  private Generator(String paramString, byte[] paramArrayOfByte, Account paramAccount)
   {
     this.secretPhrase = paramString;
     this.publicKey = paramArrayOfByte;
-    this.accountId = Account.getId(paramArrayOfByte);
+    this.account = paramAccount;
     forge();
   }
   
@@ -109,17 +119,13 @@ public final class Generator
   
   private void forge()
   {
-    Account localAccount = Account.getAccount(this.accountId);
-    if (localAccount == null) {
-      return;
-    }
-    long l1 = localAccount.getEffectiveBalance();
+    long l1 = this.account.getEffectiveBalance();
     if (l1 <= 0L) {
       return;
     }
     Block localBlock = Blockchain.getLastBlock();
     Object localObject1;
-    if (!localBlock.equals(lastBlocks.get(localAccount)))
+    if (!localBlock.equals(lastBlocks.get(this.account)))
     {
       MessageDigest localMessageDigest = Crypto.sha256();
       if (localBlock.getHeight() < 30000)
@@ -134,10 +140,10 @@ public final class Generator
       }
       Object localObject2 = new BigInteger(1, new byte[] { localObject1[7], localObject1[6], localObject1[5], localObject1[4], localObject1[3], localObject1[2], localObject1[1], localObject1[0] });
       
-      lastBlocks.put(localAccount, localBlock);
-      hits.put(localAccount, localObject2);
+      lastBlocks.put(this.account, localBlock);
+      hits.put(this.account, localObject2);
       
-      long l2 = ((BigInteger)localObject2).divide(BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(localAccount.getEffectiveBalance()))).longValue();
+      long l2 = ((BigInteger)localObject2).divide(BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(this.account.getEffectiveBalance()))).longValue();
       long l3 = Convert.getEpochTime() - localBlock.getTimestamp();
       
       this.deadline = (l2 - l3);
@@ -148,7 +154,7 @@ public final class Generator
     if (i > 0)
     {
       localObject1 = BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(l1)).multiply(BigInteger.valueOf(i));
-      if (((BigInteger)hits.get(localAccount)).compareTo((BigInteger)localObject1) < 0) {
+      if (((BigInteger)hits.get(this.account)).compareTo((BigInteger)localObject1) < 0) {
         Blockchain.generateBlock(this.secretPhrase);
       }
     }

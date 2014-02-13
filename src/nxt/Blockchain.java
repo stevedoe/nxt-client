@@ -302,6 +302,12 @@ public final class Blockchain
         if (localJSONArray.isEmpty()) {
           return Genesis.GENESIS_BLOCK_ID;
         }
+        if (localJSONArray.size() > 20)
+        {
+          Logger.logDebugMessage("Obsolete or rogue peer " + paramAnonymousPeer.getPeerAddress() + " sends too many milestoneBlockIds, blacklisting");
+          paramAnonymousPeer.blacklist();
+          return null;
+        }
         for (Object localObject2 : localJSONArray)
         {
           localObject1 = (String)localObject2;
@@ -328,6 +334,12 @@ public final class Blockchain
         if ((localJSONArray == null) || (localJSONArray.size() == 0)) {
           return null;
         }
+        if (localJSONArray.size() > 1440)
+        {
+          Logger.logDebugMessage("Obsolete or rogue peer " + paramAnonymousPeer.getPeerAddress() + " sends too many nextBlockIds, blacklisting");
+          paramAnonymousPeer.blacklist();
+          return null;
+        }
         for (Object localObject : localJSONArray)
         {
           Long localLong = Convert.parseUnsignedLong((String)localObject);
@@ -349,13 +361,12 @@ public final class Blockchain
         return null;
       }
       JSONArray localJSONArray = (JSONArray)localJSONObject2.get("nextBlocks");
-      
-
-
-
-
-
-
+      if (localJSONArray.size() > 1440)
+      {
+        Logger.logDebugMessage("Obsolete or rogue peer " + paramAnonymousPeer.getPeerAddress() + " sends too many nextBlocks, blacklisting");
+        paramAnonymousPeer.blacklist();
+        return null;
+      }
       return localJSONArray;
     }
     
@@ -693,37 +704,70 @@ public final class Blockchain
   
   public static DbIterator<Transaction> getAllTransactions(Account paramAccount, byte paramByte1, byte paramByte2, int paramInt)
   {
+    return getAllTransactions(paramAccount, paramByte1, paramByte2, paramInt, Boolean.TRUE);
+  }
+  
+  public static DbIterator<Transaction> getAllTransactions(Account paramAccount, byte paramByte1, byte paramByte2, int paramInt, Boolean paramBoolean)
+  {
     Connection localConnection = null;
     try
     {
-      localConnection = Db.getConnection();
-      PreparedStatement localPreparedStatement;
+      StringBuilder localStringBuilder = new StringBuilder();
+      if (paramBoolean != null) {
+        localStringBuilder.append("SELECT * FROM (");
+      }
+      localStringBuilder.append("SELECT * FROM transaction WHERE recipient_id = ? ");
+      if (paramInt > 0) {
+        localStringBuilder.append("AND timestamp >= ? ");
+      }
       if (paramByte1 >= 0)
       {
-        if (paramByte2 >= 0)
-        {
-          localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_id = ?) AND type = ? AND subtype = ? ORDER BY timestamp ASC");
-          localPreparedStatement.setInt(1, paramInt);
-          localPreparedStatement.setLong(2, paramAccount.getId().longValue());
-          localPreparedStatement.setLong(3, paramAccount.getId().longValue());
-          localPreparedStatement.setByte(4, paramByte1);
-          localPreparedStatement.setByte(5, paramByte2);
-        }
-        else
-        {
-          localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_id = ?) AND type = ? ORDER BY timestamp ASC");
-          localPreparedStatement.setInt(1, paramInt);
-          localPreparedStatement.setLong(2, paramAccount.getId().longValue());
-          localPreparedStatement.setLong(3, paramAccount.getId().longValue());
-          localPreparedStatement.setByte(4, paramByte1);
+        localStringBuilder.append("AND type = ? ");
+        if (paramByte2 >= 0) {
+          localStringBuilder.append("AND subtype = ? ");
         }
       }
-      else
+      localStringBuilder.append("UNION SELECT * FROM transaction WHERE sender_id = ? ");
+      if (paramInt > 0) {
+        localStringBuilder.append("AND timestamp >= ? ");
+      }
+      if (paramByte1 >= 0)
       {
-        localPreparedStatement = localConnection.prepareStatement("SELECT * FROM transaction WHERE timestamp >= ? AND (recipient_id = ? OR sender_id = ?) ORDER BY timestamp ASC");
-        localPreparedStatement.setInt(1, paramInt);
-        localPreparedStatement.setLong(2, paramAccount.getId().longValue());
-        localPreparedStatement.setLong(3, paramAccount.getId().longValue());
+        localStringBuilder.append("AND type = ? ");
+        if (paramByte2 >= 0) {
+          localStringBuilder.append("AND subtype = ? ");
+        }
+      }
+      if (Boolean.TRUE.equals(paramBoolean)) {
+        localStringBuilder.append(") ORDER BY timestamp ASC");
+      } else if (Boolean.FALSE.equals(paramBoolean)) {
+        localStringBuilder.append(") ORDER BY timestamp DESC");
+      }
+      localConnection = Db.getConnection();
+      
+      int i = 0;
+      PreparedStatement localPreparedStatement = localConnection.prepareStatement(localStringBuilder.toString());
+      localPreparedStatement.setLong(++i, paramAccount.getId().longValue());
+      if (paramInt > 0) {
+        localPreparedStatement.setInt(++i, paramInt);
+      }
+      if (paramByte1 >= 0)
+      {
+        localPreparedStatement.setByte(++i, paramByte1);
+        if (paramByte2 >= 0) {
+          localPreparedStatement.setByte(++i, paramByte2);
+        }
+      }
+      localPreparedStatement.setLong(++i, paramAccount.getId().longValue());
+      if (paramInt > 0) {
+        localPreparedStatement.setInt(++i, paramInt);
+      }
+      if (paramByte1 >= 0)
+      {
+        localPreparedStatement.setByte(++i, paramByte1);
+        if (paramByte2 >= 0) {
+          localPreparedStatement.setByte(++i, paramByte2);
+        }
       }
       new DbIterator(localConnection, localPreparedStatement, new DbIterator.ResultSetReader()
       {
@@ -750,7 +794,7 @@ public final class Blockchain
     //   4: aconst_null
     //   5: astore_1
     //   6: aload_0
-    //   7: ldc 50
+    //   7: ldc 63
     //   9: invokeinterface 15 2 0
     //   14: astore_2
     //   15: aconst_null
@@ -848,16 +892,16 @@ public final class Blockchain
     //   215: invokespecial 25	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   218: athrow
     // Line number table:
-    //   Java source line #591	-> byte code offset #0
-    //   Java source line #592	-> byte code offset #17
-    //   Java source line #593	-> byte code offset #25
-    //   Java source line #594	-> byte code offset #33
-    //   Java source line #595	-> byte code offset #43
-    //   Java source line #591	-> byte code offset #114
-    //   Java source line #595	-> byte code offset #122
-    //   Java source line #591	-> byte code offset #161
-    //   Java source line #595	-> byte code offset #166
-    //   Java source line #596	-> byte code offset #206
+    //   Java source line #625	-> byte code offset #0
+    //   Java source line #626	-> byte code offset #17
+    //   Java source line #627	-> byte code offset #25
+    //   Java source line #628	-> byte code offset #33
+    //   Java source line #629	-> byte code offset #43
+    //   Java source line #625	-> byte code offset #114
+    //   Java source line #629	-> byte code offset #122
+    //   Java source line #625	-> byte code offset #161
+    //   Java source line #629	-> byte code offset #166
+    //   Java source line #630	-> byte code offset #206
     // Local variable table:
     //   start	length	slot	name	signature
     //   3	194	0	localConnection	Connection
@@ -898,23 +942,23 @@ public final class Blockchain
     //   0: iload_1
     //   1: sipush 1440
     //   4: if_icmple +13 -> 17
-    //   7: new 51	java/lang/IllegalArgumentException
+    //   7: new 64	java/lang/IllegalArgumentException
     //   10: dup
-    //   11: ldc 52
-    //   13: invokespecial 53	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
+    //   11: ldc 65
+    //   13: invokespecial 66	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
     //   16: athrow
     //   17: invokestatic 13	nxt/Db:getConnection	()Ljava/sql/Connection;
     //   20: astore_2
     //   21: aconst_null
     //   22: astore_3
     //   23: aload_2
-    //   24: ldc 54
+    //   24: ldc 67
     //   26: invokeinterface 15 2 0
     //   31: astore 4
     //   33: aconst_null
     //   34: astore 5
     //   36: aload_2
-    //   37: ldc 55
+    //   37: ldc 68
     //   39: invokeinterface 15 2 0
     //   44: astore 6
     //   46: aconst_null
@@ -931,8 +975,8 @@ public final class Blockchain
     //   72: invokeinterface 35 1 0
     //   77: ifne +130 -> 207
     //   80: aload 8
-    //   82: invokeinterface 56 1 0
-    //   87: invokestatic 57	java/util/Collections:emptyList	()Ljava/util/List;
+    //   82: invokeinterface 69 1 0
+    //   87: invokestatic 70	java/util/Collections:emptyList	()Ljava/util/List;
     //   90: astore 9
     //   92: aload 6
     //   94: ifnull +37 -> 131
@@ -978,13 +1022,13 @@ public final class Blockchain
     //   199: invokeinterface 40 1 0
     //   204: aload 9
     //   206: areturn
-    //   207: new 58	java/util/ArrayList
+    //   207: new 71	java/util/ArrayList
     //   210: dup
-    //   211: invokespecial 59	java/util/ArrayList:<init>	()V
+    //   211: invokespecial 72	java/util/ArrayList:<init>	()V
     //   214: astore 9
     //   216: aload 8
-    //   218: ldc 60
-    //   220: invokeinterface 61 2 0
+    //   218: ldc 73
+    //   220: invokeinterface 74 2 0
     //   225: istore 10
     //   227: aload 6
     //   229: iconst_1
@@ -1002,14 +1046,14 @@ public final class Blockchain
     //   262: ifeq +26 -> 288
     //   265: aload 9
     //   267: aload 8
-    //   269: ldc 62
-    //   271: invokeinterface 63 2 0
-    //   276: invokestatic 64	java/lang/Long:valueOf	(J)Ljava/lang/Long;
-    //   279: invokeinterface 65 2 0
+    //   269: ldc 75
+    //   271: invokeinterface 76 2 0
+    //   276: invokestatic 77	java/lang/Long:valueOf	(J)Ljava/lang/Long;
+    //   279: invokeinterface 78 2 0
     //   284: pop
     //   285: goto -30 -> 255
     //   288: aload 8
-    //   290: invokeinterface 56 1 0
+    //   290: invokeinterface 69 1 0
     //   295: aload 9
     //   297: astore 11
     //   299: aload 6
@@ -1131,36 +1175,36 @@ public final class Blockchain
     //   577: invokespecial 25	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   580: athrow
     // Line number table:
-    //   Java source line #601	-> byte code offset #0
-    //   Java source line #602	-> byte code offset #7
-    //   Java source line #604	-> byte code offset #17
-    //   Java source line #605	-> byte code offset #23
-    //   Java source line #604	-> byte code offset #33
-    //   Java source line #606	-> byte code offset #36
-    //   Java source line #604	-> byte code offset #46
-    //   Java source line #607	-> byte code offset #49
-    //   Java source line #608	-> byte code offset #61
-    //   Java source line #609	-> byte code offset #70
-    //   Java source line #610	-> byte code offset #80
-    //   Java source line #611	-> byte code offset #87
-    //   Java source line #623	-> byte code offset #92
-    //   Java source line #613	-> byte code offset #207
-    //   Java source line #614	-> byte code offset #216
-    //   Java source line #615	-> byte code offset #227
-    //   Java source line #616	-> byte code offset #237
-    //   Java source line #617	-> byte code offset #246
-    //   Java source line #618	-> byte code offset #255
-    //   Java source line #619	-> byte code offset #265
-    //   Java source line #621	-> byte code offset #288
-    //   Java source line #622	-> byte code offset #295
-    //   Java source line #623	-> byte code offset #299
-    //   Java source line #604	-> byte code offset #414
-    //   Java source line #623	-> byte code offset #423
-    //   Java source line #604	-> byte code offset #467
-    //   Java source line #623	-> byte code offset #476
-    //   Java source line #604	-> byte code offset #520
-    //   Java source line #623	-> byte code offset #528
-    //   Java source line #624	-> byte code offset #568
+    //   Java source line #635	-> byte code offset #0
+    //   Java source line #636	-> byte code offset #7
+    //   Java source line #638	-> byte code offset #17
+    //   Java source line #639	-> byte code offset #23
+    //   Java source line #638	-> byte code offset #33
+    //   Java source line #640	-> byte code offset #36
+    //   Java source line #638	-> byte code offset #46
+    //   Java source line #641	-> byte code offset #49
+    //   Java source line #642	-> byte code offset #61
+    //   Java source line #643	-> byte code offset #70
+    //   Java source line #644	-> byte code offset #80
+    //   Java source line #645	-> byte code offset #87
+    //   Java source line #657	-> byte code offset #92
+    //   Java source line #647	-> byte code offset #207
+    //   Java source line #648	-> byte code offset #216
+    //   Java source line #649	-> byte code offset #227
+    //   Java source line #650	-> byte code offset #237
+    //   Java source line #651	-> byte code offset #246
+    //   Java source line #652	-> byte code offset #255
+    //   Java source line #653	-> byte code offset #265
+    //   Java source line #655	-> byte code offset #288
+    //   Java source line #656	-> byte code offset #295
+    //   Java source line #657	-> byte code offset #299
+    //   Java source line #638	-> byte code offset #414
+    //   Java source line #657	-> byte code offset #423
+    //   Java source line #638	-> byte code offset #467
+    //   Java source line #657	-> byte code offset #476
+    //   Java source line #638	-> byte code offset #520
+    //   Java source line #657	-> byte code offset #528
+    //   Java source line #658	-> byte code offset #568
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	581	0	paramLong	Long
@@ -1231,23 +1275,23 @@ public final class Blockchain
     //   0: iload_1
     //   1: sipush 1440
     //   4: if_icmple +13 -> 17
-    //   7: new 51	java/lang/IllegalArgumentException
+    //   7: new 64	java/lang/IllegalArgumentException
     //   10: dup
-    //   11: ldc 52
-    //   13: invokespecial 53	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
+    //   11: ldc 65
+    //   13: invokespecial 66	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
     //   16: athrow
     //   17: invokestatic 13	nxt/Db:getConnection	()Ljava/sql/Connection;
     //   20: astore_2
     //   21: aconst_null
     //   22: astore_3
     //   23: aload_2
-    //   24: ldc 54
+    //   24: ldc 67
     //   26: invokeinterface 15 2 0
     //   31: astore 4
     //   33: aconst_null
     //   34: astore 5
     //   36: aload_2
-    //   37: ldc 66
+    //   37: ldc 79
     //   39: invokeinterface 15 2 0
     //   44: astore 6
     //   46: aconst_null
@@ -1264,8 +1308,8 @@ public final class Blockchain
     //   72: invokeinterface 35 1 0
     //   77: ifne +130 -> 207
     //   80: aload 8
-    //   82: invokeinterface 56 1 0
-    //   87: invokestatic 57	java/util/Collections:emptyList	()Ljava/util/List;
+    //   82: invokeinterface 69 1 0
+    //   87: invokestatic 70	java/util/Collections:emptyList	()Ljava/util/List;
     //   90: astore 9
     //   92: aload 6
     //   94: ifnull +37 -> 131
@@ -1311,13 +1355,13 @@ public final class Blockchain
     //   199: invokeinterface 40 1 0
     //   204: aload 9
     //   206: areturn
-    //   207: new 58	java/util/ArrayList
+    //   207: new 71	java/util/ArrayList
     //   210: dup
-    //   211: invokespecial 59	java/util/ArrayList:<init>	()V
+    //   211: invokespecial 72	java/util/ArrayList:<init>	()V
     //   214: astore 9
     //   216: aload 8
-    //   218: ldc 60
-    //   220: invokeinterface 61 2 0
+    //   218: ldc 73
+    //   220: invokeinterface 74 2 0
     //   225: istore 10
     //   227: aload 6
     //   229: iconst_1
@@ -1336,12 +1380,12 @@ public final class Blockchain
     //   265: aload 9
     //   267: aload_2
     //   268: aload 8
-    //   270: invokestatic 67	nxt/Block:getBlock	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Block;
-    //   273: invokeinterface 65 2 0
+    //   270: invokestatic 80	nxt/Block:getBlock	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Block;
+    //   273: invokeinterface 78 2 0
     //   278: pop
     //   279: goto -24 -> 255
     //   282: aload 8
-    //   284: invokeinterface 56 1 0
+    //   284: invokeinterface 69 1 0
     //   289: aload 9
     //   291: astore 11
     //   293: aload 6
@@ -1458,41 +1502,41 @@ public final class Blockchain
     //   562: new 23	java/lang/RuntimeException
     //   565: dup
     //   566: aload_2
-    //   567: invokevirtual 69	java/lang/Exception:toString	()Ljava/lang/String;
+    //   567: invokevirtual 82	java/lang/Exception:toString	()Ljava/lang/String;
     //   570: aload_2
     //   571: invokespecial 25	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   574: athrow
     // Line number table:
-    //   Java source line #629	-> byte code offset #0
-    //   Java source line #630	-> byte code offset #7
-    //   Java source line #632	-> byte code offset #17
-    //   Java source line #633	-> byte code offset #23
-    //   Java source line #632	-> byte code offset #33
-    //   Java source line #634	-> byte code offset #36
-    //   Java source line #632	-> byte code offset #46
-    //   Java source line #635	-> byte code offset #49
-    //   Java source line #636	-> byte code offset #61
-    //   Java source line #637	-> byte code offset #70
-    //   Java source line #638	-> byte code offset #80
-    //   Java source line #639	-> byte code offset #87
-    //   Java source line #651	-> byte code offset #92
-    //   Java source line #641	-> byte code offset #207
-    //   Java source line #642	-> byte code offset #216
-    //   Java source line #643	-> byte code offset #227
-    //   Java source line #644	-> byte code offset #237
-    //   Java source line #645	-> byte code offset #246
-    //   Java source line #646	-> byte code offset #255
-    //   Java source line #647	-> byte code offset #265
-    //   Java source line #649	-> byte code offset #282
-    //   Java source line #650	-> byte code offset #289
-    //   Java source line #651	-> byte code offset #293
-    //   Java source line #632	-> byte code offset #408
-    //   Java source line #651	-> byte code offset #417
-    //   Java source line #632	-> byte code offset #461
-    //   Java source line #651	-> byte code offset #470
-    //   Java source line #632	-> byte code offset #514
-    //   Java source line #651	-> byte code offset #522
-    //   Java source line #652	-> byte code offset #562
+    //   Java source line #663	-> byte code offset #0
+    //   Java source line #664	-> byte code offset #7
+    //   Java source line #666	-> byte code offset #17
+    //   Java source line #667	-> byte code offset #23
+    //   Java source line #666	-> byte code offset #33
+    //   Java source line #668	-> byte code offset #36
+    //   Java source line #666	-> byte code offset #46
+    //   Java source line #669	-> byte code offset #49
+    //   Java source line #670	-> byte code offset #61
+    //   Java source line #671	-> byte code offset #70
+    //   Java source line #672	-> byte code offset #80
+    //   Java source line #673	-> byte code offset #87
+    //   Java source line #685	-> byte code offset #92
+    //   Java source line #675	-> byte code offset #207
+    //   Java source line #676	-> byte code offset #216
+    //   Java source line #677	-> byte code offset #227
+    //   Java source line #678	-> byte code offset #237
+    //   Java source line #679	-> byte code offset #246
+    //   Java source line #680	-> byte code offset #255
+    //   Java source line #681	-> byte code offset #265
+    //   Java source line #683	-> byte code offset #282
+    //   Java source line #684	-> byte code offset #289
+    //   Java source line #685	-> byte code offset #293
+    //   Java source line #666	-> byte code offset #408
+    //   Java source line #685	-> byte code offset #417
+    //   Java source line #666	-> byte code offset #461
+    //   Java source line #685	-> byte code offset #470
+    //   Java source line #666	-> byte code offset #514
+    //   Java source line #685	-> byte code offset #522
+    //   Java source line #686	-> byte code offset #562
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	575	0	paramLong	Long
@@ -1578,24 +1622,24 @@ public final class Blockchain
     //   0: iload_0
     //   1: iflt +23 -> 24
     //   4: getstatic 5	nxt/Blockchain:lastBlock	Ljava/util/concurrent/atomic/AtomicReference;
-    //   7: invokevirtual 70	java/util/concurrent/atomic/AtomicReference:get	()Ljava/lang/Object;
-    //   10: checkcast 71	nxt/Block
-    //   13: invokevirtual 72	nxt/Block:getHeight	()I
+    //   7: invokevirtual 83	java/util/concurrent/atomic/AtomicReference:get	()Ljava/lang/Object;
+    //   10: checkcast 84	nxt/Block
+    //   13: invokevirtual 85	nxt/Block:getHeight	()I
     //   16: iload_0
     //   17: isub
     //   18: sipush 1440
     //   21: if_icmple +13 -> 34
-    //   24: new 51	java/lang/IllegalArgumentException
+    //   24: new 64	java/lang/IllegalArgumentException
     //   27: dup
-    //   28: ldc 82
-    //   30: invokespecial 53	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
+    //   28: ldc 91
+    //   30: invokespecial 66	java/lang/IllegalArgumentException:<init>	(Ljava/lang/String;)V
     //   33: athrow
     //   34: invokestatic 13	nxt/Db:getConnection	()Ljava/sql/Connection;
     //   37: astore_1
     //   38: aconst_null
     //   39: astore_2
     //   40: aload_1
-    //   41: ldc 83
+    //   41: ldc 92
     //   43: invokeinterface 15 2 0
     //   48: astore_3
     //   49: aconst_null
@@ -1607,9 +1651,9 @@ public final class Blockchain
     //   60: aload_3
     //   61: invokeinterface 34 1 0
     //   66: astore 5
-    //   68: new 58	java/util/ArrayList
+    //   68: new 71	java/util/ArrayList
     //   71: dup
-    //   72: invokespecial 59	java/util/ArrayList:<init>	()V
+    //   72: invokespecial 72	java/util/ArrayList:<init>	()V
     //   75: astore 6
     //   77: aload 5
     //   79: invokeinterface 35 1 0
@@ -1617,8 +1661,8 @@ public final class Blockchain
     //   87: aload 6
     //   89: aload_1
     //   90: aload 5
-    //   92: invokestatic 67	nxt/Block:getBlock	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Block;
-    //   95: invokeinterface 65 2 0
+    //   92: invokestatic 80	nxt/Block:getBlock	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Block;
+    //   95: invokeinterface 78 2 0
     //   100: pop
     //   101: goto -24 -> 77
     //   104: aload 6
@@ -1701,28 +1745,28 @@ public final class Blockchain
     //   276: new 23	java/lang/RuntimeException
     //   279: dup
     //   280: aload_1
-    //   281: invokevirtual 69	java/lang/Exception:toString	()Ljava/lang/String;
+    //   281: invokevirtual 82	java/lang/Exception:toString	()Ljava/lang/String;
     //   284: aload_1
     //   285: invokespecial 25	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   288: athrow
     // Line number table:
-    //   Java source line #668	-> byte code offset #0
-    //   Java source line #669	-> byte code offset #24
-    //   Java source line #671	-> byte code offset #34
-    //   Java source line #672	-> byte code offset #40
-    //   Java source line #671	-> byte code offset #49
-    //   Java source line #673	-> byte code offset #52
-    //   Java source line #674	-> byte code offset #60
-    //   Java source line #675	-> byte code offset #68
-    //   Java source line #676	-> byte code offset #77
-    //   Java source line #677	-> byte code offset #87
-    //   Java source line #679	-> byte code offset #104
-    //   Java source line #680	-> byte code offset #108
-    //   Java source line #671	-> byte code offset #181
-    //   Java source line #680	-> byte code offset #190
-    //   Java source line #671	-> byte code offset #231
-    //   Java source line #680	-> byte code offset #236
-    //   Java source line #681	-> byte code offset #276
+    //   Java source line #702	-> byte code offset #0
+    //   Java source line #703	-> byte code offset #24
+    //   Java source line #705	-> byte code offset #34
+    //   Java source line #706	-> byte code offset #40
+    //   Java source line #705	-> byte code offset #49
+    //   Java source line #707	-> byte code offset #52
+    //   Java source line #708	-> byte code offset #60
+    //   Java source line #709	-> byte code offset #68
+    //   Java source line #710	-> byte code offset #77
+    //   Java source line #711	-> byte code offset #87
+    //   Java source line #713	-> byte code offset #104
+    //   Java source line #714	-> byte code offset #108
+    //   Java source line #705	-> byte code offset #181
+    //   Java source line #714	-> byte code offset #190
+    //   Java source line #705	-> byte code offset #231
+    //   Java source line #714	-> byte code offset #236
+    //   Java source line #715	-> byte code offset #276
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	289	0	paramInt	int
@@ -2096,7 +2140,7 @@ public final class Blockchain
           throw new BlockNotAcceptedException("Previous block hash doesn't match", null);
         }
         if ((paramBlock.getTimestamp() > i + 15) || (paramBlock.getTimestamp() <= localBlock.getTimestamp())) {
-          throw new BlockNotAcceptedException("Invalid timestamp: " + paramBlock.getTimestamp() + " current time is " + i + ", previous block timestamp is " + localBlock.getTimestamp(), null);
+          throw new BlockOutOfOrderException("Invalid timestamp: " + paramBlock.getTimestamp() + " current time is " + i + ", previous block timestamp is " + localBlock.getTimestamp());
         }
         if ((paramBlock.getId().equals(Long.valueOf(0L))) || (Block.hasBlock(paramBlock.getId()))) {
           throw new BlockNotAcceptedException("Duplicate block or invalid id", null);
@@ -2519,24 +2563,6 @@ public final class Blockchain
     extends Blockchain.BlockNotAcceptedException
   {
     BlockOutOfOrderException(String paramString)
-    {
-      super(null);
-    }
-  }
-  
-  public static class BlockNotAcceptedException
-    extends NxtException
-  {
-    private BlockNotAcceptedException(String paramString)
-    {
-      super();
-    }
-  }
-  
-  public static class BlockOutOfOrderException
-    extends Blockchain.BlockNotAcceptedException
-  {
-    private BlockOutOfOrderException(String paramString)
     {
       super(null);
     }

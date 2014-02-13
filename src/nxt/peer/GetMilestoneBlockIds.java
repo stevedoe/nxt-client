@@ -53,9 +53,9 @@ final class GetMilestoneBlockIds
       }
       else
       {
-        i = Blockchain.getLastBlock().getHeight();
-        j = i * 4 / 1461 + 1;
-        k = i + 1;
+        paramPeer.blacklist();
+        localJSONObject.put("error", "Old getMilestoneBlockIds protocol not supported, please upgrade to 0.7.3");
+        return localJSONObject;
       }
       long l = Blockchain.getBlockIdAtHeight(i);
       while ((i > 0) && (k-- > 0))
