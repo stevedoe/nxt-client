@@ -36,10 +36,10 @@ public final class Convert
   
   public static String convert(long paramLong)
   {
-    BigInteger localBigInteger = BigInteger.valueOf(paramLong);
-    if (paramLong < 0L) {
-      localBigInteger = localBigInteger.add(two64);
+    if (paramLong >= 0L) {
+      return String.valueOf(paramLong);
     }
+    BigInteger localBigInteger = BigInteger.valueOf(paramLong).add(two64);
     return localBigInteger.toString();
   }
   
@@ -73,6 +73,11 @@ public final class Convert
   public static long nullToZero(Long paramLong)
   {
     return paramLong == null ? 0L : paramLong.longValue();
+  }
+  
+  public static int nullToZero(Integer paramInteger)
+  {
+    return paramInteger == null ? 0 : paramInteger.intValue();
   }
   
   public static String truncate(String paramString1, String paramString2, int paramInt, boolean paramBoolean)

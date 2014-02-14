@@ -49,6 +49,14 @@ public final class GetConstants
     localJSONObject3.put("value", Byte.valueOf(Transaction.Type.Messaging.ALIAS_ASSIGNMENT.getSubtype()));
     localJSONObject3.put("description", "Alias assignment");
     localJSONArray2.add(localJSONObject3);
+    localJSONObject3 = new JSONObject();
+    localJSONObject3.put("value", Byte.valueOf(Transaction.Type.Messaging.POLL_CREATION.getSubtype()));
+    localJSONObject3.put("description", "Poll creation");
+    localJSONArray2.add(localJSONObject3);
+    localJSONObject3 = new JSONObject();
+    localJSONObject3.put("value", Byte.valueOf(Transaction.Type.Messaging.VOTE_CASTING.getSubtype()));
+    localJSONObject3.put("description", "Vote casting");
+    localJSONArray2.add(localJSONObject3);
     localJSONObject2.put("subtypes", localJSONArray2);
     localJSONArray1.add(localJSONObject2);
     localJSONObject2 = new JSONObject();

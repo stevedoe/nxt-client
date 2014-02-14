@@ -21,7 +21,7 @@ final class RemoveActivePeer
     }
     int i = Integer.parseInt(paramHttpServletRequest.getParameter("peer"));
     for (Peer localPeer : Peer.getAllPeers()) {
-      if (localPeer.getIndex() == i)
+      if (User.getIndex(localPeer) == i)
       {
         if ((localPeer.isBlacklisted()) || (localPeer.getState() == Peer.State.NON_CONNECTED)) {
           break;

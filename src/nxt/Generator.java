@@ -144,7 +144,7 @@ public final class Generator
       hits.put(this.account, localObject2);
       
       long l2 = ((BigInteger)localObject2).divide(BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(this.account.getEffectiveBalance()))).longValue();
-      long l3 = Convert.getEpochTime() - localBlock.getTimestamp();
+      long l3 = Math.max(Convert.getEpochTime() - localBlock.getTimestamp(), 0);
       
       this.deadline = (l2 - l3);
       

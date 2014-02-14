@@ -22,11 +22,15 @@ final class GetMilestoneBlockIds
       String str1 = (String)paramJSONObject.get("lastBlockId");
       if (str1 != null)
       {
-        Long localLong = Convert.parseUnsignedLong(str1);
-        if ((Blockchain.getLastBlock().getId().equals(localLong)) || (Blockchain.hasBlock(localLong)))
+        Long localLong1 = Convert.parseUnsignedLong(str1);
+        Long localLong2 = Blockchain.getLastBlock().getId();
+        if ((localLong2.equals(localLong1)) || (Blockchain.hasBlock(localLong1)))
         {
           localJSONArray.add(str1);
           localJSONObject.put("milestoneBlockIds", localJSONArray);
+          if (localLong2.equals(localLong1)) {
+            localJSONObject.put("last", Boolean.TRUE);
+          }
           return localJSONObject;
         }
       }
@@ -54,7 +58,7 @@ final class GetMilestoneBlockIds
       else
       {
         paramPeer.blacklist();
-        localJSONObject.put("error", "Old getMilestoneBlockIds protocol not supported, please upgrade to 0.7.3");
+        localJSONObject.put("error", "Old getMilestoneBlockIds protocol not supported, please upgrade");
         return localJSONObject;
       }
       long l = Blockchain.getBlockIdAtHeight(i);

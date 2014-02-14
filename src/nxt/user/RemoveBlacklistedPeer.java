@@ -20,7 +20,7 @@ final class RemoveBlacklistedPeer
     }
     int i = Integer.parseInt(paramHttpServletRequest.getParameter("peer"));
     for (Peer localPeer : Peer.getAllPeers()) {
-      if (localPeer.getIndex() == i)
+      if (User.getIndex(localPeer) == i)
       {
         if (!localPeer.isBlacklisted()) {
           break;

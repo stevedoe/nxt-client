@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 import nxt.crypto.Crypto;
+import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Listeners;
 
@@ -184,9 +185,9 @@ public final class Account
     return (this.publicKey.compareAndSet(null, paramArrayOfByte)) || (Arrays.equals(paramArrayOfByte, (byte[])this.publicKey.get()));
   }
   
-  synchronized Integer getAssetBalance(Long paramLong)
+  synchronized int getAssetBalance(Long paramLong)
   {
-    return (Integer)this.assetBalances.get(paramLong);
+    return Convert.nullToZero((Integer)this.assetBalances.get(paramLong));
   }
   
   synchronized void addToAssetBalance(Long paramLong, int paramInt)

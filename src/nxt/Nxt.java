@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
 public final class Nxt
   extends HttpServlet
 {
-  public static final String VERSION = "0.7.4";
+  public static final String VERSION = "0.7.5";
   public static final int BLOCK_HEADER_LENGTH = 224;
   public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
   public static final int MAX_PAYLOAD_LENGTH = 32640;
@@ -37,6 +37,8 @@ public final class Nxt
   public static final int TRANSPARENT_FORGING_BLOCK_3 = 51000;
   public static final int TRANSPARENT_FORGING_BLOCK_4 = 64000;
   public static final int TRANSPARENT_FORGING_BLOCK_5 = 67000;
+  public static final int ASSET_EXCHANGE_BLOCK = 111111;
+  public static final int VOTING_SYSTEM_BLOCK = 222222;
   public static final long MAX_BALANCE = 1000000000L;
   public static final long initialBaseTarget = 153722867L;
   public static final long maxBaseTarget = 153722867000000000L;
@@ -84,7 +86,7 @@ public final class Nxt
   public void init(ServletConfig paramServletConfig)
     throws ServletException
   {
-    Logger.logMessage("NRS 0.7.4 starting...");
+    Logger.logMessage("NRS 0.7.5 starting...");
     if (Logger.debug) {
       Logger.logMessage("DEBUG logging enabled");
     }
@@ -137,7 +139,7 @@ public final class Nxt
             throw new RuntimeException();
           }
         }
-        catch (RuntimeException localRuntimeException)
+        catch (RuntimeException localRuntimeException2)
         {
           Logger.logMessage("Your hallmark is invalid: " + myHallmark);
           System.exit(1);
@@ -154,7 +156,7 @@ public final class Nxt
           if (str7.length() > 0)
           {
             ((Set)localObject1).add(str7);
-            Peer.addPeer(str7, str7);
+            Peer.addPeer(str7);
           }
         }
         wellKnownPeers = Collections.unmodifiableSet((Set)localObject1);
@@ -293,11 +295,12 @@ public final class Nxt
       
       ThreadPools.start();
       
-      Logger.logMessage("NRS 0.7.4 started successfully.");
+      Logger.logMessage("NRS 0.7.5 started successfully.");
     }
-    catch (Exception localException)
+    catch (RuntimeException localRuntimeException1)
     {
-      Logger.logMessage("Error initializing Nxt servlet", localException);
+      Db.shutdown();
+      Logger.logMessage("Error initializing Nxt servlet", localRuntimeException1);
       System.exit(1);
     }
   }
@@ -383,6 +386,6 @@ public final class Nxt
     
     Db.shutdown();
     
-    Logger.logMessage("NRS 0.7.4 stopped.");
+    Logger.logMessage("NRS 0.7.5 stopped.");
   }
 }

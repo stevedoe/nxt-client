@@ -11,6 +11,10 @@ final class Db
   
   static void init()
   {
+    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
+    {
+      public void run() {}
+    }));
     long l = Runtime.getRuntime().maxMemory() / 2048L;
     Logger.logDebugMessage("Database cache size set to " + l + " kB");
     cp = JdbcConnectionPool.create("jdbc:h2:nxt_db/nxt;DB_CLOSE_DELAY=10;DB_CLOSE_ON_EXIT=FALSE;CACHE_SIZE=" + l, "sa", "sa");

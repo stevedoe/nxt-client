@@ -164,7 +164,11 @@ final class DbVersion
     case 13: 
       apply("ALTER INDEX transaction_sender_account_id_idx RENAME TO transaction_sender_id_idx");
     case 14: 
-      return 14;
+      apply("ALTER TABLE block DROP COLUMN IF EXISTS index");
+    case 15: 
+      apply("ALTER TABLE transaction DROP COLUMN IF EXISTS index");
+    case 16: 
+      return 16;
     }
     throw new RuntimeException("Database inconsistent with code, probably trying to run older code on newer database");
   }

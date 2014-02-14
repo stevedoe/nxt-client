@@ -20,7 +20,7 @@ final class RemoveKnownPeer
     }
     int i = Integer.parseInt(paramHttpServletRequest.getParameter("peer"));
     for (Peer localPeer : Peer.getAllPeers()) {
-      if (localPeer.getIndex() == i)
+      if (User.getIndex(localPeer) == i)
       {
         localPeer.removePeer();
         break;

@@ -43,12 +43,14 @@ final class GetInfo
       paramPeer.setPlatform(str4.trim());
       
       paramPeer.setShareAddress(Boolean.TRUE.equals(paramJSONObject.get("shareAddress")));
+      
+      paramPeer.setState(Peer.State.CONNECTED);
     }
     if ((Nxt.myHallmark != null) && (Nxt.myHallmark.length() > 0)) {
       localJSONObject.put("hallmark", Nxt.myHallmark);
     }
     localJSONObject.put("application", "NRS");
-    localJSONObject.put("version", "0.7.4");
+    localJSONObject.put("version", "0.7.5");
     localJSONObject.put("platform", Nxt.myPlatform);
     localJSONObject.put("shareAddress", Boolean.valueOf(Nxt.shareMyAddress));
     

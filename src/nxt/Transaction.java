@@ -29,6 +29,8 @@ public final class Transaction
   private static final byte SUBTYPE_PAYMENT_ORDINARY_PAYMENT = 0;
   private static final byte SUBTYPE_MESSAGING_ARBITRARY_MESSAGE = 0;
   private static final byte SUBTYPE_MESSAGING_ALIAS_ASSIGNMENT = 1;
+  private static final byte SUBTYPE_MESSAGING_POLL_CREATION = 2;
+  private static final byte SUBTYPE_MESSAGING_VOTE_CASTING = 3;
   private static final byte SUBTYPE_COLORED_COINS_ASSET_ISSUANCE = 0;
   private static final byte SUBTYPE_COLORED_COINS_ASSET_TRANSFER = 1;
   private static final byte SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT = 2;
@@ -42,7 +44,6 @@ public final class Transaction
   private final int fee;
   private final Long referencedTransactionId;
   private final Type type;
-  private int index;
   private int height;
   private Long blockId;
   private volatile Block block;
@@ -205,24 +206,24 @@ public final class Transaction
     //   279: invokespecial 35	java/lang/RuntimeException:<init>	(Ljava/lang/String;)V
     //   282: athrow
     // Line number table:
-    //   Java source line #64	-> byte code offset #0
-    //   Java source line #65	-> byte code offset #6
-    //   Java source line #64	-> byte code offset #15
-    //   Java source line #66	-> byte code offset #18
-    //   Java source line #67	-> byte code offset #29
-    //   Java source line #68	-> byte code offset #37
-    //   Java source line #69	-> byte code offset #40
-    //   Java source line #70	-> byte code offset #50
-    //   Java source line #72	-> byte code offset #58
-    //   Java source line #73	-> byte code offset #65
-    //   Java source line #74	-> byte code offset #69
-    //   Java source line #64	-> byte code offset #142
-    //   Java source line #74	-> byte code offset #151
-    //   Java source line #64	-> byte code offset #192
-    //   Java source line #74	-> byte code offset #197
-    //   Java source line #75	-> byte code offset #237
-    //   Java source line #76	-> byte code offset #250
-    //   Java source line #77	-> byte code offset #251
+    //   Java source line #66	-> byte code offset #0
+    //   Java source line #67	-> byte code offset #6
+    //   Java source line #66	-> byte code offset #15
+    //   Java source line #68	-> byte code offset #18
+    //   Java source line #69	-> byte code offset #29
+    //   Java source line #70	-> byte code offset #37
+    //   Java source line #71	-> byte code offset #40
+    //   Java source line #72	-> byte code offset #50
+    //   Java source line #74	-> byte code offset #58
+    //   Java source line #75	-> byte code offset #65
+    //   Java source line #76	-> byte code offset #69
+    //   Java source line #66	-> byte code offset #142
+    //   Java source line #76	-> byte code offset #151
+    //   Java source line #66	-> byte code offset #192
+    //   Java source line #76	-> byte code offset #197
+    //   Java source line #77	-> byte code offset #237
+    //   Java source line #78	-> byte code offset #250
+    //   Java source line #79	-> byte code offset #251
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	283	0	paramLong	Long
@@ -369,18 +370,18 @@ public final class Transaction
     //   223: invokespecial 26	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   226: athrow
     // Line number table:
-    //   Java source line #82	-> byte code offset #0
-    //   Java source line #83	-> byte code offset #6
-    //   Java source line #82	-> byte code offset #15
-    //   Java source line #84	-> byte code offset #18
-    //   Java source line #85	-> byte code offset #29
-    //   Java source line #86	-> byte code offset #37
-    //   Java source line #87	-> byte code offset #46
-    //   Java source line #82	-> byte code offset #119
-    //   Java source line #87	-> byte code offset #128
-    //   Java source line #82	-> byte code offset #169
-    //   Java source line #87	-> byte code offset #174
-    //   Java source line #88	-> byte code offset #214
+    //   Java source line #84	-> byte code offset #0
+    //   Java source line #85	-> byte code offset #6
+    //   Java source line #84	-> byte code offset #15
+    //   Java source line #86	-> byte code offset #18
+    //   Java source line #87	-> byte code offset #29
+    //   Java source line #88	-> byte code offset #37
+    //   Java source line #89	-> byte code offset #46
+    //   Java source line #84	-> byte code offset #119
+    //   Java source line #89	-> byte code offset #128
+    //   Java source line #84	-> byte code offset #169
+    //   Java source line #89	-> byte code offset #174
+    //   Java source line #90	-> byte code offset #214
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	227	0	paramLong	Long
@@ -507,7 +508,6 @@ public final class Transaction
       Transaction localTransaction = new Transaction(localType, i, s, arrayOfByte1, localLong1, j, k, localLong2, arrayOfByte2);
       
       localTransaction.blockId = Long.valueOf(paramResultSet.getLong("block_id"));
-      localTransaction.index = paramResultSet.getInt("index");
       localTransaction.height = paramResultSet.getInt("height");
       localTransaction.id = Long.valueOf(paramResultSet.getLong("id"));
       localTransaction.senderId = Long.valueOf(paramResultSet.getLong("sender_id"));
@@ -526,12 +526,12 @@ public final class Transaction
   static java.util.List<Transaction> findBlockTransactions(Connection paramConnection, Long paramLong)
   {
     // Byte code:
-    //   0: new 97	java/util/ArrayList
+    //   0: new 95	java/util/ArrayList
     //   3: dup
-    //   4: invokespecial 98	java/util/ArrayList:<init>	()V
+    //   4: invokespecial 96	java/util/ArrayList:<init>	()V
     //   7: astore_2
     //   8: aload_0
-    //   9: ldc 99
+    //   9: ldc 97
     //   11: invokeinterface 12 2 0
     //   16: astore_3
     //   17: aconst_null
@@ -551,7 +551,7 @@ public final class Transaction
     //   50: aload_0
     //   51: aload 5
     //   53: invokestatic 17	nxt/Transaction:getTransaction	(Ljava/sql/Connection;Ljava/sql/ResultSet;)Lnxt/Transaction;
-    //   56: invokeinterface 100 2 0
+    //   56: invokeinterface 98 2 0
     //   61: pop
     //   62: goto -23 -> 39
     //   65: aload 5
@@ -600,7 +600,7 @@ public final class Transaction
     //   165: new 24	java/lang/RuntimeException
     //   168: dup
     //   169: aload_3
-    //   170: invokevirtual 96	java/sql/SQLException:toString	()Ljava/lang/String;
+    //   170: invokevirtual 94	java/sql/SQLException:toString	()Ljava/lang/String;
     //   173: aload_3
     //   174: invokespecial 26	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   177: athrow
@@ -610,30 +610,30 @@ public final class Transaction
     //   183: new 28	java/lang/StringBuilder
     //   186: dup
     //   187: invokespecial 29	java/lang/StringBuilder:<init>	()V
-    //   190: ldc 101
+    //   190: ldc 99
     //   192: invokevirtual 31	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
     //   195: aload_1
     //   196: invokevirtual 32	java/lang/StringBuilder:append	(Ljava/lang/Object;)Ljava/lang/StringBuilder;
-    //   199: ldc 102
+    //   199: ldc 100
     //   201: invokevirtual 31	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
     //   204: invokevirtual 34	java/lang/StringBuilder:toString	()Ljava/lang/String;
     //   207: invokespecial 35	java/lang/RuntimeException:<init>	(Ljava/lang/String;)V
     //   210: athrow
     // Line number table:
-    //   Java source line #195	-> byte code offset #0
-    //   Java source line #196	-> byte code offset #8
-    //   Java source line #197	-> byte code offset #20
-    //   Java source line #198	-> byte code offset #31
-    //   Java source line #199	-> byte code offset #39
-    //   Java source line #200	-> byte code offset #49
-    //   Java source line #202	-> byte code offset #65
-    //   Java source line #203	-> byte code offset #72
-    //   Java source line #204	-> byte code offset #75
-    //   Java source line #196	-> byte code offset #114
-    //   Java source line #204	-> byte code offset #123
-    //   Java source line #205	-> byte code offset #165
-    //   Java source line #206	-> byte code offset #178
-    //   Java source line #207	-> byte code offset #179
+    //   Java source line #196	-> byte code offset #0
+    //   Java source line #197	-> byte code offset #8
+    //   Java source line #198	-> byte code offset #20
+    //   Java source line #199	-> byte code offset #31
+    //   Java source line #200	-> byte code offset #39
+    //   Java source line #201	-> byte code offset #49
+    //   Java source line #203	-> byte code offset #65
+    //   Java source line #204	-> byte code offset #72
+    //   Java source line #205	-> byte code offset #75
+    //   Java source line #197	-> byte code offset #114
+    //   Java source line #205	-> byte code offset #123
+    //   Java source line #206	-> byte code offset #165
+    //   Java source line #207	-> byte code offset #178
+    //   Java source line #208	-> byte code offset #179
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	211	0	paramConnection	Connection
@@ -667,32 +667,32 @@ public final class Transaction
     {
       for (Transaction localTransaction : paramVarArgs)
       {
-        PreparedStatement localPreparedStatement = paramConnection.prepareStatement("INSERT INTO transaction (id, deadline, sender_public_key, recipient_id, amount, fee, referenced_transaction_id, index, height, block_id, signature, timestamp, type, subtype, sender_id, attachment)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");Object localObject1 = null;
+        PreparedStatement localPreparedStatement = paramConnection.prepareStatement("INSERT INTO transaction (id, deadline, sender_public_key, recipient_id, amount, fee, referenced_transaction_id, height, block_id, signature, timestamp, type, subtype, sender_id, attachment)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");Object localObject1 = null;
         try
         {
-          localPreparedStatement.setLong(1, localTransaction.getId().longValue());
-          localPreparedStatement.setShort(2, localTransaction.deadline);
-          localPreparedStatement.setBytes(3, localTransaction.senderPublicKey);
-          localPreparedStatement.setLong(4, localTransaction.recipientId.longValue());
-          localPreparedStatement.setInt(5, localTransaction.amount);
-          localPreparedStatement.setInt(6, localTransaction.fee);
+          int k = 0;
+          localPreparedStatement.setLong(++k, localTransaction.getId().longValue());
+          localPreparedStatement.setShort(++k, localTransaction.deadline);
+          localPreparedStatement.setBytes(++k, localTransaction.senderPublicKey);
+          localPreparedStatement.setLong(++k, localTransaction.recipientId.longValue());
+          localPreparedStatement.setInt(++k, localTransaction.amount);
+          localPreparedStatement.setInt(++k, localTransaction.fee);
           if (localTransaction.referencedTransactionId != null) {
-            localPreparedStatement.setLong(7, localTransaction.referencedTransactionId.longValue());
+            localPreparedStatement.setLong(++k, localTransaction.referencedTransactionId.longValue());
           } else {
-            localPreparedStatement.setNull(7, -5);
+            localPreparedStatement.setNull(++k, -5);
           }
-          localPreparedStatement.setInt(8, localTransaction.index);
-          localPreparedStatement.setInt(9, localTransaction.height);
-          localPreparedStatement.setLong(10, localTransaction.blockId.longValue());
-          localPreparedStatement.setBytes(11, localTransaction.signature);
-          localPreparedStatement.setInt(12, localTransaction.timestamp);
-          localPreparedStatement.setByte(13, localTransaction.type.getType());
-          localPreparedStatement.setByte(14, localTransaction.type.getSubtype());
-          localPreparedStatement.setLong(15, localTransaction.getSenderId().longValue());
+          localPreparedStatement.setInt(++k, localTransaction.height);
+          localPreparedStatement.setLong(++k, localTransaction.blockId.longValue());
+          localPreparedStatement.setBytes(++k, localTransaction.signature);
+          localPreparedStatement.setInt(++k, localTransaction.timestamp);
+          localPreparedStatement.setByte(++k, localTransaction.type.getType());
+          localPreparedStatement.setByte(++k, localTransaction.type.getSubtype());
+          localPreparedStatement.setLong(++k, localTransaction.getSenderId().longValue());
           if (localTransaction.attachment != null) {
-            localPreparedStatement.setObject(16, localTransaction.attachment);
+            localPreparedStatement.setObject(++k, localTransaction.attachment);
           } else {
-            localPreparedStatement.setNull(16, 2000);
+            localPreparedStatement.setNull(++k, 2000);
           }
           localPreparedStatement.executeUpdate();
         }
@@ -808,16 +808,6 @@ public final class Transaction
     this.height = paramBlock.getHeight();
   }
   
-  public int getIndex()
-  {
-    return this.index;
-  }
-  
-  void setIndex(int paramInt)
-  {
-    this.index = paramInt;
-  }
-  
   public int getTimestamp()
   {
     return this.timestamp;
@@ -886,12 +876,6 @@ public final class Transaction
       return -1;
     }
     if (this.timestamp > paramTransaction.timestamp) {
-      return 1;
-    }
-    if (this.index < paramTransaction.index) {
-      return -1;
-    }
-    if (this.index > paramTransaction.index) {
       return 1;
     }
     return 0;
@@ -1071,6 +1055,10 @@ public final class Transaction
         return Transaction.Type.Messaging.ARBITRARY_MESSAGE;
       case 1: 
         return Transaction.Type.Messaging.ALIAS_ASSIGNMENT;
+      case 2: 
+        return Transaction.Type.Messaging.POLL_CREATION;
+      case 3: 
+        return Transaction.Type.Messaging.VOTE_CASTING;
       }
       return null;
     case 2: 
@@ -1339,6 +1327,94 @@ public final class Transaction
           return false;
         }
       };
+      public static final Transaction.Type POLL_CREATION = new Messaging()
+      {
+        public final byte getSubtype()
+        {
+          return 2;
+        }
+        
+        boolean loadAttachment(Transaction paramAnonymousTransaction, ByteBuffer paramAnonymousByteBuffer)
+          throws NxtException.ValidationException
+        {
+          return false;
+        }
+        
+        boolean loadAttachment(Transaction paramAnonymousTransaction, JSONObject paramAnonymousJSONObject)
+          throws NxtException.ValidationException
+        {
+          return validateAttachment(paramAnonymousTransaction);
+        }
+        
+        void apply(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2) {}
+        
+        void undo(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2)
+          throws Transaction.UndoNotSupportedException
+        {
+          throw new Transaction.UndoNotSupportedException(paramAnonymousTransaction, "Reversal of poll creation not supported");
+        }
+        
+        private boolean validateAttachment(Transaction paramAnonymousTransaction)
+          throws NxtException.ValidationException
+        {
+          if (Blockchain.getLastBlock().getHeight() < 222222) {
+            throw new Transaction.NotYetEnabledException("Voting System not yet enabled at height " + Blockchain.getLastBlock().getHeight());
+          }
+          try
+          {
+            return paramAnonymousTransaction.amount == 0;
+          }
+          catch (RuntimeException localRuntimeException)
+          {
+            Logger.logDebugMessage("Error validating poll creation", localRuntimeException);
+          }
+          return false;
+        }
+      };
+      public static final Transaction.Type VOTE_CASTING = new Messaging()
+      {
+        public final byte getSubtype()
+        {
+          return 3;
+        }
+        
+        boolean loadAttachment(Transaction paramAnonymousTransaction, ByteBuffer paramAnonymousByteBuffer)
+          throws NxtException.ValidationException
+        {
+          return false;
+        }
+        
+        boolean loadAttachment(Transaction paramAnonymousTransaction, JSONObject paramAnonymousJSONObject)
+          throws NxtException.ValidationException
+        {
+          return validateAttachment(paramAnonymousTransaction);
+        }
+        
+        void apply(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2) {}
+        
+        void undo(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2)
+          throws Transaction.UndoNotSupportedException
+        {
+          throw new Transaction.UndoNotSupportedException(paramAnonymousTransaction, "Reversal of vote casting not supported");
+        }
+        
+        private boolean validateAttachment(Transaction paramAnonymousTransaction)
+          throws NxtException.ValidationException
+        {
+          if (Blockchain.getLastBlock().getHeight() < 222222) {
+            throw new Transaction.NotYetEnabledException("Voting System not yet enabled at height " + Blockchain.getLastBlock().getHeight());
+          }
+          try
+          {
+            return paramAnonymousTransaction.amount == 0;
+          }
+          catch (RuntimeException localRuntimeException)
+          {
+            Logger.logDebugMessage("Error validating vote casting", localRuntimeException);
+          }
+          return false;
+        }
+      };
       
       void updateTotals(Transaction paramTransaction, Map<Long, Long> paramMap, Map<Long, Map<Long, Long>> paramMap1, Long paramLong) {}
     }
@@ -1388,6 +1464,7 @@ public final class Transaction
         }
         
         boolean loadAttachment(Transaction paramAnonymousTransaction, JSONObject paramAnonymousJSONObject)
+          throws NxtException.ValidationException
         {
           String str1 = (String)paramAnonymousJSONObject.get("name");
           String str2 = (String)paramAnonymousJSONObject.get("description");
@@ -1420,7 +1497,11 @@ public final class Transaction
         void updateTotals(Transaction paramAnonymousTransaction, Map<Long, Long> paramAnonymousMap, Map<Long, Map<Long, Long>> paramAnonymousMap1, Long paramAnonymousLong) {}
         
         private boolean validateAttachment(Transaction paramAnonymousTransaction)
+          throws NxtException.ValidationException
         {
+          if (Blockchain.getLastBlock().getHeight() < 111111) {
+            throw new Transaction.NotYetEnabledException("Asset Exchange not yet enabled at height " + Blockchain.getLastBlock().getHeight());
+          }
           try
           {
             Attachment.ColoredCoinsAssetIssuance localColoredCoinsAssetIssuance = (Attachment.ColoredCoinsAssetIssuance)paramAnonymousTransaction.attachment;
@@ -1450,6 +1531,7 @@ public final class Transaction
         }
         
         boolean loadAttachment(Transaction paramAnonymousTransaction, ByteBuffer paramAnonymousByteBuffer)
+          throws NxtException.ValidationException
         {
           Long localLong = Convert.zeroToNull(paramAnonymousByteBuffer.getLong());
           int i = paramAnonymousByteBuffer.getInt();
@@ -1458,6 +1540,7 @@ public final class Transaction
         }
         
         boolean loadAttachment(Transaction paramAnonymousTransaction, JSONObject paramAnonymousJSONObject)
+          throws NxtException.ValidationException
         {
           Long localLong = Convert.parseUnsignedLong((String)paramAnonymousJSONObject.get("asset"));
           int i = ((Long)paramAnonymousJSONObject.get("quantity")).intValue();
@@ -1509,7 +1592,11 @@ public final class Transaction
         }
         
         private boolean validateAttachment(Transaction paramAnonymousTransaction)
+          throws NxtException.ValidationException
         {
+          if (Blockchain.getLastBlock().getHeight() < 111111) {
+            throw new Transaction.NotYetEnabledException("Asset Exchange not yet enabled at height " + Blockchain.getLastBlock().getHeight());
+          }
           Attachment.ColoredCoinsAssetTransfer localColoredCoinsAssetTransfer = (Attachment.ColoredCoinsAssetTransfer)paramAnonymousTransaction.attachment;
           return (paramAnonymousTransaction.amount == 0) && (localColoredCoinsAssetTransfer.getQuantity() > 0) && (localColoredCoinsAssetTransfer.getQuantity() <= 1000000000L);
         }
@@ -1521,6 +1608,7 @@ public final class Transaction
         abstract Attachment.ColoredCoinsOrderPlacement makeAttachment(Long paramLong, int paramInt, long paramLong1);
         
         final boolean loadAttachment(Transaction paramTransaction, ByteBuffer paramByteBuffer)
+          throws NxtException.ValidationException
         {
           Long localLong = Convert.zeroToNull(paramByteBuffer.getLong());
           int i = paramByteBuffer.getInt();
@@ -1530,6 +1618,7 @@ public final class Transaction
         }
         
         final boolean loadAttachment(Transaction paramTransaction, JSONObject paramJSONObject)
+          throws NxtException.ValidationException
         {
           Long localLong = Convert.parseUnsignedLong((String)paramJSONObject.get("asset"));
           int i = ((Long)paramJSONObject.get("quantity")).intValue();
@@ -1539,7 +1628,11 @@ public final class Transaction
         }
         
         private boolean validateAttachment(Transaction paramTransaction)
+          throws NxtException.ValidationException
         {
+          if (Blockchain.getLastBlock().getHeight() < 111111) {
+            throw new Transaction.NotYetEnabledException("Asset Exchange not yet enabled at height " + Blockchain.getLastBlock().getHeight());
+          }
           Attachment.ColoredCoinsOrderPlacement localColoredCoinsOrderPlacement = (Attachment.ColoredCoinsOrderPlacement)paramTransaction.attachment;
           return (Genesis.CREATOR_ID.equals(paramTransaction.recipientId)) && (paramTransaction.amount == 0) && (localColoredCoinsOrderPlacement.getQuantity() > 0) && (localColoredCoinsOrderPlacement.getQuantity() <= 1000000000L) && (localColoredCoinsOrderPlacement.getPrice() > 0L) && (localColoredCoinsOrderPlacement.getPrice() <= 100000000000L);
         }
@@ -1573,8 +1666,9 @@ public final class Transaction
         void apply(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2)
         {
           Attachment.ColoredCoinsAskOrderPlacement localColoredCoinsAskOrderPlacement = (Attachment.ColoredCoinsAskOrderPlacement)paramAnonymousTransaction.attachment;
-          paramAnonymousAccount1.addToAssetAndUnconfirmedAssetBalance(localColoredCoinsAskOrderPlacement.getAssetId(), -localColoredCoinsAskOrderPlacement.getQuantity());
-          Order.Ask.addOrder(paramAnonymousTransaction.getId(), paramAnonymousAccount1, localColoredCoinsAskOrderPlacement.getAssetId(), localColoredCoinsAskOrderPlacement.getQuantity(), localColoredCoinsAskOrderPlacement.getPrice());
+          if (Asset.getAsset(localColoredCoinsAskOrderPlacement.getAssetId()) != null) {
+            Order.Ask.addOrder(paramAnonymousTransaction.getId(), paramAnonymousAccount1, localColoredCoinsAskOrderPlacement.getAssetId(), localColoredCoinsAskOrderPlacement.getQuantity(), localColoredCoinsAskOrderPlacement.getPrice());
+          }
         }
         
         void undo(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2)
@@ -1631,8 +1725,9 @@ public final class Transaction
         void apply(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2)
         {
           Attachment.ColoredCoinsBidOrderPlacement localColoredCoinsBidOrderPlacement = (Attachment.ColoredCoinsBidOrderPlacement)paramAnonymousTransaction.attachment;
-          paramAnonymousAccount1.addToBalanceAndUnconfirmedBalance(-localColoredCoinsBidOrderPlacement.getQuantity() * localColoredCoinsBidOrderPlacement.getPrice());
-          Order.Bid.addOrder(paramAnonymousTransaction.getId(), paramAnonymousAccount1, localColoredCoinsBidOrderPlacement.getAssetId(), localColoredCoinsBidOrderPlacement.getQuantity(), localColoredCoinsBidOrderPlacement.getPrice());
+          if (Asset.getAsset(localColoredCoinsBidOrderPlacement.getAssetId()) != null) {
+            Order.Bid.addOrder(paramAnonymousTransaction.getId(), paramAnonymousAccount1, localColoredCoinsBidOrderPlacement.getAssetId(), localColoredCoinsBidOrderPlacement.getQuantity(), localColoredCoinsBidOrderPlacement.getPrice());
+          }
         }
         
         void undo(Transaction paramAnonymousTransaction, Account paramAnonymousAccount1, Account paramAnonymousAccount2)
@@ -1657,7 +1752,11 @@ public final class Transaction
         extends Transaction.Type.ColoredCoins
       {
         final boolean validateAttachment(Transaction paramTransaction)
+          throws NxtException.ValidationException
         {
+          if (Blockchain.getLastBlock().getHeight() < 111111) {
+            throw new Transaction.NotYetEnabledException("Asset Exchange not yet enabled at height " + Blockchain.getLastBlock().getHeight());
+          }
           return (Genesis.CREATOR_ID.equals(paramTransaction.recipientId)) && (paramTransaction.amount == 0);
         }
         
@@ -1683,12 +1782,14 @@ public final class Transaction
         }
         
         boolean loadAttachment(Transaction paramAnonymousTransaction, ByteBuffer paramAnonymousByteBuffer)
+          throws NxtException.ValidationException
         {
           paramAnonymousTransaction.attachment = new Attachment.ColoredCoinsAskOrderCancellation(Convert.zeroToNull(paramAnonymousByteBuffer.getLong()));
           return validateAttachment(paramAnonymousTransaction);
         }
         
         boolean loadAttachment(Transaction paramAnonymousTransaction, JSONObject paramAnonymousJSONObject)
+          throws NxtException.ValidationException
         {
           paramAnonymousTransaction.attachment = new Attachment.ColoredCoinsAskOrderCancellation(Convert.parseUnsignedLong((String)paramAnonymousJSONObject.get("order")));
           return validateAttachment(paramAnonymousTransaction);
@@ -1711,12 +1812,14 @@ public final class Transaction
         }
         
         boolean loadAttachment(Transaction paramAnonymousTransaction, ByteBuffer paramAnonymousByteBuffer)
+          throws NxtException.ValidationException
         {
           paramAnonymousTransaction.attachment = new Attachment.ColoredCoinsBidOrderCancellation(Convert.zeroToNull(paramAnonymousByteBuffer.getLong()));
           return validateAttachment(paramAnonymousTransaction);
         }
         
         boolean loadAttachment(Transaction paramAnonymousTransaction, JSONObject paramAnonymousJSONObject)
+          throws NxtException.ValidationException
         {
           paramAnonymousTransaction.attachment = new Attachment.ColoredCoinsBidOrderCancellation(Convert.parseUnsignedLong((String)paramAnonymousJSONObject.get("order")));
           return validateAttachment(paramAnonymousTransaction);

@@ -33,7 +33,7 @@
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../nxt/Attachment.MessagingArbitraryMessage.html" title="class in nxt"><span class="strong">Prev Class</span></a></li>
+<li><a href="../nxt/Attachment.MessagingVoteCasting.html" title="class in nxt"><span class="strong">Prev Class</span></a></li>
 <li><a href="../nxt/Blockchain.html" title="class in nxt"><span class="strong">Next Class</span></a></li>
 </ul>
 <ul class="navList">
@@ -169,62 +169,58 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getId()">getId</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><strong><a href="../nxt/Block.html#getIndex()">getIndex</a></strong>()</code>&nbsp;</td>
+<td class="colFirst"><code>org.json.simple.JSONObject</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Block.html#getJSONObject()">getJSONObject</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>org.json.simple.JSONStreamAware</code></td>
-<td class="colLast"><code><strong><a href="../nxt/Block.html#getJSON()">getJSON</a></strong>()</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getNextBlockId()">getNextBlockId</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>byte[]</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getPayloadHash()">getPayloadHash</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getPayloadLength()">getPayloadLength</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>byte[]</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getPreviousBlockHash()">getPreviousBlockHash</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.lang.Long</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getPreviousBlockId()">getPreviousBlockId</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getStringId()">getStringId</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getTimestamp()">getTimestamp</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getTotalAmount()">getTotalAmount</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getTotalFee()">getTotalFee</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.Long[]</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getTransactionIds()">getTransactionIds</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="../nxt/Transaction.html" title="class in nxt">Transaction</a>[]</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getTransactions()">getTransactions</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#getVersion()">getVersion</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Block.html#hashCode()">hashCode</a></strong>()</code>&nbsp;</td>
 </tr>
@@ -411,15 +407,6 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;java.lang.Long&nbsp;getNextBlockId()</pre>
 </li>
 </ul>
-<a name="getIndex()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getIndex</h4>
-<pre>public&nbsp;int&nbsp;getIndex()</pre>
-</li>
-</ul>
 <a name="getHeight()">
 <!--   -->
 </a>
@@ -456,15 +443,6 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;java.lang.Long&nbsp;getGeneratorId()</pre>
 </li>
 </ul>
-<a name="getJSON()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getJSON</h4>
-<pre>public&nbsp;org.json.simple.JSONStreamAware&nbsp;getJSON()</pre>
-</li>
-</ul>
 <a name="equals(java.lang.Object)">
 <!--   -->
 </a>
@@ -481,7 +459,7 @@ extends java.lang.Object</pre>
 <a name="hashCode()">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>hashCode</h4>
 <pre>public&nbsp;int&nbsp;hashCode()</pre>
@@ -489,6 +467,15 @@ extends java.lang.Object</pre>
 <dt><strong>Overrides:</strong></dt>
 <dd><code>hashCode</code>&nbsp;in class&nbsp;<code>java.lang.Object</code></dd>
 </dl>
+</li>
+</ul>
+<a name="getJSONObject()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getJSONObject</h4>
+<pre>public&nbsp;org.json.simple.JSONObject&nbsp;getJSONObject()</pre>
 </li>
 </ul>
 </li>
@@ -516,7 +503,7 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../nxt/Attachment.MessagingArbitraryMessage.html" title="class in nxt"><span class="strong">Prev Class</span></a></li>
+<li><a href="../nxt/Attachment.MessagingVoteCasting.html" title="class in nxt"><span class="strong">Prev Class</span></a></li>
 <li><a href="../nxt/Blockchain.html" title="class in nxt"><span class="strong">Next Class</span></a></li>
 </ul>
 <ul class="navList">

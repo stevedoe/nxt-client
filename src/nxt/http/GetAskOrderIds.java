@@ -33,9 +33,18 @@ public final class GetAskOrderIds
     if (Asset.getAsset(Long.valueOf(l)) == null) {
       return JSONResponses.UNKNOWN_ASSET;
     }
+    int i;
+    try
+    {
+      i = Integer.parseInt(paramHttpServletRequest.getParameter("limit"));
+    }
+    catch (NumberFormatException localNumberFormatException)
+    {
+      i = 2147483647;
+    }
     JSONArray localJSONArray = new JSONArray();
     Iterator localIterator = Order.Ask.getSortedOrders(Long.valueOf(l)).iterator();
-    while (localIterator.hasNext()) {
+    while ((localIterator.hasNext()) && (i-- > 0)) {
       localJSONArray.add(Convert.convert(((Order.Ask)localIterator.next()).getId()));
     }
     JSONObject localJSONObject = new JSONObject();

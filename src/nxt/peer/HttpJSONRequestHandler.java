@@ -68,6 +68,10 @@ public abstract class HttpJSONRequestHandler
     Object localObject1;
     try
     {
+      localPeer = Peer.addPeer(paramHttpServletRequest.getRemoteHost(), null);
+      if (localPeer.isBlacklisted()) {
+        return;
+      }
       localObject2 = new CountingInputStream(paramHttpServletRequest.getInputStream());
       localObject3 = new BufferedReader(new InputStreamReader((InputStream)localObject2, "UTF-8"));Object localObject4 = null;
       JSONObject localJSONObject;
@@ -99,19 +103,14 @@ public abstract class HttpJSONRequestHandler
       if (localJSONObject == null) {
         return;
       }
-      localPeer = Peer.addPeer(paramHttpServletRequest.getRemoteHost(), "");
-      if (localPeer != null)
+      if (localPeer.getState() == Peer.State.DISCONNECTED) {
+        localPeer.setState(Peer.State.CONNECTED);
+      }
+      localPeer.updateDownloadedVolume(((CountingInputStream)localObject2).getCount());
+      if (!localPeer.analyzeHallmark(localPeer.getPeerAddress(), (String)localJSONObject.get("hallmark")))
       {
-        if (localPeer.isBlacklisted()) {
-          return;
-        }
-        if (localPeer.getState() == Peer.State.DISCONNECTED) {
-          localPeer.setState(Peer.State.CONNECTED);
-        }
-        localPeer.updateDownloadedVolume(((CountingInputStream)localObject2).getCount());
-        if (localPeer.analyzeHallmark(paramHttpServletRequest.getRemoteHost(), (String)localJSONObject.get("hallmark"))) {
-          localPeer.setState(Peer.State.CONNECTED);
-        }
+        localPeer.blacklist();
+        return;
       }
       if ((localJSONObject.get("protocol") != null) && (((Number)localJSONObject.get("protocol")).intValue() == 1))
       {

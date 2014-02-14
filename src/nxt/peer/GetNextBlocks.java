@@ -36,7 +36,7 @@ final class GetNextBlocks
     for (Object localObject2 = localArrayList.iterator(); ((Iterator)localObject2).hasNext();)
     {
       Block localBlock = (Block)((Iterator)localObject2).next();
-      ((JSONArray)localObject1).add(localBlock.getJSON());
+      ((JSONArray)localObject1).add(localBlock.getJSONObject());
     }
     localJSONObject.put("nextBlocks", localObject1);
     

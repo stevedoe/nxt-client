@@ -1,6 +1,5 @@
 package nxt;
 
-import java.lang.ref.SoftReference;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -14,11 +13,9 @@ import java.util.Comparator;
 import java.util.List;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
-import nxt.util.JSON;
 import nxt.util.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONStreamAware;
 
 public final class Block
 {
@@ -178,24 +175,24 @@ public final class Block
     //   279: invokespecial 27	java/lang/RuntimeException:<init>	(Ljava/lang/String;)V
     //   282: athrow
     // Line number table:
-    //   Java source line #38	-> byte code offset #0
-    //   Java source line #39	-> byte code offset #6
-    //   Java source line #38	-> byte code offset #15
-    //   Java source line #40	-> byte code offset #18
-    //   Java source line #41	-> byte code offset #29
-    //   Java source line #42	-> byte code offset #37
-    //   Java source line #43	-> byte code offset #40
-    //   Java source line #44	-> byte code offset #50
-    //   Java source line #46	-> byte code offset #58
-    //   Java source line #47	-> byte code offset #65
-    //   Java source line #48	-> byte code offset #69
-    //   Java source line #38	-> byte code offset #142
-    //   Java source line #48	-> byte code offset #151
-    //   Java source line #38	-> byte code offset #192
-    //   Java source line #48	-> byte code offset #197
-    //   Java source line #49	-> byte code offset #237
-    //   Java source line #50	-> byte code offset #250
-    //   Java source line #51	-> byte code offset #251
+    //   Java source line #35	-> byte code offset #0
+    //   Java source line #36	-> byte code offset #6
+    //   Java source line #35	-> byte code offset #15
+    //   Java source line #37	-> byte code offset #18
+    //   Java source line #38	-> byte code offset #29
+    //   Java source line #39	-> byte code offset #37
+    //   Java source line #40	-> byte code offset #40
+    //   Java source line #41	-> byte code offset #50
+    //   Java source line #43	-> byte code offset #58
+    //   Java source line #44	-> byte code offset #65
+    //   Java source line #45	-> byte code offset #69
+    //   Java source line #35	-> byte code offset #142
+    //   Java source line #45	-> byte code offset #151
+    //   Java source line #35	-> byte code offset #192
+    //   Java source line #45	-> byte code offset #197
+    //   Java source line #46	-> byte code offset #237
+    //   Java source line #47	-> byte code offset #250
+    //   Java source line #48	-> byte code offset #251
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	283	0	paramLong	Long
@@ -342,18 +339,18 @@ public final class Block
     //   223: invokespecial 18	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   226: athrow
     // Line number table:
-    //   Java source line #56	-> byte code offset #0
-    //   Java source line #57	-> byte code offset #6
-    //   Java source line #56	-> byte code offset #15
-    //   Java source line #58	-> byte code offset #18
-    //   Java source line #59	-> byte code offset #29
-    //   Java source line #60	-> byte code offset #37
-    //   Java source line #61	-> byte code offset #46
-    //   Java source line #56	-> byte code offset #119
-    //   Java source line #61	-> byte code offset #128
-    //   Java source line #56	-> byte code offset #169
-    //   Java source line #61	-> byte code offset #174
-    //   Java source line #62	-> byte code offset #214
+    //   Java source line #53	-> byte code offset #0
+    //   Java source line #54	-> byte code offset #6
+    //   Java source line #53	-> byte code offset #15
+    //   Java source line #55	-> byte code offset #18
+    //   Java source line #56	-> byte code offset #29
+    //   Java source line #57	-> byte code offset #37
+    //   Java source line #58	-> byte code offset #46
+    //   Java source line #53	-> byte code offset #119
+    //   Java source line #58	-> byte code offset #128
+    //   Java source line #53	-> byte code offset #169
+    //   Java source line #58	-> byte code offset #174
+    //   Java source line #59	-> byte code offset #214
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	227	0	paramLong	Long
@@ -519,23 +516,23 @@ public final class Block
     //   282: invokespecial 18	java/lang/RuntimeException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
     //   285: athrow
     // Line number table:
-    //   Java source line #67	-> byte code offset #0
-    //   Java source line #68	-> byte code offset #6
-    //   Java source line #67	-> byte code offset #15
-    //   Java source line #69	-> byte code offset #18
-    //   Java source line #70	-> byte code offset #26
-    //   Java source line #71	-> byte code offset #34
-    //   Java source line #72	-> byte code offset #44
-    //   Java source line #73	-> byte code offset #51
-    //   Java source line #75	-> byte code offset #83
-    //   Java source line #76	-> byte code offset #94
-    //   Java source line #77	-> byte code offset #101
-    //   Java source line #78	-> byte code offset #105
-    //   Java source line #67	-> byte code offset #178
-    //   Java source line #78	-> byte code offset #187
-    //   Java source line #67	-> byte code offset #228
-    //   Java source line #78	-> byte code offset #233
-    //   Java source line #79	-> byte code offset #273
+    //   Java source line #64	-> byte code offset #0
+    //   Java source line #65	-> byte code offset #6
+    //   Java source line #64	-> byte code offset #15
+    //   Java source line #66	-> byte code offset #18
+    //   Java source line #67	-> byte code offset #26
+    //   Java source line #68	-> byte code offset #34
+    //   Java source line #69	-> byte code offset #44
+    //   Java source line #70	-> byte code offset #51
+    //   Java source line #72	-> byte code offset #83
+    //   Java source line #73	-> byte code offset #94
+    //   Java source line #74	-> byte code offset #101
+    //   Java source line #75	-> byte code offset #105
+    //   Java source line #64	-> byte code offset #178
+    //   Java source line #75	-> byte code offset #187
+    //   Java source line #64	-> byte code offset #228
+    //   Java source line #75	-> byte code offset #233
+    //   Java source line #76	-> byte code offset #273
     // Local variable table:
     //   start	length	slot	name	signature
     //   0	286	0	paramInt	int
@@ -621,8 +618,7 @@ public final class Block
       if (paramResultSet.wasNull()) {
         localLong2 = null;
       }
-      int i1 = paramResultSet.getInt("index");
-      int i2 = paramResultSet.getInt("height");
+      int i1 = paramResultSet.getInt("height");
       byte[] arrayOfByte3 = paramResultSet.getBytes("generation_signature");
       byte[] arrayOfByte4 = paramResultSet.getBytes("block_signature");
       byte[] arrayOfByte5 = paramResultSet.getBytes("payload_hash");
@@ -636,14 +632,13 @@ public final class Block
       localBlock.cumulativeDifficulty = localBigInteger;
       localBlock.baseTarget = l;
       localBlock.nextBlockId = localLong2;
-      localBlock.index = i1;
-      localBlock.height = i2;
+      localBlock.height = i1;
       localBlock.id = localLong3;
-      for (int i3 = 0; i3 < localList.size(); i3++)
+      for (int i2 = 0; i2 < localList.size(); i2++)
       {
-        Transaction localTransaction = (Transaction)localList.get(i3);
-        localBlock.transactionIds[i3] = localTransaction.getId();
-        localBlock.blockTransactions[i3] = localTransaction;
+        Transaction localTransaction = (Transaction)localList.get(i2);
+        localBlock.transactionIds[i2] = localTransaction.getId();
+        localBlock.blockTransactions[i2] = localTransaction;
         localTransaction.setBlock(localBlock);
       }
       return localBlock;
@@ -658,35 +653,35 @@ public final class Block
   {
     try
     {
-      PreparedStatement localPreparedStatement = paramConnection.prepareStatement("INSERT INTO block (id, version, timestamp, previous_block_id, total_amount, total_fee, payload_length, generator_public_key, previous_block_hash, cumulative_difficulty, base_target, next_block_id, index, height, generation_signature, block_signature, payload_hash, generator_id)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");Object localObject1 = null;
+      PreparedStatement localPreparedStatement = paramConnection.prepareStatement("INSERT INTO block (id, version, timestamp, previous_block_id, total_amount, total_fee, payload_length, generator_public_key, previous_block_hash, cumulative_difficulty, base_target, next_block_id, height, generation_signature, block_signature, payload_hash, generator_id)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");Object localObject1 = null;
       try
       {
-        localPreparedStatement.setLong(1, paramBlock.getId().longValue());
-        localPreparedStatement.setInt(2, paramBlock.version);
-        localPreparedStatement.setInt(3, paramBlock.timestamp);
+        int i = 0;
+        localPreparedStatement.setLong(++i, paramBlock.getId().longValue());
+        localPreparedStatement.setInt(++i, paramBlock.version);
+        localPreparedStatement.setInt(++i, paramBlock.timestamp);
         if (paramBlock.previousBlockId != null) {
-          localPreparedStatement.setLong(4, paramBlock.previousBlockId.longValue());
+          localPreparedStatement.setLong(++i, paramBlock.previousBlockId.longValue());
         } else {
-          localPreparedStatement.setNull(4, -5);
+          localPreparedStatement.setNull(++i, -5);
         }
-        localPreparedStatement.setInt(5, paramBlock.totalAmount);
-        localPreparedStatement.setInt(6, paramBlock.totalFee);
-        localPreparedStatement.setInt(7, paramBlock.payloadLength);
-        localPreparedStatement.setBytes(8, paramBlock.generatorPublicKey);
-        localPreparedStatement.setBytes(9, paramBlock.previousBlockHash);
-        localPreparedStatement.setBytes(10, paramBlock.cumulativeDifficulty.toByteArray());
-        localPreparedStatement.setLong(11, paramBlock.baseTarget);
+        localPreparedStatement.setInt(++i, paramBlock.totalAmount);
+        localPreparedStatement.setInt(++i, paramBlock.totalFee);
+        localPreparedStatement.setInt(++i, paramBlock.payloadLength);
+        localPreparedStatement.setBytes(++i, paramBlock.generatorPublicKey);
+        localPreparedStatement.setBytes(++i, paramBlock.previousBlockHash);
+        localPreparedStatement.setBytes(++i, paramBlock.cumulativeDifficulty.toByteArray());
+        localPreparedStatement.setLong(++i, paramBlock.baseTarget);
         if (paramBlock.nextBlockId != null) {
-          localPreparedStatement.setLong(12, paramBlock.nextBlockId.longValue());
+          localPreparedStatement.setLong(++i, paramBlock.nextBlockId.longValue());
         } else {
-          localPreparedStatement.setNull(12, -5);
+          localPreparedStatement.setNull(++i, -5);
         }
-        localPreparedStatement.setInt(13, paramBlock.index);
-        localPreparedStatement.setInt(14, paramBlock.height);
-        localPreparedStatement.setBytes(15, paramBlock.generationSignature);
-        localPreparedStatement.setBytes(16, paramBlock.blockSignature);
-        localPreparedStatement.setBytes(17, paramBlock.payloadHash);
-        localPreparedStatement.setLong(18, paramBlock.getGeneratorId().longValue());
+        localPreparedStatement.setInt(++i, paramBlock.height);
+        localPreparedStatement.setBytes(++i, paramBlock.generationSignature);
+        localPreparedStatement.setBytes(++i, paramBlock.blockSignature);
+        localPreparedStatement.setBytes(++i, paramBlock.payloadHash);
+        localPreparedStatement.setLong(++i, paramBlock.getGeneratorId().longValue());
         localPreparedStatement.executeUpdate();
         Transaction.saveTransactions(paramConnection, paramBlock.blockTransactions);
       }
@@ -808,12 +803,10 @@ public final class Block
   private BigInteger cumulativeDifficulty = BigInteger.ZERO;
   private long baseTarget = 153722867L;
   private volatile Long nextBlockId;
-  private int index;
   private int height;
   private volatile Long id;
   private volatile String stringId = null;
   private volatile Long generatorId;
-  private SoftReference<JSONStreamAware> jsonRef;
   
   Block(int paramInt1, int paramInt2, Long paramLong, int paramInt3, int paramInt4, int paramInt5, int paramInt6, byte[] paramArrayOfByte1, byte[] paramArrayOfByte2, byte[] paramArrayOfByte3, byte[] paramArrayOfByte4, byte[] paramArrayOfByte5)
     throws NxtException.ValidationException
@@ -921,16 +914,6 @@ public final class Block
     return this.nextBlockId;
   }
   
-  public int getIndex()
-  {
-    return this.index;
-  }
-  
-  void setIndex(int paramInt)
-  {
-    this.index = paramInt;
-  }
-  
   public int getHeight()
   {
     if (this.height == -1) {
@@ -974,20 +957,6 @@ public final class Block
     return this.generatorId;
   }
   
-  public synchronized JSONStreamAware getJSON()
-  {
-    if (this.jsonRef != null)
-    {
-      localJSONStreamAware = (JSONStreamAware)this.jsonRef.get();
-      if (localJSONStreamAware != null) {
-        return localJSONStreamAware;
-      }
-    }
-    JSONStreamAware localJSONStreamAware = JSON.prepare(getJSONObject());
-    this.jsonRef = new SoftReference(localJSONStreamAware);
-    return localJSONStreamAware;
-  }
-  
   public boolean equals(Object paramObject)
   {
     return ((paramObject instanceof Block)) && (getId().equals(((Block)paramObject).getId()));
@@ -1019,7 +988,7 @@ public final class Block
     return localByteBuffer.array();
   }
   
-  JSONObject getJSONObject()
+  public JSONObject getJSONObject()
   {
     JSONObject localJSONObject = new JSONObject();
     

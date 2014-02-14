@@ -32,13 +32,14 @@ final class GetInitialData
       localObject1 = (Transaction)localIterator.next();
       
       localObject2 = new JSONObject();
-      ((JSONObject)localObject2).put("index", Integer.valueOf(((Transaction)localObject1).getIndex()));
+      ((JSONObject)localObject2).put("index", Integer.valueOf(User.getIndex((Transaction)localObject1)));
       ((JSONObject)localObject2).put("timestamp", Integer.valueOf(((Transaction)localObject1).getTimestamp()));
       ((JSONObject)localObject2).put("deadline", Short.valueOf(((Transaction)localObject1).getDeadline()));
       ((JSONObject)localObject2).put("recipient", Convert.convert(((Transaction)localObject1).getRecipientId()));
       ((JSONObject)localObject2).put("amount", Integer.valueOf(((Transaction)localObject1).getAmount()));
       ((JSONObject)localObject2).put("fee", Integer.valueOf(((Transaction)localObject1).getFee()));
       ((JSONObject)localObject2).put("sender", Convert.convert(((Transaction)localObject1).getSenderId()));
+      ((JSONObject)localObject2).put("id", ((Transaction)localObject1).getStringId());
       
       localJSONArray1.add(localObject2);
     }
@@ -51,8 +52,10 @@ final class GetInitialData
       if (((Peer)localObject1).isBlacklisted())
       {
         localObject3 = new JSONObject();
-        ((JSONObject)localObject3).put("index", Integer.valueOf(((Peer)localObject1).getIndex()));
-        ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), (String)localObject2, 25, true));
+        ((JSONObject)localObject3).put("index", Integer.valueOf(User.getIndex((Peer)localObject1)));
+        ((JSONObject)localObject3).put("address", ((Peer)localObject1).getPeerAddress());
+        ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "-", 25, true));
+        ((JSONObject)localObject3).put("software", ((Peer)localObject1).getSoftware());
         if (((Peer)localObject1).isWellKnown()) {
           ((JSONObject)localObject3).put("wellKnown", Boolean.valueOf(true));
         }
@@ -63,8 +66,10 @@ final class GetInitialData
         if (((Peer)localObject1).getAnnouncedAddress() != null)
         {
           localObject3 = new JSONObject();
-          ((JSONObject)localObject3).put("index", Integer.valueOf(((Peer)localObject1).getIndex()));
-          ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "", 25, true));
+          ((JSONObject)localObject3).put("index", Integer.valueOf(User.getIndex((Peer)localObject1)));
+          ((JSONObject)localObject3).put("address", ((Peer)localObject1).getPeerAddress());
+          ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "-", 25, true));
+          ((JSONObject)localObject3).put("software", ((Peer)localObject1).getSoftware());
           if (((Peer)localObject1).isWellKnown()) {
             ((JSONObject)localObject3).put("wellKnown", Boolean.valueOf(true));
           }
@@ -74,12 +79,12 @@ final class GetInitialData
       else
       {
         localObject3 = new JSONObject();
-        ((JSONObject)localObject3).put("index", Integer.valueOf(((Peer)localObject1).getIndex()));
+        ((JSONObject)localObject3).put("index", Integer.valueOf(User.getIndex((Peer)localObject1)));
         if (((Peer)localObject1).getState() == Peer.State.DISCONNECTED) {
           ((JSONObject)localObject3).put("disconnected", Boolean.valueOf(true));
         }
-        ((JSONObject)localObject3).put("address", Convert.truncate((String)localObject2, "", 25, true));
-        ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "", 25, true));
+        ((JSONObject)localObject3).put("address", Convert.truncate((String)localObject2, "-", 25, true));
+        ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "-", 25, true));
         ((JSONObject)localObject3).put("weight", Integer.valueOf(((Peer)localObject1).getWeight()));
         ((JSONObject)localObject3).put("downloaded", Long.valueOf(((Peer)localObject1).getDownloadedVolume()));
         ((JSONObject)localObject3).put("uploaded", Long.valueOf(((Peer)localObject1).getUploadedVolume()));
@@ -97,7 +102,7 @@ final class GetInitialData
     {
       localObject3 = (Block)((List)localObject1).get(j);
       JSONObject localJSONObject2 = new JSONObject();
-      localJSONObject2.put("index", Integer.valueOf(((Block)localObject3).getIndex()));
+      localJSONObject2.put("index", Integer.valueOf(User.getIndex((Block)localObject3)));
       localJSONObject2.put("timestamp", Integer.valueOf(((Block)localObject3).getTimestamp()));
       localJSONObject2.put("numberOfTransactions", Integer.valueOf(((Block)localObject3).getTransactionIds().length));
       localJSONObject2.put("totalAmount", Integer.valueOf(((Block)localObject3).getTotalAmount()));
@@ -114,7 +119,7 @@ final class GetInitialData
     }
     JSONObject localJSONObject1 = new JSONObject();
     localJSONObject1.put("response", "processInitialData");
-    localJSONObject1.put("version", "0.7.4");
+    localJSONObject1.put("version", "0.7.5");
     if (localJSONArray1.size() > 0) {
       localJSONObject1.put("unconfirmedTransactions", localJSONArray1);
     }

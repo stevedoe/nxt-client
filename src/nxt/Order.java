@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public abstract class Order
 {
+  private static final SortedSet emptySortedSet = Collections.unmodifiableSortedSet(new TreeSet());
   private final Long id;
   private final Account account;
   private final Long assetId;
@@ -28,6 +29,9 @@ public abstract class Order
   {
     SortedSet localSortedSet1 = (SortedSet)Ask.sortedAskOrders.get(paramLong);
     SortedSet localSortedSet2 = (SortedSet)Bid.sortedBidOrders.get(paramLong);
+    if ((localSortedSet1 == null) || (localSortedSet2 == null)) {
+      return;
+    }
     while ((!localSortedSet1.isEmpty()) && (!localSortedSet2.isEmpty()))
     {
       Ask localAsk = (Ask)localSortedSet1.first();
@@ -125,11 +129,13 @@ public abstract class Order
     
     public static SortedSet<Ask> getSortedOrders(Long paramLong)
     {
-      return Collections.unmodifiableSortedSet((SortedSet)sortedAskOrders.get(paramLong));
+      SortedSet localSortedSet = (SortedSet)sortedAskOrders.get(paramLong);
+      return localSortedSet == null ? Order.emptySortedSet : Collections.unmodifiableSortedSet(localSortedSet);
     }
     
     static void addOrder(Long paramLong1, Account paramAccount, Long paramLong2, int paramInt, long paramLong)
     {
+      paramAccount.addToAssetAndUnconfirmedAssetBalance(paramLong2, -paramInt);
       Ask localAsk = new Ask(paramLong1, paramAccount, paramLong2, paramInt, paramLong);
       askOrders.put(localAsk.getId(), localAsk);
       Object localObject = (SortedSet)sortedAskOrders.get(paramLong2);
@@ -198,13 +204,14 @@ public abstract class Order
     
     public static SortedSet<Bid> getSortedOrders(Long paramLong)
     {
-      return Collections.unmodifiableSortedSet((SortedSet)sortedBidOrders.get(paramLong));
+      SortedSet localSortedSet = (SortedSet)sortedBidOrders.get(paramLong);
+      return localSortedSet == null ? Order.emptySortedSet : Collections.unmodifiableSortedSet(localSortedSet);
     }
     
     static void addOrder(Long paramLong1, Account paramAccount, Long paramLong2, int paramInt, long paramLong)
     {
-      Bid localBid = new Bid(paramLong1, paramAccount, paramLong2, paramInt, paramLong);
       paramAccount.addToBalanceAndUnconfirmedBalance(-paramInt * paramLong);
+      Bid localBid = new Bid(paramLong1, paramAccount, paramLong2, paramInt, paramLong);
       bidOrders.put(localBid.getId(), localBid);
       Object localObject = (SortedSet)sortedBidOrders.get(paramLong2);
       if (localObject == null)
@@ -212,6 +219,7 @@ public abstract class Order
         localObject = new TreeSet();
         sortedBidOrders.put(paramLong2, localObject);
       }
+      ((SortedSet)localObject).add(localBid);
       Order.matchOrders(paramLong2);
     }
     
