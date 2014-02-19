@@ -31,8 +31,8 @@ public final class GetBidOrder
       return JSONResponses.INCORRECT_ORDER;
     }
     JSONObject localJSONObject = new JSONObject();
-    localJSONObject.put("account", Convert.convert(localBid.getAccount().getId()));
-    localJSONObject.put("asset", Convert.convert(localBid.getAssetId()));
+    localJSONObject.put("account", Convert.toUnsignedLong(localBid.getAccount().getId()));
+    localJSONObject.put("asset", Convert.toUnsignedLong(localBid.getAssetId()));
     localJSONObject.put("quantity", Integer.valueOf(localBid.getQuantity()));
     localJSONObject.put("price", Long.valueOf(localBid.getPrice()));
     

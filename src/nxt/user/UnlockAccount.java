@@ -41,7 +41,7 @@ final class UnlockAccount
     
     Object localObject2 = new JSONObject();
     ((JSONObject)localObject2).put("response", "unlockAccount");
-    ((JSONObject)localObject2).put("account", Convert.convert((Long)localObject1));
+    ((JSONObject)localObject2).put("account", Convert.toUnsignedLong((Long)localObject1));
     if (str.length() < 30) {
       ((JSONObject)localObject2).put("secretPhraseStrength", Integer.valueOf(1));
     } else {
@@ -67,7 +67,7 @@ final class UnlockAccount
           ((JSONObject)localObject4).put("index", Integer.valueOf(User.getIndex(localTransaction1)));
           ((JSONObject)localObject4).put("transactionTimestamp", Integer.valueOf(localTransaction1.getTimestamp()));
           ((JSONObject)localObject4).put("deadline", Short.valueOf(localTransaction1.getDeadline()));
-          ((JSONObject)localObject4).put("account", Convert.convert(localTransaction1.getRecipientId()));
+          ((JSONObject)localObject4).put("account", Convert.toUnsignedLong(localTransaction1.getRecipientId()));
           ((JSONObject)localObject4).put("sentAmount", Integer.valueOf(localTransaction1.getAmount()));
           if (((Long)localObject1).equals(localTransaction1.getRecipientId())) {
             ((JSONObject)localObject4).put("receivedAmount", Integer.valueOf(localTransaction1.getAmount()));
@@ -84,7 +84,7 @@ final class UnlockAccount
           ((JSONObject)localObject4).put("index", Integer.valueOf(User.getIndex(localTransaction1)));
           ((JSONObject)localObject4).put("transactionTimestamp", Integer.valueOf(localTransaction1.getTimestamp()));
           ((JSONObject)localObject4).put("deadline", Short.valueOf(localTransaction1.getDeadline()));
-          ((JSONObject)localObject4).put("account", Convert.convert(localTransaction1.getSenderId()));
+          ((JSONObject)localObject4).put("account", Convert.toUnsignedLong(localTransaction1.getSenderId()));
           ((JSONObject)localObject4).put("receivedAmount", Integer.valueOf(localTransaction1.getAmount()));
           ((JSONObject)localObject4).put("fee", Integer.valueOf(localTransaction1.getFee()));
           ((JSONObject)localObject4).put("numberOfConfirmations", Integer.valueOf(0));
@@ -149,7 +149,7 @@ final class UnlockAccount
             localJSONObject.put("index", Integer.valueOf(User.getIndex(localTransaction2)));
             localJSONObject.put("blockTimestamp", Integer.valueOf(localTransaction2.getBlock().getTimestamp()));
             localJSONObject.put("transactionTimestamp", Integer.valueOf(localTransaction2.getTimestamp()));
-            localJSONObject.put("account", Convert.convert(localTransaction2.getRecipientId()));
+            localJSONObject.put("account", Convert.toUnsignedLong(localTransaction2.getRecipientId()));
             localJSONObject.put("sentAmount", Integer.valueOf(localTransaction2.getAmount()));
             if (((Long)localObject1).equals(localTransaction2.getRecipientId())) {
               localJSONObject.put("receivedAmount", Integer.valueOf(localTransaction2.getAmount()));
@@ -165,7 +165,7 @@ final class UnlockAccount
             localJSONObject.put("index", Integer.valueOf(User.getIndex(localTransaction2)));
             localJSONObject.put("blockTimestamp", Integer.valueOf(localTransaction2.getBlock().getTimestamp()));
             localJSONObject.put("transactionTimestamp", Integer.valueOf(localTransaction2.getTimestamp()));
-            localJSONObject.put("account", Convert.convert(localTransaction2.getSenderId()));
+            localJSONObject.put("account", Convert.toUnsignedLong(localTransaction2.getSenderId()));
             localJSONObject.put("receivedAmount", Integer.valueOf(localTransaction2.getAmount()));
             localJSONObject.put("fee", Integer.valueOf(localTransaction2.getFee()));
             localJSONObject.put("numberOfConfirmations", Integer.valueOf(i - localTransaction2.getBlock().getHeight()));

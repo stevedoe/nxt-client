@@ -21,7 +21,7 @@ public final class GetAccountId
     byte[] arrayOfByte = Crypto.getPublicKey(str);
     
     JSONObject localJSONObject = new JSONObject();
-    localJSONObject.put("accountId", Convert.convert(Account.getId(arrayOfByte)));
+    localJSONObject.put("accountId", Convert.toUnsignedLong(Account.getId(arrayOfByte)));
     
     return localJSONObject;
   }

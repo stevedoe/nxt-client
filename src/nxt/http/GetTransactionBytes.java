@@ -37,11 +37,11 @@ public final class GetTransactionBytes
       if (localTransaction == null) {
         return JSONResponses.UNKNOWN_TRANSACTION;
       }
-      localJSONObject.put("bytes", Convert.convert(localTransaction.getBytes()));
+      localJSONObject.put("bytes", Convert.toHexString(localTransaction.getBytes()));
     }
     else
     {
-      localJSONObject.put("bytes", Convert.convert(localTransaction.getBytes()));
+      localJSONObject.put("bytes", Convert.toHexString(localTransaction.getBytes()));
       Block localBlock = localTransaction.getBlock();
       localJSONObject.put("confirmations", Integer.valueOf(Blockchain.getLastBlock().getHeight() - localBlock.getHeight() + 1));
     }

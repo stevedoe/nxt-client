@@ -22,7 +22,7 @@ public final class GetAliasId
       return JSONResponses.UNKNOWN_ALIAS;
     }
     JSONObject localJSONObject = new JSONObject();
-    localJSONObject.put("id", Convert.convert(localAlias.getId()));
+    localJSONObject.put("id", Convert.toUnsignedLong(localAlias.getId()));
     return localJSONObject;
   }
 }

@@ -38,12 +38,12 @@ public final class GetTransaction
         return JSONResponses.UNKNOWN_TRANSACTION;
       }
       localJSONObject = localTransaction.getJSONObject();
-      localJSONObject.put("sender", Convert.convert(localTransaction.getSenderId()));
+      localJSONObject.put("sender", Convert.toUnsignedLong(localTransaction.getSenderId()));
     }
     else
     {
       localJSONObject = localTransaction.getJSONObject();
-      localJSONObject.put("sender", Convert.convert(localTransaction.getSenderId()));
+      localJSONObject.put("sender", Convert.toUnsignedLong(localTransaction.getSenderId()));
       Block localBlock = localTransaction.getBlock();
       localJSONObject.put("block", localBlock.getStringId());
       localJSONObject.put("confirmations", Integer.valueOf(Blockchain.getLastBlock().getHeight() - localBlock.getHeight() + 1));

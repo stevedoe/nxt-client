@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import nxt.util.Convert;
 import nxt.util.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -48,7 +49,7 @@ public abstract interface Attachment
     public JSONStreamAware getJSON()
     {
       JSONObject localJSONObject = new JSONObject();
-      localJSONObject.put("message", Convert.convert(this.message));
+      localJSONObject.put("message", Convert.toHexString(this.message));
       
       return localJSONObject;
     }
@@ -142,23 +143,89 @@ public abstract interface Attachment
     implements Attachment, Serializable
   {
     static final long serialVersionUID = 0L;
+    private final String pollName;
+    private final String pollDescription;
+    private final String[] pollOptions;
+    private final byte minNumberOfOptions;
+    private final byte maxNumberOfOptions;
+    private final boolean optionsAreBinary;
+    
+    public MessagingPollCreation(String paramString1, String paramString2, String[] paramArrayOfString, byte paramByte1, byte paramByte2, boolean paramBoolean)
+    {
+      this.pollName = paramString1;
+      this.pollDescription = paramString2;
+      this.pollOptions = paramArrayOfString;
+      this.minNumberOfOptions = paramByte1;
+      this.maxNumberOfOptions = paramByte2;
+      this.optionsAreBinary = paramBoolean;
+    }
     
     public int getSize()
     {
+      try
+      {
+        int i = 2 + this.pollName.getBytes("UTF-8").length + 2 + this.pollDescription.getBytes("UTF-8").length + 1;
+        for (int j = 0; j < this.pollOptions.length; j++) {
+          i += 2 + this.pollOptions[j].getBytes("UTF-8").length;
+        }
+        i += 3;
+        return i;
+      }
+      catch (RuntimeException|UnsupportedEncodingException localRuntimeException)
+      {
+        Logger.logMessage("Error in getBytes", localRuntimeException);
+      }
       return 0;
     }
     
     public byte[] getBytes()
     {
-      ByteBuffer localByteBuffer = ByteBuffer.allocate(getSize());
-      localByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-      
-      return localByteBuffer.array();
+      try
+      {
+        byte[] arrayOfByte1 = this.pollName.getBytes("UTF-8");
+        byte[] arrayOfByte2 = this.pollDescription.getBytes("UTF-8");
+        byte[][] arrayOfByte = new byte[this.pollOptions.length][];
+        for (int i = 0; i < this.pollOptions.length; i++) {
+          arrayOfByte[i] = this.pollOptions[i].getBytes("UTF-8");
+        }
+        ByteBuffer localByteBuffer = ByteBuffer.allocate(getSize());
+        localByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        localByteBuffer.putShort((short)arrayOfByte1.length);
+        localByteBuffer.put(arrayOfByte1);
+        localByteBuffer.putShort((short)arrayOfByte2.length);
+        localByteBuffer.put(arrayOfByte2);
+        localByteBuffer.put((byte)arrayOfByte.length);
+        for (int j = 0; j < arrayOfByte.length; j++)
+        {
+          localByteBuffer.putShort((short)arrayOfByte[j].length);
+          localByteBuffer.put(arrayOfByte[j]);
+        }
+        localByteBuffer.put(this.minNumberOfOptions);
+        localByteBuffer.put(this.maxNumberOfOptions);
+        localByteBuffer.put((byte)(this.optionsAreBinary ? 1 : 0));
+        
+        return localByteBuffer.array();
+      }
+      catch (RuntimeException|UnsupportedEncodingException localRuntimeException)
+      {
+        Logger.logMessage("Error in getBytes", localRuntimeException);
+      }
+      return null;
     }
     
     public JSONStreamAware getJSON()
     {
       JSONObject localJSONObject = new JSONObject();
+      localJSONObject.put("name", this.pollName);
+      localJSONObject.put("description", this.pollDescription);
+      JSONArray localJSONArray = new JSONArray();
+      for (int i = 0; i < this.pollOptions.length; i++) {
+        localJSONArray.add(this.pollOptions[i]);
+      }
+      localJSONObject.put("options", localJSONArray);
+      localJSONObject.put("minNumberOfOptions", Byte.valueOf(this.minNumberOfOptions));
+      localJSONObject.put("maxNumberOfOptions", Byte.valueOf(this.maxNumberOfOptions));
+      localJSONObject.put("optionsAreBinary", Boolean.valueOf(this.optionsAreBinary));
       
       return localJSONObject;
     }
@@ -167,22 +234,63 @@ public abstract interface Attachment
     {
       return Transaction.Type.Messaging.POLL_CREATION;
     }
+    
+    public String getPollName()
+    {
+      return this.pollName;
+    }
+    
+    public String getPollDescription()
+    {
+      return this.pollDescription;
+    }
+    
+    public String[] getPollOptions()
+    {
+      return this.pollOptions;
+    }
+    
+    public byte getMinNumberOfOptions()
+    {
+      return this.minNumberOfOptions;
+    }
+    
+    public byte getMaxNumberOfOptions()
+    {
+      return this.maxNumberOfOptions;
+    }
+    
+    public boolean isOptionsAreBinary()
+    {
+      return this.optionsAreBinary;
+    }
   }
   
   public static class MessagingVoteCasting
     implements Attachment, Serializable
   {
     static final long serialVersionUID = 0L;
+    private final Long pollId;
+    private final byte[] pollVote;
+    
+    public MessagingVoteCasting(Long paramLong, byte[] paramArrayOfByte)
+    {
+      this.pollId = paramLong;
+      this.pollVote = paramArrayOfByte;
+    }
     
     public int getSize()
     {
-      return 0;
+      return 9 + this.pollVote.length;
     }
     
     public byte[] getBytes()
     {
       ByteBuffer localByteBuffer = ByteBuffer.allocate(getSize());
       localByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+      localByteBuffer.putLong(this.pollId.longValue());
+      localByteBuffer.put((byte)this.pollVote.length);
+      localByteBuffer.put(this.pollVote);
       
       return localByteBuffer.array();
     }
@@ -190,6 +298,12 @@ public abstract interface Attachment
     public JSONStreamAware getJSON()
     {
       JSONObject localJSONObject = new JSONObject();
+      localJSONObject.put("pollId", Convert.toUnsignedLong(this.pollId));
+      JSONArray localJSONArray = new JSONArray();
+      for (int i = 0; i < this.pollVote.length; i++) {
+        localJSONArray.add(Byte.valueOf(this.pollVote[i]));
+      }
+      localJSONObject.put("vote", localJSONArray);
       
       return localJSONObject;
     }
@@ -197,6 +311,16 @@ public abstract interface Attachment
     public Transaction.Type getTransactionType()
     {
       return Transaction.Type.Messaging.VOTE_CASTING;
+    }
+    
+    public Long getPollId()
+    {
+      return this.pollId;
+    }
+    
+    public byte[] getPollVote()
+    {
+      return this.pollVote;
     }
   }
   
@@ -314,7 +438,7 @@ public abstract interface Attachment
     public JSONStreamAware getJSON()
     {
       JSONObject localJSONObject = new JSONObject();
-      localJSONObject.put("asset", Convert.convert(this.assetId));
+      localJSONObject.put("asset", Convert.toUnsignedLong(this.assetId));
       localJSONObject.put("quantity", Integer.valueOf(this.quantity));
       
       return localJSONObject;
@@ -370,7 +494,7 @@ public abstract interface Attachment
     public JSONStreamAware getJSON()
     {
       JSONObject localJSONObject = new JSONObject();
-      localJSONObject.put("asset", Convert.convert(this.assetId));
+      localJSONObject.put("asset", Convert.toUnsignedLong(this.assetId));
       localJSONObject.put("quantity", Integer.valueOf(this.quantity));
       localJSONObject.put("price", Long.valueOf(this.price));
       
@@ -453,7 +577,7 @@ public abstract interface Attachment
     public JSONStreamAware getJSON()
     {
       JSONObject localJSONObject = new JSONObject();
-      localJSONObject.put("order", Convert.convert(this.orderId));
+      localJSONObject.put("order", Convert.toUnsignedLong(this.orderId));
       
       return localJSONObject;
     }

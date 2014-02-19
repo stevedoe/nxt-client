@@ -36,7 +36,7 @@ public final class GetAccount
     synchronized (localAccount)
     {
       if (localAccount.getPublicKey() != null) {
-        localJSONObject1.put("publicKey", Convert.convert(localAccount.getPublicKey()));
+        localJSONObject1.put("publicKey", Convert.toHexString(localAccount.getPublicKey()));
       }
       localJSONObject1.put("balance", Long.valueOf(localAccount.getBalance()));
       localJSONObject1.put("effectiveBalance", Long.valueOf(localAccount.getEffectiveBalance() * 100L));
@@ -45,7 +45,7 @@ public final class GetAccount
       for (Map.Entry localEntry : localAccount.getAssetBalances().entrySet())
       {
         JSONObject localJSONObject2 = new JSONObject();
-        localJSONObject2.put("asset", Convert.convert((Long)localEntry.getKey()));
+        localJSONObject2.put("asset", Convert.toUnsignedLong((Long)localEntry.getKey()));
         localJSONObject2.put("balance", localEntry.getValue());
         localJSONArray.add(localJSONObject2);
       }

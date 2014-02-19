@@ -42,6 +42,11 @@
         </init-param>
 
         <init-param>
+            <param-name>wellKnownPeers2</param-name>
+            <param-value>87.230.14.1; 46.19.137.116; 95.85.22.142; 162.243.214.183; scum2.bounceme.net; 162.243.213.115; node11.nxtbase.com; 78.46.63.221; scum5.bounceme.net; scum4.bounceme.net; vps5.nxtcrypto.org; node16.nxtbase.com;</param-value>
+        </init-param>
+
+        <init-param>
             <param-name>maxNumberOfConnectedPublicPeers</param-name>
             <param-value>20</param-value>
         </init-param>

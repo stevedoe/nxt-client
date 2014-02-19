@@ -86,14 +86,4 @@ public final class Alias
   {
     return this.account;
   }
-  
-  public boolean equals(Object paramObject)
-  {
-    return ((paramObject instanceof Alias)) && (getId().equals(((Alias)paramObject).getId()));
-  }
-  
-  public int hashCode()
-  {
-    return getId().hashCode();
-  }
 }

@@ -32,8 +32,8 @@ public final class GetAskOrder
     }
     JSONObject localJSONObject = new JSONObject();
     
-    localJSONObject.put("account", Convert.convert(localAsk.getAccount().getId()));
-    localJSONObject.put("asset", Convert.convert(localAsk.getAssetId()));
+    localJSONObject.put("account", Convert.toUnsignedLong(localAsk.getAccount().getId()));
+    localJSONObject.put("asset", Convert.toUnsignedLong(localAsk.getAssetId()));
     localJSONObject.put("quantity", Integer.valueOf(localAsk.getQuantity()));
     localJSONObject.put("price", Long.valueOf(localAsk.getPrice()));
     return localJSONObject;

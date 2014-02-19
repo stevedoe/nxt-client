@@ -20,7 +20,7 @@ public final class GetAssetIds
     for (Object localObject = Asset.getAllAssets().iterator(); ((Iterator)localObject).hasNext();)
     {
       Asset localAsset = (Asset)((Iterator)localObject).next();
-      localJSONArray.add(Convert.convert(localAsset.getId()));
+      localJSONArray.add(Convert.toUnsignedLong(localAsset.getId()));
     }
     localObject = new JSONObject();
     ((JSONObject)localObject).put("assetIds", localJSONArray);

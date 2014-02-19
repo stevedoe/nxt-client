@@ -94,6 +94,11 @@ public final class Generator
     return localGenerator;
   }
   
+  public static Generator getGenerator(String paramString)
+  {
+    return (Generator)generators.get(paramString);
+  }
+  
   public static Collection<Generator> getAllGenerators()
   {
     return allGenerators;

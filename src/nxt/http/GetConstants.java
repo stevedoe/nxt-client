@@ -21,8 +21,8 @@ public final class GetConstants
   static
   {
     JSONObject localJSONObject1 = new JSONObject();
-    localJSONObject1.put("genesisBlockId", Convert.convert(Genesis.GENESIS_BLOCK_ID));
-    localJSONObject1.put("genesisAccountId", Convert.convert(Genesis.CREATOR_ID));
+    localJSONObject1.put("genesisBlockId", Convert.toUnsignedLong(Genesis.GENESIS_BLOCK_ID));
+    localJSONObject1.put("genesisAccountId", Convert.toUnsignedLong(Genesis.CREATOR_ID));
     localJSONObject1.put("maxBlockPayloadLength", Integer.valueOf(32640));
     localJSONObject1.put("maxArbitraryMessageLength", Integer.valueOf(1000));
     

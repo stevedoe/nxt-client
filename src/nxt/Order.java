@@ -3,13 +3,14 @@ package nxt;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import nxt.util.Convert;
 
 public abstract class Order
 {
-  private static final SortedSet emptySortedSet = Collections.unmodifiableSortedSet(new TreeSet());
+  private static final SortedSet<? extends Order> emptySortedSet = Collections.unmodifiableSortedSet(new ConcurrentSkipListSet());
   private final Long id;
   private final Account account;
   private final Long assetId;
@@ -41,6 +42,8 @@ public abstract class Order
       }
       int i = localAsk.quantity < localBid.quantity ? localAsk.quantity : localBid.quantity;
       long l = (localAsk.getHeight() < localBid.getHeight()) || ((localAsk.getHeight() == localBid.getHeight()) && (localAsk.getId().longValue() < localBid.getId().longValue())) ? localAsk.getPrice() : localBid.getPrice();
+      
+      Trade.addTrade(paramLong, Blockchain.getLastBlock().getId(), localAsk.getId(), localBid.getId(), i, l);
       if (localAsk.quantity -= i == 0) {
         Ask.removeOrder(localAsk.getId());
       }
@@ -137,11 +140,13 @@ public abstract class Order
     {
       paramAccount.addToAssetAndUnconfirmedAssetBalance(paramLong2, -paramInt);
       Ask localAsk = new Ask(paramLong1, paramAccount, paramLong2, paramInt, paramLong);
-      askOrders.put(localAsk.getId(), localAsk);
+      if (askOrders.putIfAbsent(localAsk.getId(), localAsk) != null) {
+        throw new IllegalStateException("Ask order id " + Convert.toUnsignedLong(localAsk.getId()) + " already exists");
+      }
       Object localObject = (SortedSet)sortedAskOrders.get(paramLong2);
       if (localObject == null)
       {
-        localObject = new TreeSet();
+        localObject = new ConcurrentSkipListSet();
         sortedAskOrders.put(paramLong2, localObject);
       }
       ((SortedSet)localObject).add(localAsk);
@@ -171,16 +176,6 @@ public abstract class Order
         return 1;
       }
       return super.compareTo(paramAsk);
-    }
-    
-    public boolean equals(Object paramObject)
-    {
-      return ((paramObject instanceof Ask)) && (getId().equals(((Ask)paramObject).getId()));
-    }
-    
-    public int hashCode()
-    {
-      return getId().hashCode();
     }
   }
   
@@ -212,11 +207,13 @@ public abstract class Order
     {
       paramAccount.addToBalanceAndUnconfirmedBalance(-paramInt * paramLong);
       Bid localBid = new Bid(paramLong1, paramAccount, paramLong2, paramInt, paramLong);
-      bidOrders.put(localBid.getId(), localBid);
+      if (bidOrders.putIfAbsent(localBid.getId(), localBid) != null) {
+        throw new IllegalStateException("Bid order id " + Convert.toUnsignedLong(localBid.getId()) + " already exists");
+      }
       Object localObject = (SortedSet)sortedBidOrders.get(paramLong2);
       if (localObject == null)
       {
-        localObject = new TreeSet();
+        localObject = new ConcurrentSkipListSet();
         sortedBidOrders.put(paramLong2, localObject);
       }
       ((SortedSet)localObject).add(localBid);
@@ -246,16 +243,6 @@ public abstract class Order
         return 1;
       }
       return super.compareTo(paramBid);
-    }
-    
-    public boolean equals(Object paramObject)
-    {
-      return ((paramObject instanceof Bid)) && (getId().equals(((Bid)paramObject).getId()));
-    }
-    
-    public int hashCode()
-    {
-      return getId().hashCode();
     }
   }
 }

@@ -27,7 +27,7 @@ public final class DecodeToken
       Token localToken = Token.parseToken(str2, str1.trim());
       
       JSONObject localJSONObject = new JSONObject();
-      localJSONObject.put("account", Convert.convert(Account.getId(localToken.getPublicKey())));
+      localJSONObject.put("account", Convert.toUnsignedLong(Account.getId(localToken.getPublicKey())));
       localJSONObject.put("timestamp", Integer.valueOf(localToken.getTimestamp()));
       localJSONObject.put("valid", Boolean.valueOf(localToken.isValid()));
       

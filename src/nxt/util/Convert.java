@@ -8,14 +8,16 @@ public final class Convert
   public static final String alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
   public static final BigInteger two64 = new BigInteger("18446744073709551616");
   
-  public static byte[] convert(String paramString)
+  public static byte[] parseHexString(String paramString)
   {
     byte[] arrayOfByte = new byte[paramString.length() / 2];
     for (int i = 0; i < arrayOfByte.length; i++)
     {
-      int j = "0123456789abcdefghijklmnopqrstuvwxyz".indexOf(paramString.charAt(i * 2));
-      int k = "0123456789abcdefghijklmnopqrstuvwxyz".indexOf(paramString.charAt(i * 2 + 1));
-      if ((j < 0) || (k < 0) || (j > 15)) {
+      int j = paramString.charAt(i * 2);
+      j = j > 96 ? j - 87 : j - 48;
+      int k = paramString.charAt(i * 2 + 1);
+      k = k > 96 ? k - 87 : k - 48;
+      if ((j < 0) || (k < 0) || (j > 15) || (k > 15)) {
         throw new NumberFormatException("Invalid hex number: " + paramString);
       }
       arrayOfByte[i] = ((byte)((j << 4) + k));
@@ -23,18 +25,20 @@ public final class Convert
     return arrayOfByte;
   }
   
-  public static String convert(byte[] paramArrayOfByte)
+  public static String toHexString(byte[] paramArrayOfByte)
   {
-    StringBuilder localStringBuilder = new StringBuilder();
-    for (int k : paramArrayOfByte)
+    char[] arrayOfChar = new char[paramArrayOfByte.length * 2];
+    for (int i = 0; i < paramArrayOfByte.length; i++)
     {
-      int m;
-      localStringBuilder.append("0123456789abcdefghijklmnopqrstuvwxyz".charAt((m = k & 0xFF) >> 4)).append("0123456789abcdefghijklmnopqrstuvwxyz".charAt(m & 0xF));
+      int j = (paramArrayOfByte[i] & 0xFF) >> 4;
+      arrayOfChar[(i * 2)] = ((char)(j > 9 ? j + 87 : j + 48));
+      int k = paramArrayOfByte[i] & 0xF;
+      arrayOfChar[(i * 2 + 1)] = ((char)(k > 9 ? k + 87 : k + 48));
     }
-    return localStringBuilder.toString();
+    return String.valueOf(arrayOfChar);
   }
   
-  public static String convert(long paramLong)
+  public static String toUnsignedLong(long paramLong)
   {
     if (paramLong >= 0L) {
       return String.valueOf(paramLong);
@@ -43,9 +47,9 @@ public final class Convert
     return localBigInteger.toString();
   }
   
-  public static String convert(Long paramLong)
+  public static String toUnsignedLong(Long paramLong)
   {
-    return convert(nullToZero(paramLong));
+    return toUnsignedLong(nullToZero(paramLong));
   }
   
   public static Long parseUnsignedLong(String paramString)

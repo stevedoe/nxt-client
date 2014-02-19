@@ -138,7 +138,12 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#Attachment.MessagingPollCreation()">Attachment.MessagingPollCreation</a></strong>()</code>&nbsp;</td>
+<td class="colOne"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#Attachment.MessagingPollCreation(java.lang.String, java.lang.String, java.lang.String[], byte, byte, boolean)">Attachment.MessagingPollCreation</a></strong>(java.lang.String&nbsp;pollName,
+                                java.lang.String&nbsp;pollDescription,
+                                java.lang.String[]&nbsp;pollOptions,
+                                byte&nbsp;minNumberOfOptions,
+                                byte&nbsp;maxNumberOfOptions,
+                                boolean&nbsp;optionsAreBinary)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -164,12 +169,36 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#getJSON()">getJSON</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>byte</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#getMaxNumberOfOptions()">getMaxNumberOfOptions</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>byte</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#getMinNumberOfOptions()">getMinNumberOfOptions</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#getPollDescription()">getPollDescription</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#getPollName()">getPollName</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>java.lang.String[]</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#getPollOptions()">getPollOptions</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#getSize()">getSize</a></strong>()</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="../nxt/Transaction.Type.html" title="class in nxt">Transaction.Type</a></code></td>
 <td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#getTransactionType()">getTransactionType</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingPollCreation.html#isOptionsAreBinary()">isOptionsAreBinary</a></strong>()</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -193,13 +222,18 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="Attachment.MessagingPollCreation()">
+<a name="Attachment.MessagingPollCreation(java.lang.String, java.lang.String, java.lang.String[], byte, byte, boolean)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>Attachment.MessagingPollCreation</h4>
-<pre>public&nbsp;Attachment.MessagingPollCreation()</pre>
+<pre>public&nbsp;Attachment.MessagingPollCreation(java.lang.String&nbsp;pollName,
+                                java.lang.String&nbsp;pollDescription,
+                                java.lang.String[]&nbsp;pollOptions,
+                                byte&nbsp;minNumberOfOptions,
+                                byte&nbsp;maxNumberOfOptions,
+                                boolean&nbsp;optionsAreBinary)</pre>
 </li>
 </ul>
 </li>
@@ -252,7 +286,7 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <a name="getTransactionType()">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getTransactionType</h4>
 <pre>public&nbsp;<a href="../nxt/Transaction.Type.html" title="class in nxt">Transaction.Type</a>&nbsp;getTransactionType()</pre>
@@ -260,6 +294,60 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../nxt/Attachment.html#getTransactionType()">getTransactionType</a></code>&nbsp;in interface&nbsp;<code><a href="../nxt/Attachment.html" title="interface in nxt">Attachment</a></code></dd>
 </dl>
+</li>
+</ul>
+<a name="getPollName()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getPollName</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getPollName()</pre>
+</li>
+</ul>
+<a name="getPollDescription()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getPollDescription</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getPollDescription()</pre>
+</li>
+</ul>
+<a name="getPollOptions()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getPollOptions</h4>
+<pre>public&nbsp;java.lang.String[]&nbsp;getPollOptions()</pre>
+</li>
+</ul>
+<a name="getMinNumberOfOptions()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMinNumberOfOptions</h4>
+<pre>public&nbsp;byte&nbsp;getMinNumberOfOptions()</pre>
+</li>
+</ul>
+<a name="getMaxNumberOfOptions()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMaxNumberOfOptions</h4>
+<pre>public&nbsp;byte&nbsp;getMaxNumberOfOptions()</pre>
+</li>
+</ul>
+<a name="isOptionsAreBinary()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>isOptionsAreBinary</h4>
+<pre>public&nbsp;boolean&nbsp;isOptionsAreBinary()</pre>
 </li>
 </ul>
 </li>

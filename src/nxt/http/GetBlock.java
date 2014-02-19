@@ -1,5 +1,6 @@
 package nxt.http;
 
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Block;
 import nxt.Blockchain;
@@ -33,29 +34,29 @@ public final class GetBlock
     }
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("height", Integer.valueOf(localBlock.getHeight()));
-    localJSONObject.put("generator", Convert.convert(localBlock.getGeneratorId()));
+    localJSONObject.put("generator", Convert.toUnsignedLong(localBlock.getGeneratorId()));
     localJSONObject.put("timestamp", Integer.valueOf(localBlock.getTimestamp()));
-    localJSONObject.put("numberOfTransactions", Integer.valueOf(localBlock.getTransactionIds().length));
+    localJSONObject.put("numberOfTransactions", Integer.valueOf(localBlock.getTransactionIds().size()));
     localJSONObject.put("totalAmount", Integer.valueOf(localBlock.getTotalAmount()));
     localJSONObject.put("totalFee", Integer.valueOf(localBlock.getTotalFee()));
     localJSONObject.put("payloadLength", Integer.valueOf(localBlock.getPayloadLength()));
     localJSONObject.put("version", Integer.valueOf(localBlock.getVersion()));
-    localJSONObject.put("baseTarget", Convert.convert(localBlock.getBaseTarget()));
+    localJSONObject.put("baseTarget", Convert.toUnsignedLong(localBlock.getBaseTarget()));
     if (localBlock.getPreviousBlockId() != null) {
-      localJSONObject.put("previousBlock", Convert.convert(localBlock.getPreviousBlockId()));
+      localJSONObject.put("previousBlock", Convert.toUnsignedLong(localBlock.getPreviousBlockId()));
     }
     if (localBlock.getNextBlockId() != null) {
-      localJSONObject.put("nextBlock", Convert.convert(localBlock.getNextBlockId()));
+      localJSONObject.put("nextBlock", Convert.toUnsignedLong(localBlock.getNextBlockId()));
     }
-    localJSONObject.put("payloadHash", Convert.convert(localBlock.getPayloadHash()));
-    localJSONObject.put("generationSignature", Convert.convert(localBlock.getGenerationSignature()));
+    localJSONObject.put("payloadHash", Convert.toHexString(localBlock.getPayloadHash()));
+    localJSONObject.put("generationSignature", Convert.toHexString(localBlock.getGenerationSignature()));
     if (localBlock.getVersion() > 1) {
-      localJSONObject.put("previousBlockHash", Convert.convert(localBlock.getPreviousBlockHash()));
+      localJSONObject.put("previousBlockHash", Convert.toHexString(localBlock.getPreviousBlockHash()));
     }
-    localJSONObject.put("blockSignature", Convert.convert(localBlock.getBlockSignature()));
+    localJSONObject.put("blockSignature", Convert.toHexString(localBlock.getBlockSignature()));
     JSONArray localJSONArray = new JSONArray();
     for (Long localLong : localBlock.getTransactionIds()) {
-      localJSONArray.add(Convert.convert(localLong));
+      localJSONArray.add(Convert.toUnsignedLong(localLong));
     }
     localJSONObject.put("transactions", localJSONArray);
     

@@ -1,8 +1,8 @@
 package nxt.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class Listeners<T, E extends Enum<E>>
 {
@@ -15,7 +15,7 @@ public final class Listeners<T, E extends Enum<E>>
       Object localObject1 = (List)this.listenersMap.get(paramEnum);
       if (localObject1 == null)
       {
-        localObject1 = new ArrayList();
+        localObject1 = new CopyOnWriteArrayList();
         this.listenersMap.put(paramEnum, localObject1);
       }
       return ((List)localObject1).add(paramListener);

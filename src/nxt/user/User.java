@@ -114,20 +114,17 @@ public final class User
         localJSONObject2.put("index", Integer.valueOf(User.getIndex(paramAnonymousPeer)));
         localJSONArray1.add(localJSONObject2);
         localJSONObject1.put("removedActivePeers", localJSONArray1);
-        if (paramAnonymousPeer.getAnnouncedAddress() != null)
-        {
-          JSONArray localJSONArray2 = new JSONArray();
-          JSONObject localJSONObject3 = new JSONObject();
-          localJSONObject3.put("index", Integer.valueOf(User.getIndex(paramAnonymousPeer)));
-          localJSONObject3.put("address", paramAnonymousPeer.getPeerAddress());
-          localJSONObject3.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "-", 25, true));
-          if (paramAnonymousPeer.isWellKnown()) {
-            localJSONObject3.put("wellKnown", Boolean.valueOf(true));
-          }
-          localJSONObject3.put("software", paramAnonymousPeer.getSoftware());
-          localJSONArray2.add(localJSONObject3);
-          localJSONObject1.put("addedKnownPeers", localJSONArray2);
+        JSONArray localJSONArray2 = new JSONArray();
+        JSONObject localJSONObject3 = new JSONObject();
+        localJSONObject3.put("index", Integer.valueOf(User.getIndex(paramAnonymousPeer)));
+        localJSONObject3.put("address", paramAnonymousPeer.getPeerAddress());
+        localJSONObject3.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "-", 25, true));
+        if (paramAnonymousPeer.isWellKnown()) {
+          localJSONObject3.put("wellKnown", Boolean.valueOf(true));
         }
+        localJSONObject3.put("software", paramAnonymousPeer.getSoftware());
+        localJSONArray2.add(localJSONObject3);
+        localJSONObject1.put("addedKnownPeers", localJSONArray2);
         User.sendNewDataToAll(localJSONObject1);
       }
     }, Peer.Event.DEACTIVATE);
@@ -233,31 +230,28 @@ public final class User
       public void notify(Peer paramAnonymousPeer)
       {
         JSONObject localJSONObject1 = new JSONObject();
-        if (paramAnonymousPeer.getAnnouncedAddress() != null)
-        {
-          localJSONArray = new JSONArray();
-          localJSONObject2 = new JSONObject();
-          localJSONObject2.put("index", Integer.valueOf(User.getIndex(paramAnonymousPeer)));
-          localJSONArray.add(localJSONObject2);
-          localJSONObject1.put("removedKnownPeers", localJSONArray);
-        }
-        JSONArray localJSONArray = new JSONArray();
+        JSONArray localJSONArray1 = new JSONArray();
         JSONObject localJSONObject2 = new JSONObject();
         localJSONObject2.put("index", Integer.valueOf(User.getIndex(paramAnonymousPeer)));
+        localJSONArray1.add(localJSONObject2);
+        localJSONObject1.put("removedKnownPeers", localJSONArray1);
+        JSONArray localJSONArray2 = new JSONArray();
+        JSONObject localJSONObject3 = new JSONObject();
+        localJSONObject3.put("index", Integer.valueOf(User.getIndex(paramAnonymousPeer)));
         if (paramAnonymousPeer.getState() == Peer.State.DISCONNECTED) {
-          localJSONObject2.put("disconnected", Boolean.valueOf(true));
+          localJSONObject3.put("disconnected", Boolean.valueOf(true));
         }
-        localJSONObject2.put("address", Convert.truncate(paramAnonymousPeer.getPeerAddress(), "-", 25, true));
-        localJSONObject2.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "-", 25, true));
+        localJSONObject3.put("address", Convert.truncate(paramAnonymousPeer.getPeerAddress(), "-", 25, true));
+        localJSONObject3.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "-", 25, true));
         if (paramAnonymousPeer.isWellKnown()) {
-          localJSONObject2.put("wellKnown", Boolean.valueOf(true));
+          localJSONObject3.put("wellKnown", Boolean.valueOf(true));
         }
-        localJSONObject2.put("weight", Integer.valueOf(paramAnonymousPeer.getWeight()));
-        localJSONObject2.put("downloaded", Long.valueOf(paramAnonymousPeer.getDownloadedVolume()));
-        localJSONObject2.put("uploaded", Long.valueOf(paramAnonymousPeer.getUploadedVolume()));
-        localJSONObject2.put("software", paramAnonymousPeer.getSoftware());
-        localJSONArray.add(localJSONObject2);
-        localJSONObject1.put("addedActivePeers", localJSONArray);
+        localJSONObject3.put("weight", Integer.valueOf(paramAnonymousPeer.getWeight()));
+        localJSONObject3.put("downloaded", Long.valueOf(paramAnonymousPeer.getDownloadedVolume()));
+        localJSONObject3.put("uploaded", Long.valueOf(paramAnonymousPeer.getUploadedVolume()));
+        localJSONObject3.put("software", paramAnonymousPeer.getSoftware());
+        localJSONArray2.add(localJSONObject3);
+        localJSONObject1.put("addedActivePeers", localJSONArray2);
         User.sendNewDataToAll(localJSONObject1);
       }
     }, Peer.Event.ADDED_ACTIVE_PEER);
@@ -316,10 +310,10 @@ public final class User
           localJSONObject2.put("index", Integer.valueOf(User.getIndex(localTransaction)));
           localJSONObject2.put("timestamp", Integer.valueOf(localTransaction.getTimestamp()));
           localJSONObject2.put("deadline", Short.valueOf(localTransaction.getDeadline()));
-          localJSONObject2.put("recipient", Convert.convert(localTransaction.getRecipientId()));
+          localJSONObject2.put("recipient", Convert.toUnsignedLong(localTransaction.getRecipientId()));
           localJSONObject2.put("amount", Integer.valueOf(localTransaction.getAmount()));
           localJSONObject2.put("fee", Integer.valueOf(localTransaction.getFee()));
-          localJSONObject2.put("sender", Convert.convert(localTransaction.getSenderId()));
+          localJSONObject2.put("sender", Convert.toUnsignedLong(localTransaction.getSenderId()));
           localJSONObject2.put("id", localTransaction.getStringId());
           localJSONArray.add(localJSONObject2);
         }
@@ -342,8 +336,8 @@ public final class User
           localJSONObject2.put("index", Integer.valueOf(User.getIndex(localTransaction)));
           localJSONObject2.put("blockTimestamp", Integer.valueOf(localTransaction.getBlock().getTimestamp()));
           localJSONObject2.put("transactionTimestamp", Integer.valueOf(localTransaction.getTimestamp()));
-          localJSONObject2.put("sender", Convert.convert(localTransaction.getSenderId()));
-          localJSONObject2.put("recipient", Convert.convert(localTransaction.getRecipientId()));
+          localJSONObject2.put("sender", Convert.toUnsignedLong(localTransaction.getSenderId()));
+          localJSONObject2.put("recipient", Convert.toUnsignedLong(localTransaction.getRecipientId()));
           localJSONObject2.put("amount", Integer.valueOf(localTransaction.getAmount()));
           localJSONObject2.put("fee", Integer.valueOf(localTransaction.getFee()));
           localJSONObject2.put("id", localTransaction.getStringId());
@@ -368,10 +362,10 @@ public final class User
           localJSONObject2.put("index", Integer.valueOf(User.getIndex(localTransaction)));
           localJSONObject2.put("timestamp", Integer.valueOf(localTransaction.getTimestamp()));
           localJSONObject2.put("deadline", Short.valueOf(localTransaction.getDeadline()));
-          localJSONObject2.put("recipient", Convert.convert(localTransaction.getRecipientId()));
+          localJSONObject2.put("recipient", Convert.toUnsignedLong(localTransaction.getRecipientId()));
           localJSONObject2.put("amount", Integer.valueOf(localTransaction.getAmount()));
           localJSONObject2.put("fee", Integer.valueOf(localTransaction.getFee()));
-          localJSONObject2.put("sender", Convert.convert(localTransaction.getSenderId()));
+          localJSONObject2.put("sender", Convert.toUnsignedLong(localTransaction.getSenderId()));
           localJSONObject2.put("id", localTransaction.getStringId());
           localJSONArray.add(localJSONObject2);
         }
@@ -384,26 +378,23 @@ public final class User
 
     Blockchain.addBlockListener(new Listener()
     {
-      public void notify(List<Block> paramAnonymousList)
+      public void notify(Block paramAnonymousBlock)
       {
         JSONObject localJSONObject1 = new JSONObject();
         JSONArray localJSONArray = new JSONArray();
-        for (Block localBlock : paramAnonymousList)
-        {
-          JSONObject localJSONObject2 = new JSONObject();
-          localJSONObject2.put("index", Integer.valueOf(User.getIndex(localBlock)));
-          localJSONObject2.put("timestamp", Integer.valueOf(localBlock.getTimestamp()));
-          localJSONObject2.put("numberOfTransactions", Integer.valueOf(localBlock.getTransactionIds().length));
-          localJSONObject2.put("totalAmount", Integer.valueOf(localBlock.getTotalAmount()));
-          localJSONObject2.put("totalFee", Integer.valueOf(localBlock.getTotalFee()));
-          localJSONObject2.put("payloadLength", Integer.valueOf(localBlock.getPayloadLength()));
-          localJSONObject2.put("generator", Convert.convert(localBlock.getGeneratorId()));
-          localJSONObject2.put("height", Integer.valueOf(localBlock.getHeight()));
-          localJSONObject2.put("version", Integer.valueOf(localBlock.getVersion()));
-          localJSONObject2.put("block", localBlock.getStringId());
-          localJSONObject2.put("baseTarget", BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
-          localJSONArray.add(localJSONObject2);
-        }
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(User.getIndex(paramAnonymousBlock)));
+        localJSONObject2.put("timestamp", Integer.valueOf(paramAnonymousBlock.getTimestamp()));
+        localJSONObject2.put("numberOfTransactions", Integer.valueOf(paramAnonymousBlock.getTransactionIds().size()));
+        localJSONObject2.put("totalAmount", Integer.valueOf(paramAnonymousBlock.getTotalAmount()));
+        localJSONObject2.put("totalFee", Integer.valueOf(paramAnonymousBlock.getTotalFee()));
+        localJSONObject2.put("payloadLength", Integer.valueOf(paramAnonymousBlock.getPayloadLength()));
+        localJSONObject2.put("generator", Convert.toUnsignedLong(paramAnonymousBlock.getGeneratorId()));
+        localJSONObject2.put("height", Integer.valueOf(paramAnonymousBlock.getHeight()));
+        localJSONObject2.put("version", Integer.valueOf(paramAnonymousBlock.getVersion()));
+        localJSONObject2.put("block", paramAnonymousBlock.getStringId());
+        localJSONObject2.put("baseTarget", BigInteger.valueOf(paramAnonymousBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
+        localJSONArray.add(localJSONObject2);
         localJSONObject1.put("addedOrphanedBlocks", localJSONArray);
         User.sendNewDataToAll(localJSONObject1);
       }
@@ -413,26 +404,23 @@ public final class User
 
     Blockchain.addBlockListener(new Listener()
     {
-      public void notify(List<Block> paramAnonymousList)
+      public void notify(Block paramAnonymousBlock)
       {
         JSONObject localJSONObject1 = new JSONObject();
         JSONArray localJSONArray = new JSONArray();
-        for (Block localBlock : paramAnonymousList)
-        {
-          JSONObject localJSONObject2 = new JSONObject();
-          localJSONObject2.put("index", Integer.valueOf(User.getIndex(localBlock)));
-          localJSONObject2.put("timestamp", Integer.valueOf(localBlock.getTimestamp()));
-          localJSONObject2.put("numberOfTransactions", Integer.valueOf(localBlock.getTransactionIds().length));
-          localJSONObject2.put("totalAmount", Integer.valueOf(localBlock.getTotalAmount()));
-          localJSONObject2.put("totalFee", Integer.valueOf(localBlock.getTotalFee()));
-          localJSONObject2.put("payloadLength", Integer.valueOf(localBlock.getPayloadLength()));
-          localJSONObject2.put("generator", Convert.convert(localBlock.getGeneratorId()));
-          localJSONObject2.put("height", Integer.valueOf(localBlock.getHeight()));
-          localJSONObject2.put("version", Integer.valueOf(localBlock.getVersion()));
-          localJSONObject2.put("block", localBlock.getStringId());
-          localJSONObject2.put("baseTarget", BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
-          localJSONArray.add(localJSONObject2);
-        }
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(User.getIndex(paramAnonymousBlock)));
+        localJSONObject2.put("timestamp", Integer.valueOf(paramAnonymousBlock.getTimestamp()));
+        localJSONObject2.put("numberOfTransactions", Integer.valueOf(paramAnonymousBlock.getTransactionIds().size()));
+        localJSONObject2.put("totalAmount", Integer.valueOf(paramAnonymousBlock.getTotalAmount()));
+        localJSONObject2.put("totalFee", Integer.valueOf(paramAnonymousBlock.getTotalFee()));
+        localJSONObject2.put("payloadLength", Integer.valueOf(paramAnonymousBlock.getPayloadLength()));
+        localJSONObject2.put("generator", Convert.toUnsignedLong(paramAnonymousBlock.getGeneratorId()));
+        localJSONObject2.put("height", Integer.valueOf(paramAnonymousBlock.getHeight()));
+        localJSONObject2.put("version", Integer.valueOf(paramAnonymousBlock.getVersion()));
+        localJSONObject2.put("block", paramAnonymousBlock.getStringId());
+        localJSONObject2.put("baseTarget", BigInteger.valueOf(paramAnonymousBlock.getBaseTarget()).multiply(BigInteger.valueOf(100000L)).divide(BigInteger.valueOf(153722867L)));
+        localJSONArray.add(localJSONObject2);
         localJSONObject1.put("addedRecentBlocks", localJSONArray);
         User.sendNewDataToAll(localJSONObject1);
       }

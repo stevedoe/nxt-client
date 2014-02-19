@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicReference;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Listeners;
+import nxt.util.Logger;
 
 public final class Account
 {
@@ -34,6 +34,10 @@ public final class Account
   private static final Listeners<Account, Event> listeners = new Listeners();
   private final Long id;
   private final int height;
+  private byte[] publicKey;
+  private int keyHeight;
+  private long balance;
+  private long unconfirmedBalance;
   
   public static boolean addListener(Listener<Account> paramListener, Event paramEvent)
   {
@@ -80,9 +84,6 @@ public final class Account
     accounts.clear();
   }
   
-  private final AtomicReference<byte[]> publicKey = new AtomicReference();
-  private long balance;
-  private long unconfirmedBalance;
   private final List<GuaranteedBalance> guaranteedBalances = new ArrayList();
   private final Map<Long, Integer> assetBalances = new HashMap();
   private final Map<Long, Integer> unconfirmedAssetBalances = new HashMap();
@@ -98,9 +99,9 @@ public final class Account
     return this.id;
   }
   
-  public byte[] getPublicKey()
+  public synchronized byte[] getPublicKey()
   {
-    return (byte[])this.publicKey.get();
+    return this.publicKey;
   }
   
   public synchronized long getBalance()
@@ -125,7 +126,7 @@ public final class Account
         return 0;
       }
       int i = 0;
-      for (Transaction localTransaction : localBlock.blockTransactions) {
+      for (Transaction localTransaction : localBlock.getTransactions()) {
         if (localTransaction.getRecipientId().equals(this.id)) {
           i += localTransaction.getAmount();
         }
@@ -170,19 +171,63 @@ public final class Account
     return Collections.unmodifiableMap(this.assetBalances);
   }
   
-  public boolean equals(Object paramObject)
+  synchronized boolean setOrVerify(byte[] paramArrayOfByte, int paramInt)
   {
-    return ((paramObject instanceof Account)) && (getId().equals(((Account)paramObject).getId()));
+    if (this.publicKey == null)
+    {
+      this.publicKey = paramArrayOfByte;
+      this.keyHeight = -1;
+      return true;
+    }
+    if (Arrays.equals(this.publicKey, paramArrayOfByte)) {
+      return true;
+    }
+    if (this.keyHeight == -1)
+    {
+      Logger.logMessage("DUPLICATE KEY!!!");
+      Logger.logMessage("Account key for " + Convert.toUnsignedLong(this.id) + " was already set to a different one at the same height " + ", current height is " + paramInt + ", rejecting new key");
+      
+      return false;
+    }
+    if (this.keyHeight >= paramInt)
+    {
+      Logger.logMessage("DUPLICATE KEY!!!");
+      Logger.logMessage("Changing key for account " + Convert.toUnsignedLong(this.id) + " at height " + paramInt + ", was previously set to a different one at height " + this.keyHeight);
+      
+      this.publicKey = paramArrayOfByte;
+      this.keyHeight = paramInt;
+      return true;
+    }
+    Logger.logMessage("DUPLICATE KEY!!!");
+    Logger.logMessage("Invalid key for account " + Convert.toUnsignedLong(this.id) + " at height " + paramInt + ", was already set to a different one at height " + this.keyHeight);
+    
+    return false;
   }
   
-  public int hashCode()
+  synchronized void apply(int paramInt)
   {
-    return getId().hashCode();
+    if (this.publicKey == null) {
+      throw new IllegalStateException("Public key has not been set for account " + Convert.toUnsignedLong(this.id) + " at height " + paramInt + ", key height is " + this.keyHeight);
+    }
+    if ((this.keyHeight == -1) || (this.keyHeight > paramInt)) {
+      this.keyHeight = paramInt;
+    }
   }
   
-  boolean setOrVerify(byte[] paramArrayOfByte)
+  synchronized void undo(int paramInt)
   {
-    return (this.publicKey.compareAndSet(null, paramArrayOfByte)) || (Arrays.equals(paramArrayOfByte, (byte[])this.publicKey.get()));
+    if (this.keyHeight >= paramInt)
+    {
+      Logger.logDebugMessage("Unsetting key for account " + Convert.toUnsignedLong(this.id) + " at height " + paramInt + ", was previously set at height " + this.keyHeight);
+      
+      this.publicKey = null;
+      this.keyHeight = -1;
+    }
+    if (this.height == paramInt)
+    {
+      Logger.logDebugMessage("Removing account " + Convert.toUnsignedLong(this.id) + " which was created in the popped off block");
+      accounts.remove(this);
+    }
   }
   
   synchronized int getAssetBalance(Long paramLong)

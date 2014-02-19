@@ -33,7 +33,7 @@ public final class GetAccountPublicKey
     if (localAccount.getPublicKey() != null)
     {
       JSONObject localJSONObject = new JSONObject();
-      localJSONObject.put("publicKey", Convert.convert(localAccount.getPublicKey()));
+      localJSONObject.put("publicKey", Convert.toHexString(localAccount.getPublicKey()));
       return localJSONObject;
     }
     return JSON.emptyJSON;

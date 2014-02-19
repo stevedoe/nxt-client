@@ -70,7 +70,7 @@ public final class PlaceBidOrder
     try
     {
       i = Integer.parseInt(str3);
-      if ((i <= 0) || (i >= 1000000000L)) {
+      if ((i <= 0) || (i > 1000000000L)) {
         return JSONResponses.INCORRECT_QUANTITY;
       }
     }

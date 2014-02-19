@@ -69,6 +69,20 @@ public final class JSONResponses
   public static final JSONStreamAware INCORRECT_ARBITRARY_MESSAGE = incorrect("message", "(length must be not longer than \"1000\" bytes)");
   public static final JSONStreamAware MISSING_AMOUNT = missing("amount");
   public static final JSONStreamAware INCORRECT_AMOUNT = incorrect("amount");
+  public static final JSONStreamAware MISSING_DESCRIPTION = missing("description");
+  public static final JSONStreamAware MISSING_MINNUMBEROFOPTIONS = missing("minNumberOfOptions");
+  public static final JSONStreamAware MISSING_MAXNUMBEROFOPTIONS = missing("maxNumberOfOptions");
+  public static final JSONStreamAware MISSING_OPTIONSAREBINARY = missing("optionsAreBinary");
+  public static final JSONStreamAware MISSING_POLL = missing("poll");
+  public static final JSONStreamAware INCORRECT_POLL_NAME_LENGTH = incorrect("name", "(length must be not longer than 100 characters)");
+  public static final JSONStreamAware INCORRECT_POLL_DESCRIPTION_LENGTH = incorrect("description", "(length must be not longer than 1000 characters)");
+  public static final JSONStreamAware INCORRECT_POLL_OPTION_LENGTH = incorrect("option", "(length must be not longer than 100 characters)");
+  public static final JSONStreamAware INCORRECT_MINNUMBEROFOPTIONS = incorrect("minNumberOfOptions");
+  public static final JSONStreamAware INCORRECT_MAXNUMBEROFOPTIONS = incorrect("maxNumberOfOptions");
+  public static final JSONStreamAware INCORRECT_OPTIONSAREBINARY = incorrect("optionsAreBinary");
+  public static final JSONStreamAware INCORRECT_POLL = incorrect("poll");
+  public static final JSONStreamAware INCORRECT_VOTE = incorrect("vote");
+  public static final JSONStreamAware UNKNOWN_POLL = unknown("poll");
   public static final JSONStreamAware NOT_ENOUGH_FUNDS;
   public static final JSONStreamAware ASSET_NAME_ALREADY_USED;
   public static final JSONStreamAware ERROR_NOT_ALLOWED;
@@ -123,7 +137,7 @@ public final class JSONResponses
   {
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("errorCode", Integer.valueOf(4));
-    localJSONObject.put("errorDescription", "Incorrect \"" + paramString1 + "\"" + paramString2);
+    localJSONObject.put("errorDescription", "Incorrect \"" + paramString1 + "\" " + paramString2);
     return JSON.prepare(localJSONObject);
   }
   

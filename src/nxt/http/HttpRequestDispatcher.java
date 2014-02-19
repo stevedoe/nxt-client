@@ -23,6 +23,10 @@ public class HttpRequestDispatcher
     
     localHashMap.put("assignAlias", AssignAlias.instance);
     localHashMap.put("broadcastTransaction", BroadcastTransaction.instance);
+    localHashMap.put("cancelAskOrder", CancelAskOrder.instance);
+    localHashMap.put("cancelBidOrder", CancelBidOrder.instance);
+    localHashMap.put("castVote", CastVote.instance);
+    localHashMap.put("createPoll", CreatePoll.instance);
     localHashMap.put("decodeHallmark", DecodeHallmark.instance);
     localHashMap.put("decodeToken", DecodeToken.instance);
     localHashMap.put("getAccount", GetAccount.instance);
@@ -43,8 +47,11 @@ public class HttpRequestDispatcher
     localHashMap.put("getMyInfo", GetMyInfo.instance);
     localHashMap.put("getPeer", GetPeer.instance);
     localHashMap.put("getPeers", GetPeers.instance);
+    localHashMap.put("getPoll", GetPoll.instance);
+    localHashMap.put("getPollIds", GetPollIds.instance);
     localHashMap.put("getState", GetState.instance);
     localHashMap.put("getTime", GetTime.instance);
+    localHashMap.put("getTrades", GetTrades.instance);
     localHashMap.put("getTransaction", GetTransaction.instance);
     localHashMap.put("getTransactionBytes", GetTransactionBytes.instance);
     localHashMap.put("getUnconfirmedTransactionIds", GetUnconfirmedTransactionIds.instance);
@@ -54,21 +61,17 @@ public class HttpRequestDispatcher
     localHashMap.put("getAskOrderIds", GetAskOrderIds.instance);
     localHashMap.put("getBidOrder", GetBidOrder.instance);
     localHashMap.put("getBidOrderIds", GetBidOrderIds.instance);
+    localHashMap.put("issueAsset", IssueAsset.instance);
     localHashMap.put("listAccountAliases", ListAccountAliases.instance);
     localHashMap.put("markHost", MarkHost.instance);
+    localHashMap.put("placeAskOrder", PlaceAskOrder.instance);
+    localHashMap.put("placeBidOrder", PlaceBidOrder.instance);
     localHashMap.put("sendMessage", SendMessage.instance);
     localHashMap.put("sendMoney", SendMoney.instance);
     localHashMap.put("startForging", StartForging.instance);
     localHashMap.put("stopForging", StopForging.instance);
+    localHashMap.put("transferAsset", TransferAsset.instance);
     
-
-
-
-
-
-
-
-
     handlers = Collections.unmodifiableMap(localHashMap);
   }
   

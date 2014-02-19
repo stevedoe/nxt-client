@@ -107,7 +107,7 @@ public final class SendMoney
     
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("transaction", localTransaction.getStringId());
-    localJSONObject.put("bytes", Convert.convert(localTransaction.getBytes()));
+    localJSONObject.put("bytes", Convert.toHexString(localTransaction.getBytes()));
     
     return localJSONObject;
   }

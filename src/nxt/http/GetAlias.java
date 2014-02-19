@@ -31,7 +31,7 @@ public final class GetAlias
       return JSONResponses.INCORRECT_ALIAS;
     }
     JSONObject localJSONObject = new JSONObject();
-    localJSONObject.put("account", Convert.convert(localAlias.getAccount().getId()));
+    localJSONObject.put("account", Convert.toUnsignedLong(localAlias.getAccount().getId()));
     localJSONObject.put("alias", localAlias.getAliasName());
     if (localAlias.getURI().length() > 0) {
       localJSONObject.put("uri", localAlias.getURI());

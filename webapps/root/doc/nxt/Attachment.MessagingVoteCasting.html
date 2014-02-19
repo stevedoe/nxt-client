@@ -138,7 +138,8 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><strong><a href="../nxt/Attachment.MessagingVoteCasting.html#Attachment.MessagingVoteCasting()">Attachment.MessagingVoteCasting</a></strong>()</code>&nbsp;</td>
+<td class="colOne"><code><strong><a href="../nxt/Attachment.MessagingVoteCasting.html#Attachment.MessagingVoteCasting(java.lang.Long, byte[])">Attachment.MessagingVoteCasting</a></strong>(java.lang.Long&nbsp;pollId,
+                               byte[]&nbsp;pollVote)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -162,6 +163,14 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <tr class="rowColor">
 <td class="colFirst"><code>org.json.simple.JSONStreamAware</code></td>
 <td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingVoteCasting.html#getJSON()">getJSON</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>java.lang.Long</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingVoteCasting.html#getPollId()">getPollId</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>byte[]</code></td>
+<td class="colLast"><code><strong><a href="../nxt/Attachment.MessagingVoteCasting.html#getPollVote()">getPollVote</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>int</code></td>
@@ -193,13 +202,14 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="Attachment.MessagingVoteCasting()">
+<a name="Attachment.MessagingVoteCasting(java.lang.Long, byte[])">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>Attachment.MessagingVoteCasting</h4>
-<pre>public&nbsp;Attachment.MessagingVoteCasting()</pre>
+<pre>public&nbsp;Attachment.MessagingVoteCasting(java.lang.Long&nbsp;pollId,
+                               byte[]&nbsp;pollVote)</pre>
 </li>
 </ul>
 </li>
@@ -252,7 +262,7 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <a name="getTransactionType()">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getTransactionType</h4>
 <pre>public&nbsp;<a href="../nxt/Transaction.Type.html" title="class in nxt">Transaction.Type</a>&nbsp;getTransactionType()</pre>
@@ -260,6 +270,24 @@ implements <a href="../nxt/Attachment.html" title="interface in nxt">Attachment<
 <dt><strong>Specified by:</strong></dt>
 <dd><code><a href="../nxt/Attachment.html#getTransactionType()">getTransactionType</a></code>&nbsp;in interface&nbsp;<code><a href="../nxt/Attachment.html" title="interface in nxt">Attachment</a></code></dd>
 </dl>
+</li>
+</ul>
+<a name="getPollId()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getPollId</h4>
+<pre>public&nbsp;java.lang.Long&nbsp;getPollId()</pre>
+</li>
+</ul>
+<a name="getPollVote()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getPollVote</h4>
+<pre>public&nbsp;byte[]&nbsp;getPollVote()</pre>
 </li>
 </ul>
 </li>

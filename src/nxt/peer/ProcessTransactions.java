@@ -1,7 +1,6 @@
 package nxt.peer;
 
 import nxt.Blockchain;
-import nxt.NxtException.ValidationException;
 import nxt.util.JSON;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -13,14 +12,8 @@ final class ProcessTransactions
   
   JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
-    try
-    {
-      Blockchain.processTransactions(paramJSONObject);
-    }
-    catch (NxtException.ValidationException localValidationException)
-    {
-      paramPeer.blacklist(localValidationException);
-    }
+    Blockchain.processTransactions(paramJSONObject);
+    
     return JSON.emptyJSON;
   }
 }

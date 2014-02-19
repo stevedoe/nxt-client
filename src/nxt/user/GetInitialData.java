@@ -35,10 +35,10 @@ final class GetInitialData
       ((JSONObject)localObject2).put("index", Integer.valueOf(User.getIndex((Transaction)localObject1)));
       ((JSONObject)localObject2).put("timestamp", Integer.valueOf(((Transaction)localObject1).getTimestamp()));
       ((JSONObject)localObject2).put("deadline", Short.valueOf(((Transaction)localObject1).getDeadline()));
-      ((JSONObject)localObject2).put("recipient", Convert.convert(((Transaction)localObject1).getRecipientId()));
+      ((JSONObject)localObject2).put("recipient", Convert.toUnsignedLong(((Transaction)localObject1).getRecipientId()));
       ((JSONObject)localObject2).put("amount", Integer.valueOf(((Transaction)localObject1).getAmount()));
       ((JSONObject)localObject2).put("fee", Integer.valueOf(((Transaction)localObject1).getFee()));
-      ((JSONObject)localObject2).put("sender", Convert.convert(((Transaction)localObject1).getSenderId()));
+      ((JSONObject)localObject2).put("sender", Convert.toUnsignedLong(((Transaction)localObject1).getSenderId()));
       ((JSONObject)localObject2).put("id", ((Transaction)localObject1).getStringId());
       
       localJSONArray1.add(localObject2);
@@ -104,11 +104,11 @@ final class GetInitialData
       JSONObject localJSONObject2 = new JSONObject();
       localJSONObject2.put("index", Integer.valueOf(User.getIndex((Block)localObject3)));
       localJSONObject2.put("timestamp", Integer.valueOf(((Block)localObject3).getTimestamp()));
-      localJSONObject2.put("numberOfTransactions", Integer.valueOf(((Block)localObject3).getTransactionIds().length));
+      localJSONObject2.put("numberOfTransactions", Integer.valueOf(((Block)localObject3).getTransactionIds().size()));
       localJSONObject2.put("totalAmount", Integer.valueOf(((Block)localObject3).getTotalAmount()));
       localJSONObject2.put("totalFee", Integer.valueOf(((Block)localObject3).getTotalFee()));
       localJSONObject2.put("payloadLength", Integer.valueOf(((Block)localObject3).getPayloadLength()));
-      localJSONObject2.put("generator", Convert.convert(((Block)localObject3).getGeneratorId()));
+      localJSONObject2.put("generator", Convert.toUnsignedLong(((Block)localObject3).getGeneratorId()));
       localJSONObject2.put("height", Integer.valueOf(((Block)localObject3).getHeight()));
       localJSONObject2.put("version", Integer.valueOf(((Block)localObject3).getVersion()));
       localJSONObject2.put("block", ((Block)localObject3).getStringId());
@@ -119,7 +119,7 @@ final class GetInitialData
     }
     JSONObject localJSONObject1 = new JSONObject();
     localJSONObject1.put("response", "processInitialData");
-    localJSONObject1.put("version", "0.7.5");
+    localJSONObject1.put("version", "0.7.6");
     if (localJSONArray1.size() > 0) {
       localJSONObject1.put("unconfirmedTransactions", localJSONArray1);
     }

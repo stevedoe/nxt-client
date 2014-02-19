@@ -64,7 +64,7 @@ final class GetMilestoneBlockIds
       long l = Blockchain.getBlockIdAtHeight(i);
       while ((i > 0) && (k-- > 0))
       {
-        localJSONArray.add(Convert.convert(l));
+        localJSONArray.add(Convert.toUnsignedLong(l));
         l = Blockchain.getBlockIdAtHeight(i);
         i -= j;
       }

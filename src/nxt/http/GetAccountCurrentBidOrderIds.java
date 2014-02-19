@@ -44,7 +44,7 @@ public final class GetAccountCurrentBidOrderIds
     {
       Order.Bid localBid = (Order.Bid)((Iterator)localObject).next();
       if (((localLong == null) || (localBid.getAssetId().equals(localLong))) && (localBid.getAccount().equals(localAccount))) {
-        localJSONArray.add(Convert.convert(localBid.getId()));
+        localJSONArray.add(Convert.toUnsignedLong(localBid.getId()));
       }
     }
     localObject = new JSONObject();

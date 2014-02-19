@@ -45,7 +45,7 @@ public final class GetAskOrderIds
     JSONArray localJSONArray = new JSONArray();
     Iterator localIterator = Order.Ask.getSortedOrders(Long.valueOf(l)).iterator();
     while ((localIterator.hasNext()) && (i-- > 0)) {
-      localJSONArray.add(Convert.convert(((Order.Ask)localIterator.next()).getId()));
+      localJSONArray.add(Convert.toUnsignedLong(((Order.Ask)localIterator.next()).getId()));
     }
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("askOrderIds", localJSONArray);

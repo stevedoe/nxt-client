@@ -1,7 +1,9 @@
 package nxt.peer;
 
+import nxt.Block;
 import nxt.Blockchain;
 import nxt.NxtException;
+import nxt.util.Convert;
 import nxt.util.JSON;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -31,6 +33,9 @@ final class ProcessBlock
   {
     try
     {
+      if (!Blockchain.getLastBlock().getId().equals(Convert.parseUnsignedLong((String)paramJSONObject.get("previousBlock")))) {
+        return NOT_ACCEPTED;
+      }
       boolean bool = Blockchain.pushBlock(paramJSONObject);
       return bool ? ACCEPTED : NOT_ACCEPTED;
     }

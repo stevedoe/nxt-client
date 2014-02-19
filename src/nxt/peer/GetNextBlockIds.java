@@ -19,7 +19,7 @@ final class GetNextBlockIds
     Long localLong1 = Convert.parseUnsignedLong((String)paramJSONObject.get("blockId"));
     List localList = Blockchain.getBlockIdsAfter(localLong1, 1440);
     for (Long localLong2 : localList) {
-      localJSONArray.add(Convert.convert(localLong2));
+      localJSONArray.add(Convert.toUnsignedLong(localLong2));
     }
     localJSONObject.put("nextBlockIds", localJSONArray);
     

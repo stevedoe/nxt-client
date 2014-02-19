@@ -52,7 +52,7 @@ public final class SendMessage
     byte[] arrayOfByte1;
     try
     {
-      arrayOfByte1 = Convert.convert(str3);
+      arrayOfByte1 = Convert.parseHexString(str3);
     }
     catch (RuntimeException localRuntimeException2)
     {
@@ -111,7 +111,7 @@ public final class SendMessage
     
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("transaction", localTransaction.getStringId());
-    localJSONObject.put("bytes", Convert.convert(localTransaction.getBytes()));
+    localJSONObject.put("bytes", Convert.toHexString(localTransaction.getBytes()));
     
     return localJSONObject;
   }

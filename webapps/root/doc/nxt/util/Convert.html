@@ -137,22 +137,6 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#convert(byte[])">convert</a></strong>(byte[]&nbsp;bytes)</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#convert(long)">convert</a></strong>(long&nbsp;objectId)</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#convert(java.lang.Long)">convert</a></strong>(java.lang.Long&nbsp;objectId)</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>static byte[]</code></td>
-<td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#convert(java.lang.String)">convert</a></strong>(java.lang.String&nbsp;string)</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#getEpochTime()">getEpochTime</a></strong>()</code>&nbsp;</td>
 </tr>
@@ -165,8 +149,24 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#nullToZero(java.lang.Long)">nullToZero</a></strong>(java.lang.Long&nbsp;l)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>static byte[]</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#parseHexString(java.lang.String)">parseHexString</a></strong>(java.lang.String&nbsp;hex)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.Long</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#parseUnsignedLong(java.lang.String)">parseUnsignedLong</a></strong>(java.lang.String&nbsp;number)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#toHexString(byte[])">toHexString</a></strong>(byte[]&nbsp;bytes)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#toUnsignedLong(long)">toUnsignedLong</a></strong>(long&nbsp;objectId)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/util/Convert.html#toUnsignedLong(java.lang.Long)">toUnsignedLong</a></strong>(java.lang.Long&nbsp;objectId)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
@@ -228,40 +228,40 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="convert(java.lang.String)">
+<a name="parseHexString(java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>convert</h4>
-<pre>public static&nbsp;byte[]&nbsp;convert(java.lang.String&nbsp;string)</pre>
+<h4>parseHexString</h4>
+<pre>public static&nbsp;byte[]&nbsp;parseHexString(java.lang.String&nbsp;hex)</pre>
 </li>
 </ul>
-<a name="convert(byte[])">
+<a name="toHexString(byte[])">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>convert</h4>
-<pre>public static&nbsp;java.lang.String&nbsp;convert(byte[]&nbsp;bytes)</pre>
+<h4>toHexString</h4>
+<pre>public static&nbsp;java.lang.String&nbsp;toHexString(byte[]&nbsp;bytes)</pre>
 </li>
 </ul>
-<a name="convert(long)">
+<a name="toUnsignedLong(long)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>convert</h4>
-<pre>public static&nbsp;java.lang.String&nbsp;convert(long&nbsp;objectId)</pre>
+<h4>toUnsignedLong</h4>
+<pre>public static&nbsp;java.lang.String&nbsp;toUnsignedLong(long&nbsp;objectId)</pre>
 </li>
 </ul>
-<a name="convert(java.lang.Long)">
+<a name="toUnsignedLong(java.lang.Long)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>convert</h4>
-<pre>public static&nbsp;java.lang.String&nbsp;convert(java.lang.Long&nbsp;objectId)</pre>
+<h4>toUnsignedLong</h4>
+<pre>public static&nbsp;java.lang.String&nbsp;toUnsignedLong(java.lang.Long&nbsp;objectId)</pre>
 </li>
 </ul>
 <a name="parseUnsignedLong(java.lang.String)">

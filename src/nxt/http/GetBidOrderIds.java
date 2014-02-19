@@ -45,7 +45,7 @@ public final class GetBidOrderIds
     JSONArray localJSONArray = new JSONArray();
     Iterator localIterator = Order.Bid.getSortedOrders(Long.valueOf(l)).iterator();
     while ((localIterator.hasNext()) && (i-- > 0)) {
-      localJSONArray.add(Convert.convert(((Order.Bid)localIterator.next()).getId()));
+      localJSONArray.add(Convert.toUnsignedLong(((Order.Bid)localIterator.next()).getId()));
     }
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("bidOrderIds", localJSONArray);

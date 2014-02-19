@@ -44,7 +44,7 @@ public final class GetAccountCurrentAskOrderIds
     {
       Order.Ask localAsk = (Order.Ask)((Iterator)localObject).next();
       if (((localLong == null) || (localAsk.getAssetId().equals(localLong))) && (localAsk.getAccount().equals(localAccount))) {
-        localJSONArray.add(Convert.convert(localAsk.getId()));
+        localJSONArray.add(Convert.toUnsignedLong(localAsk.getId()));
       }
     }
     localObject = new JSONObject();

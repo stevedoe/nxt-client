@@ -23,7 +23,7 @@ public final class DecodeHallmark
       Hallmark localHallmark = Hallmark.parseHallmark(str1);
       
       JSONObject localJSONObject = new JSONObject();
-      localJSONObject.put("account", Convert.convert(Account.getId(localHallmark.getPublicKey())));
+      localJSONObject.put("account", Convert.toUnsignedLong(Account.getId(localHallmark.getPublicKey())));
       localJSONObject.put("host", localHallmark.getHost());
       localJSONObject.put("weight", Integer.valueOf(localHallmark.getWeight()));
       String str2 = Hallmark.formatDate(localHallmark.getDate());

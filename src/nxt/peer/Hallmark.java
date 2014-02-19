@@ -57,7 +57,7 @@ public final class Hallmark
         arrayOfByte3[(arrayOfByte3.length - 1)] = ((byte)ThreadLocalRandom.current().nextInt());
         arrayOfByte4 = Crypto.sign(arrayOfByte3, paramString1);
       } while (!Crypto.verify(arrayOfByte4, arrayOfByte3, arrayOfByte1));
-      return Convert.convert(arrayOfByte3) + Convert.convert(arrayOfByte4);
+      return Convert.toHexString(arrayOfByte3) + Convert.toHexString(arrayOfByte4);
     }
     catch (UnsupportedEncodingException localUnsupportedEncodingException)
     {
@@ -69,7 +69,7 @@ public final class Hallmark
   {
     try
     {
-      byte[] arrayOfByte1 = Convert.convert(paramString);
+      byte[] arrayOfByte1 = Convert.parseHexString(paramString);
       
       ByteBuffer localByteBuffer = ByteBuffer.wrap(arrayOfByte1);
       localByteBuffer.order(ByteOrder.LITTLE_ENDIAN);

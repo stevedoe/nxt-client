@@ -37,7 +37,7 @@ public final class GetAliasIds
     {
       Alias localAlias = (Alias)((Iterator)localObject).next();
       if (localAlias.getTimestamp() >= i) {
-        localJSONArray.add(Convert.convert(localAlias.getId()));
+        localJSONArray.add(Convert.toUnsignedLong(localAlias.getId()));
       }
     }
     localObject = new JSONObject();

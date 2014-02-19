@@ -22,7 +22,7 @@ public final class BroadcastTransaction
     }
     try
     {
-      byte[] arrayOfByte = Convert.convert(str);
+      byte[] arrayOfByte = Convert.parseHexString(str);
       Transaction localTransaction = Transaction.getTransaction(arrayOfByte);
       
       Blockchain.broadcast(localTransaction);

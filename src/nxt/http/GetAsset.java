@@ -30,7 +30,7 @@ public final class GetAsset
       return JSONResponses.INCORRECT_ASSET;
     }
     JSONObject localJSONObject = new JSONObject();
-    localJSONObject.put("account", Convert.convert(localAsset.getAccountId()));
+    localJSONObject.put("account", Convert.toUnsignedLong(localAsset.getAccountId()));
     localJSONObject.put("name", localAsset.getName());
     if (localAsset.getDescription().length() > 0) {
       localJSONObject.put("description", localAsset.getDescription());

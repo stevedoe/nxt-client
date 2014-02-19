@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import nxt.util.Convert;
 
 public final class Asset
 {
@@ -34,8 +35,12 @@ public final class Asset
   static void addAsset(Long paramLong1, Long paramLong2, String paramString1, String paramString2, int paramInt)
   {
     Asset localAsset = new Asset(paramLong1, paramLong2, paramString1, paramString2, paramInt);
-    assets.put(paramLong1, localAsset);
-    assetNameToAssetMappings.put(paramString1.toLowerCase(), localAsset);
+    if (assets.putIfAbsent(paramLong1, localAsset) != null) {
+      throw new IllegalStateException("Asset with id " + Convert.toUnsignedLong(paramLong1) + " already exists");
+    }
+    if (assetNameToAssetMappings.putIfAbsent(paramString1.toLowerCase(), localAsset) != null) {
+      throw new IllegalStateException("Asset with name " + paramString1.toLowerCase() + " already exists");
+    }
   }
   
   static void removeAsset(Long paramLong)
@@ -82,15 +87,5 @@ public final class Asset
   public int getQuantity()
   {
     return this.quantity;
-  }
-  
-  public boolean equals(Object paramObject)
-  {
-    return ((paramObject instanceof Asset)) && (getId().equals(((Asset)paramObject).getId()));
-  }
-  
-  public int hashCode()
-  {
-    return getId().hashCode();
   }
 }
