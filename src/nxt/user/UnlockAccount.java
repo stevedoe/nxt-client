@@ -10,15 +10,17 @@ import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.util.Convert;
 import nxt.util.DbIterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class UnlockAccount
-  extends UserRequestHandler
+public final class UnlockAccount
+  extends UserServlet.UserRequestHandler
 {
   static final UnlockAccount instance = new UnlockAccount();
   
@@ -26,7 +28,7 @@ final class UnlockAccount
     throws IOException
   {
     String str = paramHttpServletRequest.getParameter("secretPhrase");
-    for (Object localObject1 = User.getAllUsers().iterator(); ((Iterator)localObject1).hasNext();)
+    for (Object localObject1 = Users.getAllUsers().iterator(); ((Iterator)localObject1).hasNext();)
     {
       localObject2 = (User)((Iterator)localObject1).next();
       if (str.equals(((User)localObject2).getSecretPhrase()))
@@ -58,13 +60,13 @@ final class UnlockAccount
       
       JSONArray localJSONArray = new JSONArray();
       byte[] arrayOfByte = localAccount.getPublicKey();
-      for (Object localObject3 = Blockchain.getAllUnconfirmedTransactions().iterator(); ((Iterator)localObject3).hasNext();)
+      for (Object localObject3 = Nxt.getTransactionProcessor().getAllUnconfirmedTransactions().iterator(); ((Iterator)localObject3).hasNext();)
       {
         Transaction localTransaction1 = (Transaction)((Iterator)localObject3).next();
         if (Arrays.equals(localTransaction1.getSenderPublicKey(), arrayOfByte))
         {
           localObject4 = new JSONObject();
-          ((JSONObject)localObject4).put("index", Integer.valueOf(User.getIndex(localTransaction1)));
+          ((JSONObject)localObject4).put("index", Integer.valueOf(Users.getIndex(localTransaction1)));
           ((JSONObject)localObject4).put("transactionTimestamp", Integer.valueOf(localTransaction1.getTimestamp()));
           ((JSONObject)localObject4).put("deadline", Short.valueOf(localTransaction1.getDeadline()));
           ((JSONObject)localObject4).put("account", Convert.toUnsignedLong(localTransaction1.getRecipientId()));
@@ -81,7 +83,7 @@ final class UnlockAccount
         else if (((Long)localObject1).equals(localTransaction1.getRecipientId()))
         {
           localObject4 = new JSONObject();
-          ((JSONObject)localObject4).put("index", Integer.valueOf(User.getIndex(localTransaction1)));
+          ((JSONObject)localObject4).put("index", Integer.valueOf(Users.getIndex(localTransaction1)));
           ((JSONObject)localObject4).put("transactionTimestamp", Integer.valueOf(localTransaction1.getTimestamp()));
           ((JSONObject)localObject4).put("deadline", Short.valueOf(localTransaction1.getDeadline()));
           ((JSONObject)localObject4).put("account", Convert.toUnsignedLong(localTransaction1.getSenderId()));
@@ -95,8 +97,8 @@ final class UnlockAccount
       }
       localObject3 = new TreeMap();
       
-      int i = Blockchain.getLastBlock().getHeight();
-      Object localObject4 = Blockchain.getAllBlocks(localAccount, 0);Object localObject5 = null;
+      int i = Nxt.getBlockchain().getLastBlock().getHeight();
+      Object localObject4 = Nxt.getBlockchain().getAllBlocks(localAccount, 0);Object localObject5 = null;
       JSONObject localJSONObject;
       try
       {
@@ -106,7 +108,7 @@ final class UnlockAccount
           if (localBlock.getTotalFee() > 0)
           {
             localJSONObject = new JSONObject();
-            localJSONObject.put("index", Integer.valueOf(User.getIndex(localBlock)));
+            localJSONObject.put("index", Integer.valueOf(Users.getIndex(localBlock)));
             localJSONObject.put("blockTimestamp", Integer.valueOf(localBlock.getTimestamp()));
             localJSONObject.put("block", localBlock.getStringId());
             localJSONObject.put("earnedAmount", Integer.valueOf(localBlock.getTotalFee()));
@@ -137,7 +139,7 @@ final class UnlockAccount
           }
         }
       }
-      localObject4 = Blockchain.getAllTransactions(localAccount, (byte)-1, (byte)-1, 0, null);localObject5 = null;
+      localObject4 = Nxt.getBlockchain().getAllTransactions(localAccount, (byte)-1, (byte)-1, 0, null);localObject5 = null;
       try
       {
         while (((DbIterator)localObject4).hasNext())
@@ -146,7 +148,7 @@ final class UnlockAccount
           if (localTransaction2.getSenderId().equals(localObject1))
           {
             localJSONObject = new JSONObject();
-            localJSONObject.put("index", Integer.valueOf(User.getIndex(localTransaction2)));
+            localJSONObject.put("index", Integer.valueOf(Users.getIndex(localTransaction2)));
             localJSONObject.put("blockTimestamp", Integer.valueOf(localTransaction2.getBlock().getTimestamp()));
             localJSONObject.put("transactionTimestamp", Integer.valueOf(localTransaction2.getTimestamp()));
             localJSONObject.put("account", Convert.toUnsignedLong(localTransaction2.getRecipientId()));
@@ -162,7 +164,7 @@ final class UnlockAccount
           else if (localTransaction2.getRecipientId().equals(localObject1))
           {
             localJSONObject = new JSONObject();
-            localJSONObject.put("index", Integer.valueOf(User.getIndex(localTransaction2)));
+            localJSONObject.put("index", Integer.valueOf(Users.getIndex(localTransaction2)));
             localJSONObject.put("blockTimestamp", Integer.valueOf(localTransaction2.getBlock().getTimestamp()));
             localJSONObject.put("transactionTimestamp", Integer.valueOf(localTransaction2.getTimestamp()));
             localJSONObject.put("account", Convert.toUnsignedLong(localTransaction2.getSenderId()));

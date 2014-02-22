@@ -4,17 +4,18 @@ import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Asset;
 import nxt.Attachment.ColoredCoinsAssetIssuance;
-import nxt.Blockchain;
 import nxt.Genesis;
+import nxt.Nxt;
 import nxt.NxtException.ValidationException;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class IssueAsset
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final IssueAsset instance = new IssueAsset();
   
@@ -84,11 +85,11 @@ public final class IssueAsset
     }
     int k = Convert.getEpochTime();
     Attachment.ColoredCoinsAssetIssuance localColoredCoinsAssetIssuance = new Attachment.ColoredCoinsAssetIssuance(str2, str3, i);
-    Transaction localTransaction = Transaction.newTransaction(k, (short)1440, arrayOfByte, Genesis.CREATOR_ID, 0, j, null, localColoredCoinsAssetIssuance);
+    Transaction localTransaction = Nxt.getTransactionProcessor().newTransaction(k, (short)1440, arrayOfByte, Genesis.CREATOR_ID, 0, j, null, localColoredCoinsAssetIssuance);
     
     localTransaction.sign(str1);
     
-    Blockchain.broadcast(localTransaction);
+    Nxt.getTransactionProcessor().broadcast(localTransaction);
     
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("transaction", localTransaction.getStringId());

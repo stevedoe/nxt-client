@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetAccount
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final GetAccount instance = new GetAccount();
   

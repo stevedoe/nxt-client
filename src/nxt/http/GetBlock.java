@@ -4,13 +4,14 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetBlock
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final GetBlock instance = new GetBlock();
   
@@ -23,7 +24,7 @@ public final class GetBlock
     Block localBlock;
     try
     {
-      localBlock = Blockchain.getBlock(Convert.parseUnsignedLong(str));
+      localBlock = Nxt.getBlockchain().getBlock(Convert.parseUnsignedLong(str));
       if (localBlock == null) {
         return JSONResponses.UNKNOWN_BLOCK;
       }

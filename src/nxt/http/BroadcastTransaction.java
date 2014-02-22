@@ -1,15 +1,16 @@
 package nxt.http;
 
 import javax.servlet.http.HttpServletRequest;
-import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.NxtException.ValidationException;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class BroadcastTransaction
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final BroadcastTransaction instance = new BroadcastTransaction();
   
@@ -23,9 +24,9 @@ public final class BroadcastTransaction
     try
     {
       byte[] arrayOfByte = Convert.parseHexString(str);
-      Transaction localTransaction = Transaction.getTransaction(arrayOfByte);
+      Transaction localTransaction = Nxt.getTransactionProcessor().parseTransaction(arrayOfByte);
       
-      Blockchain.broadcast(localTransaction);
+      Nxt.getTransactionProcessor().broadcast(localTransaction);
       
       JSONObject localJSONObject = new JSONObject();
       localJSONObject.put("transaction", localTransaction.getStringId());

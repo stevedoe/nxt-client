@@ -18,9 +18,9 @@ public abstract interface Attachment
   
   public abstract JSONStreamAware getJSON();
   
-  public abstract Transaction.Type getTransactionType();
+  public abstract TransactionType getTransactionType();
   
-  public static class MessagingArbitraryMessage
+  public static final class MessagingArbitraryMessage
     implements Attachment, Serializable
   {
     static final long serialVersionUID = 0L;
@@ -54,9 +54,9 @@ public abstract interface Attachment
       return localJSONObject;
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.Messaging.ARBITRARY_MESSAGE;
+      return TransactionType.Messaging.ARBITRARY_MESSAGE;
     }
     
     public byte[] getMessage()
@@ -65,7 +65,7 @@ public abstract interface Attachment
     }
   }
   
-  public static class MessagingAliasAssignment
+  public static final class MessagingAliasAssignment
     implements Attachment, Serializable
   {
     static final long serialVersionUID = 0L;
@@ -123,9 +123,9 @@ public abstract interface Attachment
       return localJSONObject;
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.Messaging.ALIAS_ASSIGNMENT;
+      return TransactionType.Messaging.ALIAS_ASSIGNMENT;
     }
     
     public String getAliasName()
@@ -139,7 +139,7 @@ public abstract interface Attachment
     }
   }
   
-  public static class MessagingPollCreation
+  public static final class MessagingPollCreation
     implements Attachment, Serializable
   {
     static final long serialVersionUID = 0L;
@@ -230,9 +230,9 @@ public abstract interface Attachment
       return localJSONObject;
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.Messaging.POLL_CREATION;
+      return TransactionType.Messaging.POLL_CREATION;
     }
     
     public String getPollName()
@@ -266,7 +266,7 @@ public abstract interface Attachment
     }
   }
   
-  public static class MessagingVoteCasting
+  public static final class MessagingVoteCasting
     implements Attachment, Serializable
   {
     static final long serialVersionUID = 0L;
@@ -308,9 +308,9 @@ public abstract interface Attachment
       return localJSONObject;
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.Messaging.VOTE_CASTING;
+      return TransactionType.Messaging.VOTE_CASTING;
     }
     
     public Long getPollId()
@@ -324,7 +324,7 @@ public abstract interface Attachment
     }
   }
   
-  public static class ColoredCoinsAssetIssuance
+  public static final class ColoredCoinsAssetIssuance
     implements Attachment, Serializable
   {
     static final long serialVersionUID = 0L;
@@ -386,9 +386,9 @@ public abstract interface Attachment
       return localJSONObject;
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.ColoredCoins.ASSET_ISSUANCE;
+      return TransactionType.ColoredCoins.ASSET_ISSUANCE;
     }
     
     public String getName()
@@ -407,7 +407,7 @@ public abstract interface Attachment
     }
   }
   
-  public static class ColoredCoinsAssetTransfer
+  public static final class ColoredCoinsAssetTransfer
     implements Attachment, Serializable
   {
     static final long serialVersionUID = 0L;
@@ -444,9 +444,9 @@ public abstract interface Attachment
       return localJSONObject;
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.ColoredCoins.ASSET_TRANSFER;
+      return TransactionType.ColoredCoins.ASSET_TRANSFER;
     }
     
     public Long getAssetId()
@@ -517,7 +517,7 @@ public abstract interface Attachment
     }
   }
   
-  public static class ColoredCoinsAskOrderPlacement
+  public static final class ColoredCoinsAskOrderPlacement
     extends Attachment.ColoredCoinsOrderPlacement
   {
     static final long serialVersionUID = 0L;
@@ -527,13 +527,13 @@ public abstract interface Attachment
       super(paramInt, paramLong1, null);
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.ColoredCoins.ASK_ORDER_PLACEMENT;
+      return TransactionType.ColoredCoins.ASK_ORDER_PLACEMENT;
     }
   }
   
-  public static class ColoredCoinsBidOrderPlacement
+  public static final class ColoredCoinsBidOrderPlacement
     extends Attachment.ColoredCoinsOrderPlacement
   {
     static final long serialVersionUID = 0L;
@@ -543,9 +543,9 @@ public abstract interface Attachment
       super(paramInt, paramLong1, null);
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.ColoredCoins.BID_ORDER_PLACEMENT;
+      return TransactionType.ColoredCoins.BID_ORDER_PLACEMENT;
     }
   }
   
@@ -588,7 +588,7 @@ public abstract interface Attachment
     }
   }
   
-  public static class ColoredCoinsAskOrderCancellation
+  public static final class ColoredCoinsAskOrderCancellation
     extends Attachment.ColoredCoinsOrderCancellation
   {
     static final long serialVersionUID = 0L;
@@ -598,13 +598,13 @@ public abstract interface Attachment
       super(null);
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.ColoredCoins.ASK_ORDER_CANCELLATION;
+      return TransactionType.ColoredCoins.ASK_ORDER_CANCELLATION;
     }
   }
   
-  public static class ColoredCoinsBidOrderCancellation
+  public static final class ColoredCoinsBidOrderCancellation
     extends Attachment.ColoredCoinsOrderCancellation
   {
     static final long serialVersionUID = 0L;
@@ -614,9 +614,9 @@ public abstract interface Attachment
       super(null);
     }
     
-    public Transaction.Type getTransactionType()
+    public TransactionType getTransactionType()
     {
-      return Transaction.Type.ColoredCoins.BID_ORDER_CANCELLATION;
+      return TransactionType.ColoredCoins.BID_ORDER_CANCELLATION;
     }
   }
 }

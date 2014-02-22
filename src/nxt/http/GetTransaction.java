@@ -3,13 +3,15 @@ package nxt.http;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetTransaction
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final GetTransaction instance = new GetTransaction();
   
@@ -24,7 +26,7 @@ public final class GetTransaction
     try
     {
       localLong = Convert.parseUnsignedLong(str);
-      localTransaction = Blockchain.getTransaction(localLong);
+      localTransaction = Nxt.getBlockchain().getTransaction(localLong);
     }
     catch (RuntimeException localRuntimeException)
     {
@@ -33,7 +35,7 @@ public final class GetTransaction
     JSONObject localJSONObject;
     if (localTransaction == null)
     {
-      localTransaction = Blockchain.getUnconfirmedTransaction(localLong);
+      localTransaction = Nxt.getTransactionProcessor().getUnconfirmedTransaction(localLong);
       if (localTransaction == null) {
         return JSONResponses.UNKNOWN_TRANSACTION;
       }
@@ -46,7 +48,7 @@ public final class GetTransaction
       localJSONObject.put("sender", Convert.toUnsignedLong(localTransaction.getSenderId()));
       Block localBlock = localTransaction.getBlock();
       localJSONObject.put("block", localBlock.getStringId());
-      localJSONObject.put("confirmations", Integer.valueOf(Blockchain.getLastBlock().getHeight() - localBlock.getHeight() + 1));
+      localJSONObject.put("confirmations", Integer.valueOf(Nxt.getBlockchain().getLastBlock().getHeight() - localBlock.getHeight() + 1));
     }
     return localJSONObject;
   }

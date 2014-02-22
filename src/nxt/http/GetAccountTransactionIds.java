@@ -3,6 +3,7 @@ package nxt.http;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.Transaction;
 import nxt.util.Convert;
 import nxt.util.DbIterator;
@@ -11,7 +12,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetAccountTransactionIds
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final GetAccountTransactionIds instance = new GetAccountTransactionIds();
   
@@ -68,7 +69,7 @@ public final class GetAccountTransactionIds
       b2 = -1;
     }
     JSONArray localJSONArray = new JSONArray();
-    Object localObject1 = Blockchain.getAllTransactions(localAccount, b1, b2, i);Object localObject2 = null;
+    Object localObject1 = Nxt.getBlockchain().getAllTransactions(localAccount, b1, b2, i);Object localObject2 = null;
     try
     {
       while (((DbIterator)localObject1).hasNext())

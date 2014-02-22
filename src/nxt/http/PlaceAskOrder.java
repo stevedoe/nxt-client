@@ -3,17 +3,18 @@ package nxt.http;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Attachment.ColoredCoinsAskOrderPlacement;
-import nxt.Blockchain;
 import nxt.Genesis;
+import nxt.Nxt;
 import nxt.NxtException.ValidationException;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class PlaceAskOrder
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final PlaceAskOrder instance = new PlaceAskOrder();
   
@@ -124,11 +125,11 @@ public final class PlaceAskOrder
     int k = Convert.getEpochTime();
     
     Attachment.ColoredCoinsAskOrderPlacement localColoredCoinsAskOrderPlacement = new Attachment.ColoredCoinsAskOrderPlacement(localLong1, i, l);
-    Transaction localTransaction = Transaction.newTransaction(k, s, arrayOfByte, Genesis.CREATOR_ID, 0, j, localLong2, localColoredCoinsAskOrderPlacement);
+    Transaction localTransaction = Nxt.getTransactionProcessor().newTransaction(k, s, arrayOfByte, Genesis.CREATOR_ID, 0, j, localLong2, localColoredCoinsAskOrderPlacement);
     
     localTransaction.sign(str1);
     
-    Blockchain.broadcast(localTransaction);
+    Nxt.getTransactionProcessor().broadcast(localTransaction);
     
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("transaction", localTransaction.getStringId());

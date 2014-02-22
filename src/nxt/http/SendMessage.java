@@ -3,16 +3,17 @@ package nxt.http;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Attachment.MessagingArbitraryMessage;
-import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.NxtException.ValidationException;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class SendMessage
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final SendMessage instance = new SendMessage();
   
@@ -103,11 +104,11 @@ public final class SendMessage
     int j = Convert.getEpochTime();
     
     Attachment.MessagingArbitraryMessage localMessagingArbitraryMessage = new Attachment.MessagingArbitraryMessage(arrayOfByte1);
-    Transaction localTransaction = Transaction.newTransaction(j, s, arrayOfByte2, localLong1, 0, i, localLong2, localMessagingArbitraryMessage);
+    Transaction localTransaction = Nxt.getTransactionProcessor().newTransaction(j, s, arrayOfByte2, localLong1, 0, i, localLong2, localMessagingArbitraryMessage);
     
     localTransaction.sign(str1);
     
-    Blockchain.broadcast(localTransaction);
+    Nxt.getTransactionProcessor().broadcast(localTransaction);
     
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("transaction", localTransaction.getStringId());

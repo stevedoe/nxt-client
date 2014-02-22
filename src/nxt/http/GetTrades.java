@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import nxt.Asset;
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.Trade;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
@@ -12,7 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetTrades
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final GetTrades instance = new GetTrades();
   
@@ -63,7 +64,7 @@ public final class GetTrades
         Trade localTrade = (Trade)localList.get(k);
         
         JSONObject localJSONObject2 = new JSONObject();
-        localJSONObject2.put("timestamp", Integer.valueOf(Blockchain.getBlock(localTrade.getBlockId()).getTimestamp()));
+        localJSONObject2.put("timestamp", Integer.valueOf(Nxt.getBlockchain().getBlock(localTrade.getBlockId()).getTimestamp()));
         localJSONObject2.put("askOrderId", Convert.toUnsignedLong(localTrade.getAskOrderId()));
         localJSONObject2.put("bidOrderId", Convert.toUnsignedLong(localTrade.getBidOrderId()));
         localJSONObject2.put("quantity", Integer.valueOf(localTrade.getQuantity()));

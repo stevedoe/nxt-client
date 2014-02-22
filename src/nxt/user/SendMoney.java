@@ -3,15 +3,16 @@ package nxt.user;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
-import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.NxtException.ValidationException;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class SendMoney
-  extends UserRequestHandler
+public final class SendMoney
+  extends UserServlet.UserRequestHandler
 {
   static final SendMoney instance = new SendMoney();
   
@@ -115,10 +116,10 @@ final class SendMoney
       
       return localObject2;
     }
-    Object localObject2 = Transaction.newTransaction(Convert.getEpochTime(), s, paramUser.getPublicKey(), localLong, i, j, null);
+    Object localObject2 = Nxt.getTransactionProcessor().newTransaction(Convert.getEpochTime(), s, paramUser.getPublicKey(), localLong, i, j, null);
     ((Transaction)localObject2).sign(paramUser.getSecretPhrase());
     
-    Blockchain.broadcast((Transaction)localObject2);
+    Nxt.getTransactionProcessor().broadcast((Transaction)localObject2);
     
     return JSONResponses.NOTIFY_OF_ACCEPTED_TRANSACTION;
   }

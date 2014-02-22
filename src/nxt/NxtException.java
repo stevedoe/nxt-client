@@ -23,12 +23,12 @@ public abstract class NxtException
   public static class ValidationException
     extends NxtException
   {
-    public ValidationException(String paramString)
+    ValidationException(String paramString)
     {
       super();
     }
     
-    public ValidationException(String paramString, Throwable paramThrowable)
+    ValidationException(String paramString, Throwable paramThrowable)
     {
       super(paramThrowable);
     }

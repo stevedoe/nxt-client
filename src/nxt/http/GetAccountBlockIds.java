@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.util.Convert;
 import nxt.util.DbIterator;
 import org.json.simple.JSONArray;
@@ -11,7 +12,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetAccountBlockIds
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final GetAccountBlockIds instance = new GetAccountBlockIds();
   
@@ -50,7 +51,7 @@ public final class GetAccountBlockIds
       return JSONResponses.INCORRECT_TIMESTAMP;
     }
     JSONArray localJSONArray = new JSONArray();
-    Object localObject1 = Blockchain.getAllBlocks(localAccount, i);Object localObject2 = null;
+    Object localObject1 = Nxt.getBlockchain().getAllBlocks(localAccount, i);Object localObject2 = null;
     try
     {
       while (((DbIterator)localObject1).hasNext())

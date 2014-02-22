@@ -5,7 +5,7 @@ import nxt.Nxt;
 
 public final class Convert
 {
-  public static final String alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+  private static final char[] hexChars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
   public static final BigInteger two64 = new BigInteger("18446744073709551616");
   
   public static byte[] parseHexString(String paramString)
@@ -30,10 +30,8 @@ public final class Convert
     char[] arrayOfChar = new char[paramArrayOfByte.length * 2];
     for (int i = 0; i < paramArrayOfByte.length; i++)
     {
-      int j = (paramArrayOfByte[i] & 0xFF) >> 4;
-      arrayOfChar[(i * 2)] = ((char)(j > 9 ? j + 87 : j + 48));
-      int k = paramArrayOfByte[i] & 0xF;
-      arrayOfChar[(i * 2 + 1)] = ((char)(k > 9 ? k + 87 : k + 48));
+      arrayOfChar[(i * 2)] = hexChars[(paramArrayOfByte[i] >> 4 & 0xF)];
+      arrayOfChar[(i * 2 + 1)] = hexChars[(paramArrayOfByte[i] & 0xF)];
     }
     return String.valueOf(arrayOfChar);
   }
@@ -66,7 +64,7 @@ public final class Convert
   
   public static int getEpochTime()
   {
-    return (int)((System.currentTimeMillis() - Nxt.epochBeginning + 500L) / 1000L);
+    return (int)((System.currentTimeMillis() - Nxt.EPOCH_BEGINNING + 500L) / 1000L);
   }
   
   public static Long zeroToNull(long paramLong)

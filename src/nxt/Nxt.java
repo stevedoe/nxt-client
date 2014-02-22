@@ -1,35 +1,33 @@
 package nxt;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import nxt.http.HttpRequestDispatcher;
-import nxt.peer.Hallmark;
-import nxt.peer.HttpJSONRequestHandler;
-import nxt.peer.Peer;
-import nxt.user.User;
-import nxt.user.UserRequestHandler;
+import java.util.Properties;
+import nxt.http.API;
+import nxt.peer.Peers;
+import nxt.user.Users;
 import nxt.util.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import nxt.util.ThreadPool;
 
 public final class Nxt
-  extends HttpServlet
 {
-  public static final String VERSION = "0.7.6";
+  public static final String VERSION = "0.8.0e";
   public static final int BLOCK_HEADER_LENGTH = 224;
   public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
   public static final int MAX_PAYLOAD_LENGTH = 32640;
+  public static final long MAX_BALANCE = 1000000000L;
+  public static final long INITIAL_BASE_TARGET = 153722867L;
+  public static final long MAX_BASE_TARGET = 153722867000000000L;
+  public static final int MAX_ALIAS_URI_LENGTH = 1000;
+  public static final int MAX_ALIAS_LENGTH = 100;
   public static final int MAX_ARBITRARY_MESSAGE_LENGTH = 1000;
+  public static final long MAX_ASSET_QUANTITY = 1000000000L;
+  public static final int ASSET_ISSUANCE_FEE = 1000;
+  public static final int MAX_POLL_NAME_LENGTH = 100;
+  public static final int MAX_POLL_DESCRIPTION_LENGTH = 1000;
+  public static final int MAX_POLL_OPTION_LENGTH = 100;
   public static final int ALIAS_SYSTEM_BLOCK = 22000;
   public static final int TRANSPARENT_FORGING_BLOCK = 30000;
   public static final int ARBITRARY_MESSAGES_BLOCK = 40000;
@@ -39,356 +37,215 @@ public final class Nxt
   public static final int TRANSPARENT_FORGING_BLOCK_5 = 67000;
   public static final int ASSET_EXCHANGE_BLOCK = 111111;
   public static final int VOTING_SYSTEM_BLOCK = 222222;
-  public static final long MAX_BALANCE = 1000000000L;
-  public static final long initialBaseTarget = 153722867L;
-  public static final long maxBaseTarget = 153722867000000000L;
-  public static final long MAX_ASSET_QUANTITY = 1000000000L;
-  public static final int ASSET_ISSUANCE_FEE = 1000;
-  public static final int MAX_ALIAS_URI_LENGTH = 1000;
-  public static final int MAX_ALIAS_LENGTH = 100;
-  public static final int MAX_POLL_NAME_LENGTH = 100;
-  public static final int MAX_POLL_DESCRIPTION_LENGTH = 1000;
-  public static final int MAX_POLL_OPTION_LENGTH = 100;
-  public static final long epochBeginning;
-  public static String myPlatform;
-  public static String myScheme;
-  public static String myAddress;
-  public static String myHallmark;
-  public static int myPort;
-  public static boolean shareMyAddress;
-  public static Set<String> allowedUserHosts;
-  public static Set<String> allowedBotHosts;
-  public static int blacklistingPeriod;
-  public static final int LOGGING_MASK_EXCEPTIONS = 1;
-  public static final int LOGGING_MASK_NON200_RESPONSES = 2;
-  public static final int LOGGING_MASK_200_RESPONSES = 4;
-  public static int communicationLoggingMask;
-  public static Set<String> wellKnownPeers;
-  public static int maxNumberOfConnectedPublicPeers;
-  public static int connectTimeout;
-  public static int readTimeout;
-  public static boolean enableHallmarkProtection;
-  public static int pushThreshold;
-  public static int pullThreshold;
-  public static int sendToPeersLimit;
+  public static final long EPOCH_BEGINNING;
+  public static final String ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
+  private static final Properties defaultProperties;
+  private static final Properties properties;
   
   static
   {
-    Calendar localCalendar = Calendar.getInstance();
-    localCalendar.set(15, 0);
-    localCalendar.set(1, 2013);
-    localCalendar.set(2, 10);
-    localCalendar.set(5, 24);
-    localCalendar.set(11, 12);
-    localCalendar.set(12, 0);
-    localCalendar.set(13, 0);
-    localCalendar.set(14, 0);
-    epochBeginning = localCalendar.getTimeInMillis();
-  }
-  
-  public void init(ServletConfig paramServletConfig)
-    throws ServletException
-  {
-    Logger.logMessage("NRS 0.7.6 starting...");
-    if (Logger.debug) {
-      Logger.logMessage("DEBUG logging enabled");
-    }
-    if (Logger.enableStackTraces) {
-      Logger.logMessage("logging of exception stack traces enabled");
-    }
+    Object localObject1 = Calendar.getInstance();
+    ((Calendar)localObject1).set(15, 0);
+    ((Calendar)localObject1).set(1, 2013);
+    ((Calendar)localObject1).set(2, 10);
+    ((Calendar)localObject1).set(5, 24);
+    ((Calendar)localObject1).set(11, 12);
+    ((Calendar)localObject1).set(12, 0);
+    ((Calendar)localObject1).set(13, 0);
+    ((Calendar)localObject1).set(14, 0);
+    EPOCH_BEGINNING = ((Calendar)localObject1).getTimeInMillis();
+    
+
+
+
+    defaultProperties = new Properties();
+    Object localObject2;
     try
     {
-      myPlatform = paramServletConfig.getInitParameter("myPlatform");
-      Logger.logMessage("\"myPlatform\" = \"" + myPlatform + "\"");
-      if (myPlatform == null) {
-        myPlatform = "PC";
-      } else {
-        myPlatform = myPlatform.trim();
-      }
-      myScheme = paramServletConfig.getInitParameter("myScheme");
-      Logger.logMessage("\"myScheme\" = \"" + myScheme + "\"");
-      if (myScheme == null) {
-        myScheme = "http";
-      } else {
-        myScheme = myScheme.trim();
-      }
-      String str1 = paramServletConfig.getInitParameter("myPort");
-      Logger.logMessage("\"myPort\" = \"" + str1 + "\"");
+      localObject1 = ClassLoader.getSystemResourceAsStream("nxt-default.properties");localObject2 = null;
       try
       {
-        myPort = Integer.parseInt(str1);
+        defaultProperties.load((InputStream)localObject1);
       }
-      catch (NumberFormatException localNumberFormatException1)
+      catch (Throwable localThrowable2)
       {
-        myPort = myScheme.equals("https") ? 7875 : 7874;
-        Logger.logMessage("Invalid value for myPort " + str1 + ", using default " + myPort);
+        localObject2 = localThrowable2;throw localThrowable2;
       }
-      myAddress = paramServletConfig.getInitParameter("myAddress");
-      Logger.logMessage("\"myAddress\" = \"" + myAddress + "\"");
-      if (myAddress != null) {
-        myAddress = myAddress.trim();
-      }
-      String str2 = paramServletConfig.getInitParameter("shareMyAddress");
-      Logger.logMessage("\"shareMyAddress\" = \"" + str2 + "\"");
-      shareMyAddress = Boolean.parseBoolean(str2);
-      
-      myHallmark = paramServletConfig.getInitParameter("myHallmark");
-      Logger.logMessage("\"myHallmark\" = \"" + myHallmark + "\"");
-      if ((myHallmark != null) && ((Nxt.myHallmark = myHallmark.trim()).length() > 0)) {
-        try
-        {
-          Hallmark localHallmark = Hallmark.parseHallmark(myHallmark);
-          if (!localHallmark.isValid()) {
-            throw new RuntimeException();
-          }
-        }
-        catch (RuntimeException localRuntimeException2)
-        {
-          Logger.logMessage("Your hallmark is invalid: " + myHallmark);
-          System.exit(1);
-        }
-      }
-      String str3 = paramServletConfig.getInitParameter("wellKnownPeers");
-      Logger.logMessage("\"wellKnownPeers\" = \"" + str3 + "\"");
-      if (str3 != null)
+      finally
       {
-        localObject1 = new HashSet();
-        for (str7 : str3.split(";"))
-        {
-          str7 = str7.trim();
-          if (str7.length() > 0)
-          {
-            ((Set)localObject1).add(str7);
-            Peer.addPeer(str7);
-          }
-        }
-        wellKnownPeers = Collections.unmodifiableSet((Set)localObject1);
-      }
-      else
-      {
-        wellKnownPeers = Collections.emptySet();
-        Logger.logMessage("No wellKnownPeers defined, it is unlikely to work");
-      }
-      Object localObject1 = paramServletConfig.getInitParameter("maxNumberOfConnectedPublicPeers");
-      Logger.logMessage("\"maxNumberOfConnectedPublicPeers\" = \"" + (String)localObject1 + "\"");
-      try
-      {
-        maxNumberOfConnectedPublicPeers = Integer.parseInt((String)localObject1);
-      }
-      catch (NumberFormatException localNumberFormatException2)
-      {
-        maxNumberOfConnectedPublicPeers = 10;
-        Logger.logMessage("Invalid value for maxNumberOfConnectedPublicPeers " + (String)localObject1 + ", using default " + maxNumberOfConnectedPublicPeers);
-      }
-      String str4 = paramServletConfig.getInitParameter("connectTimeout");
-      Logger.logMessage("\"connectTimeout\" = \"" + str4 + "\"");
-      try
-      {
-        connectTimeout = Integer.parseInt(str4);
-      }
-      catch (NumberFormatException localNumberFormatException3)
-      {
-        connectTimeout = 1000;
-        Logger.logMessage("Invalid value for connectTimeout " + str4 + ", using default " + connectTimeout);
-      }
-      String str5 = paramServletConfig.getInitParameter("readTimeout");
-      Logger.logMessage("\"readTimeout\" = \"" + str5 + "\"");
-      try
-      {
-        readTimeout = Integer.parseInt(str5);
-      }
-      catch (NumberFormatException localNumberFormatException4)
-      {
-        readTimeout = 1000;
-        Logger.logMessage("Invalid value for readTimeout " + str5 + ", using default " + readTimeout);
-      }
-      String str6 = paramServletConfig.getInitParameter("enableHallmarkProtection");
-      Logger.logMessage("\"enableHallmarkProtection\" = \"" + str6 + "\"");
-      enableHallmarkProtection = Boolean.parseBoolean(str6);
-      
-      String str7 = paramServletConfig.getInitParameter("pushThreshold");
-      Logger.logMessage("\"pushThreshold\" = \"" + str7 + "\"");
-      try
-      {
-        pushThreshold = Integer.parseInt(str7);
-      }
-      catch (NumberFormatException localNumberFormatException5)
-      {
-        pushThreshold = 0;
-        Logger.logMessage("Invalid value for pushThreshold " + str7 + ", using default " + pushThreshold);
-      }
-      String str8 = paramServletConfig.getInitParameter("pullThreshold");
-      Logger.logMessage("\"pullThreshold\" = \"" + str8 + "\"");
-      try
-      {
-        pullThreshold = Integer.parseInt(str8);
-      }
-      catch (NumberFormatException localNumberFormatException6)
-      {
-        pullThreshold = 0;
-        Logger.logMessage("Invalid value for pullThreshold " + str8 + ", using default " + pullThreshold);
-      }
-      String str9 = paramServletConfig.getInitParameter("allowedUserHosts");
-      Logger.logMessage("\"allowedUserHosts\" = \"" + str9 + "\"");
-      if (str9 != null) {
-        if (!str9.trim().equals("*"))
-        {
-          localObject2 = new HashSet();
-          for (String str12 : str9.split(";"))
-          {
-            str12 = str12.trim();
-            if (str12.length() > 0) {
-              ((Set)localObject2).add(str12);
+        if (localObject1 != null) {
+          if (localObject2 != null) {
+            try
+            {
+              ((InputStream)localObject1).close();
             }
-          }
-          allowedUserHosts = Collections.unmodifiableSet((Set)localObject2);
-        }
-      }
-      Object localObject2 = paramServletConfig.getInitParameter("allowedBotHosts");
-      Logger.logMessage("\"allowedBotHosts\" = \"" + (String)localObject2 + "\"");
-      if (localObject2 != null) {
-        if (!((String)localObject2).trim().equals("*"))
-        {
-          ??? = new HashSet();
-          for (String str13 : ((String)localObject2).split(";"))
-          {
-            str13 = str13.trim();
-            if (str13.length() > 0) {
-              ((Set)???).add(str13);
+            catch (Throwable localThrowable5)
+            {
+              localObject2.addSuppressed(localThrowable5);
             }
+          } else {
+            ((InputStream)localObject1).close();
           }
-          allowedBotHosts = Collections.unmodifiableSet((Set)???);
         }
       }
-      ??? = paramServletConfig.getInitParameter("blacklistingPeriod");
-      Logger.logMessage("\"blacklistingPeriod\" = \"" + (String)??? + "\"");
-      try
-      {
-        blacklistingPeriod = Integer.parseInt((String)???);
-      }
-      catch (NumberFormatException localNumberFormatException7)
-      {
-        blacklistingPeriod = 300000;
-        Logger.logMessage("Invalid value for blacklistingPeriod " + (String)??? + ", using default " + blacklistingPeriod);
-      }
-      String str10 = paramServletConfig.getInitParameter("communicationLoggingMask");
-      Logger.logMessage("\"communicationLoggingMask\" = \"" + str10 + "\"");
-      try
-      {
-        communicationLoggingMask = Integer.parseInt(str10);
-      }
-      catch (NumberFormatException localNumberFormatException8)
-      {
-        Logger.logMessage("Invalid value for communicationLogginMask " + str10 + ", using default 0");
-      }
-      String str11 = paramServletConfig.getInitParameter("sendToPeersLimit");
-      Logger.logMessage("\"sendToPeersLimit\" = \"" + str11 + "\"");
-      try
-      {
-        sendToPeersLimit = Integer.parseInt(str11);
-      }
-      catch (NumberFormatException localNumberFormatException9)
-      {
-        sendToPeersLimit = 10;
-        Logger.logMessage("Invalid value for sendToPeersLimit " + str11 + ", using default " + sendToPeersLimit);
-      }
-      Db.init();
-      
-      Blockchain.init();
-      
-      ThreadPools.start();
-      
-      Logger.logMessage("NRS 0.7.6 started successfully.");
     }
-    catch (RuntimeException localRuntimeException1)
+    catch (IOException localIOException1)
     {
-      Db.shutdown();
-      Logger.logMessage("Error initializing Nxt servlet", localRuntimeException1);
-      System.exit(1);
+      throw new RuntimeException("Error loading nxt-default.properties", localIOException1);
     }
-  }
-  
-  public void doGet(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
-    throws ServletException, IOException
-  {
-    paramHttpServletResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, private");
-    paramHttpServletResponse.setHeader("Pragma", "no-cache");
-    paramHttpServletResponse.setDateHeader("Expires", 0L);
-    
-    User localUser = null;
+    properties = new Properties(defaultProperties);
     try
     {
-      String str = paramHttpServletRequest.getParameter("user");
-      if (str == null)
+      InputStream localInputStream = ClassLoader.getSystemResourceAsStream("nxt.properties");localObject2 = null;
+      try
       {
-        HttpRequestDispatcher.process(paramHttpServletRequest, paramHttpServletResponse);
-        return;
+        if (localInputStream != null) {
+          properties.load(localInputStream);
+        }
       }
-      if ((allowedUserHosts != null) && (!allowedUserHosts.contains(paramHttpServletRequest.getRemoteHost())))
+      catch (Throwable localThrowable4)
       {
-        JSONObject localJSONObject1 = new JSONObject();
-        localJSONObject1.put("response", "denyAccess");
-        JSONArray localJSONArray = new JSONArray();
-        localJSONArray.add(localJSONObject1);
-        JSONObject localJSONObject2 = new JSONObject();
-        localJSONObject2.put("responses", localJSONArray);
-        paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
-        PrintWriter localPrintWriter = paramHttpServletResponse.getWriter();Object localObject1 = null;
-        try
-        {
-          localJSONObject2.writeJSONString(localPrintWriter);
-        }
-        catch (Throwable localThrowable2)
-        {
-          localObject1 = localThrowable2;throw localThrowable2;
-        }
-        finally
-        {
-          if (localPrintWriter != null) {
-            if (localObject1 != null) {
-              try
-              {
-                localPrintWriter.close();
-              }
-              catch (Throwable localThrowable3)
-              {
-                localObject1.addSuppressed(localThrowable3);
-              }
-            } else {
-              localPrintWriter.close();
+        localObject2 = localThrowable4;throw localThrowable4;
+      }
+      finally
+      {
+        if (localInputStream != null) {
+          if (localObject2 != null) {
+            try
+            {
+              localInputStream.close();
             }
+            catch (Throwable localThrowable6)
+            {
+              localObject2.addSuppressed(localThrowable6);
+            }
+          } else {
+            localInputStream.close();
           }
         }
-        return;
       }
-      localUser = User.getUser(str);
-      UserRequestHandler.process(paramHttpServletRequest, localUser);
     }
-    catch (Exception localException)
+    catch (IOException localIOException2)
     {
-      if (localUser != null) {
-        Logger.logMessage("Error processing GET request", localException);
-      } else {
-        Logger.logDebugMessage("Error processing GET request", localException);
-      }
-    }
-    if (localUser != null) {
-      localUser.processPendingResponses(paramHttpServletRequest, paramHttpServletResponse);
+      throw new RuntimeException("Error loading nxt.properties", localIOException2);
     }
   }
   
-  public void doPost(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
-    throws ServletException, IOException
+  public static int getIntProperty(String paramString)
   {
-    HttpJSONRequestHandler.process(paramHttpServletRequest, paramHttpServletResponse);
+    try
+    {
+      int i = Integer.parseInt(properties.getProperty(paramString));
+      Logger.logMessage(paramString + " = \"" + i + "\"");
+      return i;
+    }
+    catch (NumberFormatException localNumberFormatException)
+    {
+      Logger.logMessage(paramString + " not defined, assuming 0");
+    }
+    return 0;
   }
   
-  public void destroy()
+  public static String getStringProperty(String paramString)
   {
-    ThreadPools.shutdown();
+    String str = properties.getProperty(paramString);
+    if ((str != null) && (!"".equals(str = str.trim())))
+    {
+      Logger.logMessage(paramString + " = \"" + str + "\"");
+      return str;
+    }
+    Logger.logMessage(paramString + " not defined, assuming null");
+    return null;
+  }
+  
+  public static Boolean getBooleanProperty(String paramString)
+  {
+    String str = properties.getProperty(paramString);
+    if (Boolean.TRUE.toString().equals(str))
+    {
+      Logger.logMessage(paramString + " = \"true\"");
+      return Boolean.valueOf(true);
+    }
+    if (Boolean.FALSE.toString().equals(str))
+    {
+      Logger.logMessage(paramString + " = \"false\"");
+      return Boolean.valueOf(false);
+    }
+    Logger.logMessage(paramString + " not defined, assuming false");
+    return Boolean.valueOf(false);
+  }
+  
+  public static Blockchain getBlockchain()
+  {
+    return BlockchainImpl.getInstance();
+  }
+  
+  public static BlockchainProcessor getBlockchainProcessor()
+  {
+    return BlockchainProcessorImpl.getInstance();
+  }
+  
+  public static TransactionProcessor getTransactionProcessor()
+  {
+    return TransactionProcessorImpl.getInstance();
+  }
+  
+  public static void main(String[] paramArrayOfString)
+  {
     
+    if ((paramArrayOfString.length == 1) && ("reset".equalsIgnoreCase(paramArrayOfString[0]))) {
+      getBlockchainProcessor().fullReset();
+    }
+  }
+  
+  public static void init(Properties paramProperties)
+  {
+    properties.putAll(paramProperties);
+    init();
+  }
+  
+  private static void shutdown()
+  {
+    Peers.shutdown();
+    ThreadPool.shutdown();
     Db.shutdown();
+    Logger.logMessage("Nxt server 0.8.0e stopped.");
+  }
+  
+  public static void init() {}
+  
+  private static class Init
+  {
+    private static void init() {}
     
-    Logger.logMessage("NRS 0.7.6 stopped.");
+    static
+    {
+      System.out.println("Initializing Nxt server version 0.8.0e");
+      
+      long l1 = System.currentTimeMillis();
+      
+      Logger.logMessage("logging enabled");
+      if (!Nxt.getBooleanProperty("nxt.debugJetty").booleanValue())
+      {
+        System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
+        Logger.logDebugMessage("jetty logging disabled");
+      }
+      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
+      {
+        public void run() {}
+      }));
+      Db.init();
+      BlockchainProcessorImpl.getInstance();
+      TransactionProcessorImpl.getInstance();
+      Peers.init();
+      Generator.init();
+      API.init();
+      Users.init();
+      ThreadPool.start();
+      
+      long l2 = System.currentTimeMillis();
+      Logger.logDebugMessage("Initialization took " + (l2 - l1) / 1000L + " seconds");
+      Logger.logMessage("Nxt server 0.8.0e started successfully.");
+    }
   }
 }

@@ -4,8 +4,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import org.json.simple.JSONStreamAware;
 
-final class LockAccount
-  extends UserRequestHandler
+public final class LockAccount
+  extends UserServlet.UserRequestHandler
 {
   static final LockAccount instance = new LockAccount();
   

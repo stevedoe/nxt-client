@@ -4,15 +4,18 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.ThreadLocalRandom;
+import nxt.Account;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 
 public final class Hallmark
 {
+  private final String hallmarkString;
   private final String host;
   private final int weight;
   private final int date;
   private final byte[] publicKey;
+  private final Long accountId;
   private final byte[] signature;
   private final boolean isValid;
   
@@ -94,7 +97,7 @@ public final class Hallmark
       
       boolean bool = (str.length() < 100) && (j > 0) && (j <= 1000000000L) && (Crypto.verify(arrayOfByte4, arrayOfByte5, arrayOfByte2));
       
-      return new Hallmark(arrayOfByte2, arrayOfByte4, str, j, k, bool);
+      return new Hallmark(paramString, arrayOfByte2, arrayOfByte4, str, j, k, bool);
     }
     catch (UnsupportedEncodingException localUnsupportedEncodingException)
     {
@@ -102,14 +105,21 @@ public final class Hallmark
     }
   }
   
-  private Hallmark(byte[] paramArrayOfByte1, byte[] paramArrayOfByte2, String paramString, int paramInt1, int paramInt2, boolean paramBoolean)
+  private Hallmark(String paramString1, byte[] paramArrayOfByte1, byte[] paramArrayOfByte2, String paramString2, int paramInt1, int paramInt2, boolean paramBoolean)
   {
-    this.host = paramString;
+    this.hallmarkString = paramString1;
+    this.host = paramString2;
     this.publicKey = paramArrayOfByte1;
+    this.accountId = Account.getId(paramArrayOfByte1);
     this.signature = paramArrayOfByte2;
     this.weight = paramInt1;
     this.date = paramInt2;
     this.isValid = paramBoolean;
+  }
+  
+  public String getHallmarkString()
+  {
+    return this.hallmarkString;
   }
   
   public String getHost()
@@ -135,6 +145,11 @@ public final class Hallmark
   public byte[] getPublicKey()
   {
     return this.publicKey;
+  }
+  
+  public Long getAccountId()
+  {
+    return this.accountId;
   }
   
   public boolean isValid()

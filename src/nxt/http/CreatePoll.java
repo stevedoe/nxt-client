@@ -6,17 +6,18 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Attachment.MessagingPollCreation;
-import nxt.Blockchain;
 import nxt.Genesis;
+import nxt.Nxt;
 import nxt.NxtException;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class CreatePoll
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final CreatePoll instance = new CreatePoll();
   
@@ -142,11 +143,11 @@ public final class CreatePoll
     }
     int j = Convert.getEpochTime();
     
-    Attachment.MessagingPollCreation localMessagingPollCreation = new Attachment.MessagingPollCreation(str2.trim(), str3.trim(), (String[])localArrayList.toArray(new String[0]), b1, b2, bool);
-    Transaction localTransaction = Transaction.newTransaction(j, s, arrayOfByte, Genesis.CREATOR_ID, 0, i, localLong, localMessagingPollCreation);
+    Attachment.MessagingPollCreation localMessagingPollCreation = new Attachment.MessagingPollCreation(str2.trim(), str3.trim(), (String[])localArrayList.toArray(new String[localArrayList.size()]), b1, b2, bool);
+    Transaction localTransaction = Nxt.getTransactionProcessor().newTransaction(j, s, arrayOfByte, Genesis.CREATOR_ID, 0, i, localLong, localMessagingPollCreation);
     localTransaction.sign(str1);
     
-    Blockchain.broadcast(localTransaction);
+    Nxt.getTransactionProcessor().broadcast(localTransaction);
     
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("transaction", localTransaction.getStringId());

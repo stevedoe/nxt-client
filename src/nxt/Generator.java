@@ -11,6 +11,7 @@ import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Listeners;
 import nxt.util.Logger;
+import nxt.util.ThreadPool;
 
 public final class Generator
 {
@@ -26,7 +27,7 @@ public final class Generator
   private static final ConcurrentMap<Account, BigInteger> hits = new ConcurrentHashMap();
   private static final ConcurrentMap<String, Generator> generators = new ConcurrentHashMap();
   private static final Collection<Generator> allGenerators = Collections.unmodifiableCollection(generators.values());
-  static final Runnable generateBlockThread = new Runnable()
+  private static final Runnable generateBlockThread = new Runnable()
   {
     public void run()
     {
@@ -55,6 +56,11 @@ public final class Generator
   private final String secretPhrase;
   private final byte[] publicKey;
   private volatile long deadline;
+  
+  static
+  {
+    ThreadPool.scheduleThread(generateBlockThread, 1);
+  }
   
   public static boolean addListener(Listener<Generator> paramListener, Event paramEvent)
   {
@@ -128,7 +134,7 @@ public final class Generator
     if (l1 <= 0L) {
       return;
     }
-    Block localBlock = Blockchain.getLastBlock();
+    Block localBlock = Nxt.getBlockchain().getLastBlock();
     Object localObject1;
     if (!localBlock.equals(lastBlocks.get(this.account)))
     {
@@ -160,8 +166,10 @@ public final class Generator
     {
       localObject1 = BigInteger.valueOf(localBlock.getBaseTarget()).multiply(BigInteger.valueOf(l1)).multiply(BigInteger.valueOf(i));
       if (((BigInteger)hits.get(this.account)).compareTo((BigInteger)localObject1) < 0) {
-        Blockchain.generateBlock(this.secretPhrase);
+        BlockchainProcessorImpl.getInstance().generateBlock(this.secretPhrase);
       }
     }
   }
+  
+  static void init() {}
 }

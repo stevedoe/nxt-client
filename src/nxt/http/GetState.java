@@ -11,20 +11,22 @@ import nxt.Alias;
 import nxt.Asset;
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.BlockchainProcessor;
 import nxt.Generator;
+import nxt.Nxt;
 import nxt.Order.Ask;
 import nxt.Order.Bid;
 import nxt.Poll;
 import nxt.Trade;
 import nxt.Vote;
 import nxt.peer.Peer;
-import nxt.user.User;
+import nxt.peer.Peers;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetState
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final GetState instance = new GetState();
   
@@ -32,10 +34,10 @@ public final class GetState
   {
     JSONObject localJSONObject = new JSONObject();
     
-    localJSONObject.put("version", "0.7.6");
+    localJSONObject.put("version", "0.8.0e");
     localJSONObject.put("time", Integer.valueOf(Convert.getEpochTime()));
-    localJSONObject.put("lastBlock", Blockchain.getLastBlock().getStringId());
-    localJSONObject.put("cumulativeDifficulty", Blockchain.getLastBlock().getCumulativeDifficulty().toString());
+    localJSONObject.put("lastBlock", Nxt.getBlockchain().getLastBlock().getStringId());
+    localJSONObject.put("cumulativeDifficulty", Nxt.getBlockchain().getLastBlock().getCumulativeDifficulty().toString());
     
     long l1 = 0L;
     for (Iterator localIterator = Account.getAllAccounts().iterator(); localIterator.hasNext();)
@@ -48,8 +50,8 @@ public final class GetState
     }
     localJSONObject.put("totalEffectiveBalance", Long.valueOf(l1 * 100L));
     
-    localJSONObject.put("numberOfBlocks", Integer.valueOf(Blockchain.getBlockCount()));
-    localJSONObject.put("numberOfTransactions", Integer.valueOf(Blockchain.getTransactionCount()));
+    localJSONObject.put("numberOfBlocks", Integer.valueOf(Nxt.getBlockchain().getBlockCount()));
+    localJSONObject.put("numberOfTransactions", Integer.valueOf(Nxt.getBlockchain().getTransactionCount()));
     localJSONObject.put("numberOfAccounts", Integer.valueOf(Account.getAllAccounts().size()));
     localJSONObject.put("numberOfAssets", Integer.valueOf(Asset.getAllAssets().size()));
     localJSONObject.put("numberOfOrders", Integer.valueOf(Order.Ask.getAllAskOrders().size() + Order.Bid.getAllBidOrders().size()));
@@ -63,10 +65,10 @@ public final class GetState
     localJSONObject.put("numberOfAliases", Integer.valueOf(Alias.getAllAliases().size()));
     localJSONObject.put("numberOfPolls", Integer.valueOf(Poll.getAllPolls().size()));
     localJSONObject.put("numberOfVotes", Integer.valueOf(Vote.getVotes().size()));
-    localJSONObject.put("numberOfPeers", Integer.valueOf(Peer.getAllPeers().size()));
-    localJSONObject.put("numberOfUsers", Integer.valueOf(User.getAllUsers().size()));
+    localJSONObject.put("numberOfPeers", Integer.valueOf(Peers.getAllPeers().size()));
+    
     localJSONObject.put("numberOfUnlockedAccounts", Integer.valueOf(Generator.getAllGenerators().size()));
-    localObject = Blockchain.getLastBlockchainFeeder();
+    localObject = Nxt.getBlockchainProcessor().getLastBlockchainFeeder();
     localJSONObject.put("lastBlockchainFeeder", localObject == null ? null : ((Peer)localObject).getAnnouncedAddress());
     localJSONObject.put("availableProcessors", Integer.valueOf(Runtime.getRuntime().availableProcessors()));
     localJSONObject.put("maxMemory", Long.valueOf(Runtime.getRuntime().maxMemory()));

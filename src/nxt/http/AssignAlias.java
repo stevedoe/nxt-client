@@ -4,17 +4,18 @@ import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Alias;
 import nxt.Attachment.MessagingAliasAssignment;
-import nxt.Blockchain;
 import nxt.Genesis;
+import nxt.Nxt;
 import nxt.NxtException.ValidationException;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class AssignAlias
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final AssignAlias instance = new AssignAlias();
   
@@ -96,11 +97,11 @@ public final class AssignAlias
     {
       int j = Convert.getEpochTime();
       Attachment.MessagingAliasAssignment localMessagingAliasAssignment = new Attachment.MessagingAliasAssignment(str2, str3);
-      Transaction localTransaction = Transaction.newTransaction(j, s, arrayOfByte, Genesis.CREATOR_ID, 0, i, localLong, localMessagingAliasAssignment);
+      Transaction localTransaction = Nxt.getTransactionProcessor().newTransaction(j, s, arrayOfByte, Genesis.CREATOR_ID, 0, i, localLong, localMessagingAliasAssignment);
       
       localTransaction.sign(str1);
       
-      Blockchain.broadcast(localTransaction);
+      Nxt.getTransactionProcessor().broadcast(localTransaction);
       
       localJSONObject.put("transaction", localTransaction.getStringId());
     }

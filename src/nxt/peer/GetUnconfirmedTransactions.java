@@ -1,21 +1,23 @@
 package nxt.peer;
 
-import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONStreamAware;
 
 final class GetUnconfirmedTransactions
-  extends HttpJSONRequestHandler
+  extends PeerServlet.PeerRequestHandler
 {
   static final GetUnconfirmedTransactions instance = new GetUnconfirmedTransactions();
   
-  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONStreamAware processRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     
     JSONArray localJSONArray = new JSONArray();
-    for (Transaction localTransaction : Blockchain.getAllUnconfirmedTransactions()) {
+    for (Transaction localTransaction : Nxt.getTransactionProcessor().getAllUnconfirmedTransactions()) {
       localJSONArray.add(localTransaction.getJSONObject());
     }
     localJSONObject.put("unconfirmedTransactions", localJSONArray);

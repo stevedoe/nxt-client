@@ -4,18 +4,19 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Attachment.MessagingVoteCasting;
-import nxt.Blockchain;
 import nxt.Genesis;
+import nxt.Nxt;
 import nxt.NxtException;
 import nxt.Poll;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class CastVote
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final CastVote instance = new CastVote();
   
@@ -109,10 +110,10 @@ public final class CastVote
     int m = Convert.getEpochTime();
     
     Attachment.MessagingVoteCasting localMessagingVoteCasting = new Attachment.MessagingVoteCasting(localPoll.getId(), arrayOfByte1);
-    Transaction localTransaction = Transaction.newTransaction(m, s, arrayOfByte2, Genesis.CREATOR_ID, 0, k, localLong, localMessagingVoteCasting);
+    Transaction localTransaction = Nxt.getTransactionProcessor().newTransaction(m, s, arrayOfByte2, Genesis.CREATOR_ID, 0, k, localLong, localMessagingVoteCasting);
     localTransaction.sign(str1);
     
-    Blockchain.broadcast(localTransaction);
+    Nxt.getTransactionProcessor().broadcast(localTransaction);
     
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("transaction", localTransaction.getStringId());

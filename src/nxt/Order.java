@@ -43,7 +43,7 @@ public abstract class Order
       int i = localAsk.quantity < localBid.quantity ? localAsk.quantity : localBid.quantity;
       long l = (localAsk.getHeight() < localBid.getHeight()) || ((localAsk.getHeight() == localBid.getHeight()) && (localAsk.getId().longValue() < localBid.getId().longValue())) ? localAsk.getPrice() : localBid.getPrice();
       
-      Trade.addTrade(paramLong, Blockchain.getLastBlock().getId(), localAsk.getId(), localBid.getId(), i, l);
+      Trade.addTrade(paramLong, Nxt.getBlockchain().getLastBlock().getId(), localAsk.getId(), localBid.getId(), i, l);
       if (localAsk.quantity -= i == 0) {
         Ask.removeOrder(localAsk.getId());
       }
@@ -62,7 +62,7 @@ public abstract class Order
     this.assetId = paramLong2;
     this.quantity = paramInt;
     this.price = paramLong;
-    this.height = Blockchain.getLastBlock().getHeight();
+    this.height = Nxt.getBlockchain().getLastBlock().getHeight();
   }
   
   public Long getId()

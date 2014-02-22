@@ -66,7 +66,7 @@ public final class JSONResponses
   public static final JSONStreamAware MISSING_MESSAGE = missing("message");
   public static final JSONStreamAware MISSING_RECIPIENT = missing("recipient");
   public static final JSONStreamAware INCORRECT_RECIPIENT = incorrect("recipient");
-  public static final JSONStreamAware INCORRECT_ARBITRARY_MESSAGE = incorrect("message", "(length must be not longer than \"1000\" bytes)");
+  public static final JSONStreamAware INCORRECT_ARBITRARY_MESSAGE = incorrect("message", "(length must be not longer than 1000 bytes)");
   public static final JSONStreamAware MISSING_AMOUNT = missing("amount");
   public static final JSONStreamAware INCORRECT_AMOUNT = incorrect("amount");
   public static final JSONStreamAware MISSING_DESCRIPTION = missing("description");
@@ -87,6 +87,7 @@ public final class JSONResponses
   public static final JSONStreamAware ASSET_NAME_ALREADY_USED;
   public static final JSONStreamAware ERROR_NOT_ALLOWED;
   public static final JSONStreamAware ERROR_INCORRECT_REQUEST;
+  public static final JSONStreamAware NOT_FORGING;
   
   static
   {
@@ -118,6 +119,14 @@ public final class JSONResponses
     localJSONObject.put("errorCode", Integer.valueOf(1));
     localJSONObject.put("errorDescription", "Incorrect request");
     ERROR_INCORRECT_REQUEST = JSON.prepare(localJSONObject);
+    
+
+
+
+    localJSONObject = new JSONObject();
+    localJSONObject.put("errorCode", Integer.valueOf(5));
+    localJSONObject.put("errorDescription", "Account is not forging");
+    NOT_FORGING = JSON.prepare(localJSONObject);
   }
   
   private static JSONStreamAware missing(String paramString)
@@ -130,14 +139,14 @@ public final class JSONResponses
   
   private static JSONStreamAware incorrect(String paramString)
   {
-    return incorrect(paramString, "");
+    return incorrect(paramString, null);
   }
   
   private static JSONStreamAware incorrect(String paramString1, String paramString2)
   {
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("errorCode", Integer.valueOf(4));
-    localJSONObject.put("errorDescription", "Incorrect \"" + paramString1 + "\" " + paramString2);
+    localJSONObject.put("errorDescription", "Incorrect \"" + paramString1 + (paramString2 != null ? "\" " + paramString2 : "\""));
     return JSON.prepare(localJSONObject);
   }
   

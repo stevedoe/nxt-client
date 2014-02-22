@@ -3,18 +3,19 @@ package nxt.http;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Attachment.ColoredCoinsBidOrderCancellation;
-import nxt.Blockchain;
 import nxt.Genesis;
+import nxt.Nxt;
 import nxt.NxtException.ValidationException;
 import nxt.Order.Bid;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class CancelBidOrder
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final CancelBidOrder instance = new CancelBidOrder();
   
@@ -86,11 +87,11 @@ public final class CancelBidOrder
     }
     int j = Convert.getEpochTime();
     Attachment.ColoredCoinsBidOrderCancellation localColoredCoinsBidOrderCancellation = new Attachment.ColoredCoinsBidOrderCancellation(localLong1);
-    Transaction localTransaction = Transaction.newTransaction(j, s, arrayOfByte, Genesis.CREATOR_ID, 0, i, localLong2, localColoredCoinsBidOrderCancellation);
+    Transaction localTransaction = Nxt.getTransactionProcessor().newTransaction(j, s, arrayOfByte, Genesis.CREATOR_ID, 0, i, localLong2, localColoredCoinsBidOrderCancellation);
     
     localTransaction.sign(str1);
     
-    Blockchain.broadcast(localTransaction);
+    Nxt.getTransactionProcessor().broadcast(localTransaction);
     
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("transaction", localTransaction.getStringId());

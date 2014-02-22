@@ -2,18 +2,19 @@ package nxt.peer;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONStreamAware;
 
 final class GetPeers
-  extends HttpJSONRequestHandler
+  extends PeerServlet.PeerRequestHandler
 {
   static final GetPeers instance = new GetPeers();
   
-  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONStreamAware processRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     
     JSONArray localJSONArray = new JSONArray();
-    for (Peer localPeer : Peer.getAllPeers()) {
+    for (Peer localPeer : Peers.getAllPeers()) {
       if ((!localPeer.isBlacklisted()) && (localPeer.getAnnouncedAddress() != null) && (localPeer.getState() == Peer.State.CONNECTED) && (localPeer.shareAddress())) {
         localJSONArray.add(localPeer.getAnnouncedAddress());
       }

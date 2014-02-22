@@ -8,16 +8,19 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.Transaction;
+import nxt.TransactionProcessor;
 import nxt.peer.Peer;
 import nxt.peer.Peer.State;
+import nxt.peer.Peers;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GetInitialData
-  extends UserRequestHandler
+public final class GetInitialData
+  extends UserServlet.UserRequestHandler
 {
   static final GetInitialData instance = new GetInitialData();
   
@@ -27,12 +30,12 @@ final class GetInitialData
     JSONArray localJSONArray1 = new JSONArray();
     JSONArray localJSONArray2 = new JSONArray();JSONArray localJSONArray3 = new JSONArray();JSONArray localJSONArray4 = new JSONArray();
     JSONArray localJSONArray5 = new JSONArray();
-    for (Iterator localIterator = Blockchain.getAllUnconfirmedTransactions().iterator(); localIterator.hasNext();)
+    for (Iterator localIterator = Nxt.getTransactionProcessor().getAllUnconfirmedTransactions().iterator(); localIterator.hasNext();)
     {
       localObject1 = (Transaction)localIterator.next();
       
       localObject2 = new JSONObject();
-      ((JSONObject)localObject2).put("index", Integer.valueOf(User.getIndex((Transaction)localObject1)));
+      ((JSONObject)localObject2).put("index", Integer.valueOf(Users.getIndex((Transaction)localObject1)));
       ((JSONObject)localObject2).put("timestamp", Integer.valueOf(((Transaction)localObject1).getTimestamp()));
       ((JSONObject)localObject2).put("deadline", Short.valueOf(((Transaction)localObject1).getDeadline()));
       ((JSONObject)localObject2).put("recipient", Convert.toUnsignedLong(((Transaction)localObject1).getRecipientId()));
@@ -44,7 +47,7 @@ final class GetInitialData
       localJSONArray1.add(localObject2);
     }
     Object localObject2;
-    for (localIterator = Peer.getAllPeers().iterator(); localIterator.hasNext();)
+    for (localIterator = Peers.getAllPeers().iterator(); localIterator.hasNext();)
     {
       localObject1 = (Peer)localIterator.next();
       
@@ -52,7 +55,7 @@ final class GetInitialData
       if (((Peer)localObject1).isBlacklisted())
       {
         localObject3 = new JSONObject();
-        ((JSONObject)localObject3).put("index", Integer.valueOf(User.getIndex((Peer)localObject1)));
+        ((JSONObject)localObject3).put("index", Integer.valueOf(Users.getIndex((Peer)localObject1)));
         ((JSONObject)localObject3).put("address", ((Peer)localObject1).getPeerAddress());
         ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "-", 25, true));
         ((JSONObject)localObject3).put("software", ((Peer)localObject1).getSoftware());
@@ -66,7 +69,7 @@ final class GetInitialData
         if (((Peer)localObject1).getAnnouncedAddress() != null)
         {
           localObject3 = new JSONObject();
-          ((JSONObject)localObject3).put("index", Integer.valueOf(User.getIndex((Peer)localObject1)));
+          ((JSONObject)localObject3).put("index", Integer.valueOf(Users.getIndex((Peer)localObject1)));
           ((JSONObject)localObject3).put("address", ((Peer)localObject1).getPeerAddress());
           ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "-", 25, true));
           ((JSONObject)localObject3).put("software", ((Peer)localObject1).getSoftware());
@@ -79,7 +82,7 @@ final class GetInitialData
       else
       {
         localObject3 = new JSONObject();
-        ((JSONObject)localObject3).put("index", Integer.valueOf(User.getIndex((Peer)localObject1)));
+        ((JSONObject)localObject3).put("index", Integer.valueOf(Users.getIndex((Peer)localObject1)));
         if (((Peer)localObject1).getState() == Peer.State.DISCONNECTED) {
           ((JSONObject)localObject3).put("disconnected", Boolean.valueOf(true));
         }
@@ -96,13 +99,13 @@ final class GetInitialData
       }
     }
     Object localObject3;
-    int i = Blockchain.getLastBlock().getHeight();
-    Object localObject1 = Blockchain.getBlocksFromHeight(Math.max(0, i - 59));
+    int i = Nxt.getBlockchain().getLastBlock().getHeight();
+    Object localObject1 = Nxt.getBlockchain().getBlocksFromHeight(Math.max(0, i - 59));
     for (int j = ((List)localObject1).size() - 1; j >= 0; j--)
     {
       localObject3 = (Block)((List)localObject1).get(j);
       JSONObject localJSONObject2 = new JSONObject();
-      localJSONObject2.put("index", Integer.valueOf(User.getIndex((Block)localObject3)));
+      localJSONObject2.put("index", Integer.valueOf(Users.getIndex((Block)localObject3)));
       localJSONObject2.put("timestamp", Integer.valueOf(((Block)localObject3).getTimestamp()));
       localJSONObject2.put("numberOfTransactions", Integer.valueOf(((Block)localObject3).getTransactionIds().size()));
       localJSONObject2.put("totalAmount", Integer.valueOf(((Block)localObject3).getTotalAmount()));
@@ -119,7 +122,7 @@ final class GetInitialData
     }
     JSONObject localJSONObject1 = new JSONObject();
     localJSONObject1.put("response", "processInitialData");
-    localJSONObject1.put("version", "0.7.6");
+    localJSONObject1.put("version", "0.8.0e");
     if (localJSONArray1.size() > 0) {
       localJSONObject1.put("unconfirmedTransactions", localJSONArray1);
     }

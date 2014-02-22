@@ -91,7 +91,7 @@ public final class Account
   private Account(Long paramLong)
   {
     this.id = paramLong;
-    this.height = Blockchain.getLastBlock().getHeight();
+    this.height = Nxt.getBlockchain().getLastBlock().getHeight();
   }
   
   public Long getId()
@@ -116,7 +116,7 @@ public final class Account
   
   public int getEffectiveBalance()
   {
-    Block localBlock = Blockchain.getLastBlock();
+    Block localBlock = Nxt.getBlockchain().getLastBlock();
     if ((localBlock.getHeight() < 51000) && (this.height < 47000))
     {
       if (this.height == 0) {
@@ -138,13 +138,13 @@ public final class Account
   
   public synchronized long getGuaranteedBalance(int paramInt)
   {
-    if ((paramInt > 2881) || (paramInt >= Blockchain.getLastBlock().getHeight()) || (paramInt < 0)) {
+    if ((paramInt > 2881) || (paramInt >= Nxt.getBlockchain().getLastBlock().getHeight()) || (paramInt < 0)) {
       throw new IllegalArgumentException("Number of required confirmations must be between 0 and 2881");
     }
     if (this.guaranteedBalances.isEmpty()) {
       return 0L;
     }
-    int i = Collections.binarySearch(this.guaranteedBalances, new GuaranteedBalance(Blockchain.getLastBlock().getHeight() - paramInt, 0L, null));
+    int i = Collections.binarySearch(this.guaranteedBalances, new GuaranteedBalance(Nxt.getBlockchain().getLastBlock().getHeight() - paramInt, 0L, null));
     if (i == -1) {
       return 0L;
     }
@@ -226,7 +226,7 @@ public final class Account
     if (this.height == paramInt)
     {
       Logger.logDebugMessage("Removing account " + Convert.toUnsignedLong(this.id) + " which was created in the popped off block");
-      accounts.remove(this);
+      accounts.remove(getId());
     }
   }
   
@@ -303,16 +303,12 @@ public final class Account
   
   private synchronized void addToGuaranteedBalance(long paramLong)
   {
-    int i = Blockchain.getLastBlock().getHeight();
+    int i = Nxt.getBlockchain().getLastBlock().getHeight();
     GuaranteedBalance localGuaranteedBalance1 = null;
     if ((this.guaranteedBalances.size() > 0) && ((localGuaranteedBalance1 = (GuaranteedBalance)this.guaranteedBalances.get(this.guaranteedBalances.size() - 1)).height > i))
     {
-      if (paramLong > 0L)
-      {
-        Iterator localIterator1 = this.guaranteedBalances.iterator();
-        while (localIterator1.hasNext())
-        {
-          GuaranteedBalance localGuaranteedBalance2 = (GuaranteedBalance)localIterator1.next();
+      if (paramLong > 0L) {
+        for (GuaranteedBalance localGuaranteedBalance2 : this.guaranteedBalances) {
           localGuaranteedBalance2.balance += paramLong;
         }
       }

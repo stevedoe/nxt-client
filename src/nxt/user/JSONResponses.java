@@ -4,12 +4,14 @@ import nxt.util.JSON;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class JSONResponses
+public final class JSONResponses
 {
-  static final JSONStreamAware INVALID_SECRET_PHRASE;
-  static final JSONStreamAware LOCK_ACCOUNT;
-  static final JSONStreamAware LOCAL_USERS_ONLY;
-  static final JSONStreamAware NOTIFY_OF_ACCEPTED_TRANSACTION;
+  public static final JSONStreamAware INVALID_SECRET_PHRASE;
+  public static final JSONStreamAware LOCK_ACCOUNT;
+  public static final JSONStreamAware LOCAL_USERS_ONLY;
+  public static final JSONStreamAware NOTIFY_OF_ACCEPTED_TRANSACTION;
+  public static final JSONStreamAware DENY_ACCESS;
+  public static final JSONStreamAware INCORRECT_REQUEST;
   
   static
   {
@@ -39,5 +41,20 @@ final class JSONResponses
     localJSONObject = new JSONObject();
     localJSONObject.put("response", "notifyOfAcceptedTransaction");
     NOTIFY_OF_ACCEPTED_TRANSACTION = JSON.prepare(localJSONObject);
+    
+
+
+
+    localJSONObject = new JSONObject();
+    localJSONObject.put("response", "denyAccess");
+    DENY_ACCESS = JSON.prepare(localJSONObject);
+    
+
+
+
+    localJSONObject = new JSONObject();
+    localJSONObject.put("response", "showMessage");
+    localJSONObject.put("message", "Incorrect request!");
+    INCORRECT_REQUEST = JSON.prepare(localJSONObject);
   }
 }

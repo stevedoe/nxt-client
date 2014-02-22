@@ -4,19 +4,20 @@ import java.util.Collection;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import nxt.peer.Peer;
+import nxt.peer.Peers;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public final class GetPeers
-  extends HttpRequestDispatcher.HttpRequestHandler
+  extends APIServlet.APIRequestHandler
 {
   static final GetPeers instance = new GetPeers();
   
   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
   {
     JSONArray localJSONArray = new JSONArray();
-    for (Object localObject = Peer.getAllPeers().iterator(); ((Iterator)localObject).hasNext();)
+    for (Object localObject = Peers.getAllPeers().iterator(); ((Iterator)localObject).hasNext();)
     {
       Peer localPeer = (Peer)((Iterator)localObject).next();
       localJSONArray.add(localPeer.getPeerAddress());

@@ -2,17 +2,19 @@ package nxt.peer;
 
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.Nxt;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONStreamAware;
 
 final class GetMilestoneBlockIds
-  extends HttpJSONRequestHandler
+  extends PeerServlet.PeerRequestHandler
 {
   static final GetMilestoneBlockIds instance = new GetMilestoneBlockIds();
   
-  JSONObject processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONStreamAware processRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     JSONObject localJSONObject = new JSONObject();
     try
@@ -23,8 +25,8 @@ final class GetMilestoneBlockIds
       if (str1 != null)
       {
         Long localLong1 = Convert.parseUnsignedLong(str1);
-        Long localLong2 = Blockchain.getLastBlock().getId();
-        if ((localLong2.equals(localLong1)) || (Blockchain.hasBlock(localLong1)))
+        Long localLong2 = Nxt.getBlockchain().getLastBlock().getId();
+        if ((localLong2.equals(localLong1)) || (Nxt.getBlockchain().hasBlock(localLong1)))
         {
           localJSONArray.add(str1);
           localJSONObject.put("milestoneBlockIds", localJSONArray);
@@ -40,18 +42,18 @@ final class GetMilestoneBlockIds
       int k;
       if (str2 != null)
       {
-        Block localBlock = Blockchain.getBlock(Convert.parseUnsignedLong(str2));
+        Block localBlock = Nxt.getBlockchain().getBlock(Convert.parseUnsignedLong(str2));
         if (localBlock == null) {
           throw new IllegalStateException("Don't have block " + str2);
         }
         i = localBlock.getHeight();
-        j = Math.min(1440, Blockchain.getLastBlock().getHeight() - i);
+        j = Math.min(1440, Nxt.getBlockchain().getLastBlock().getHeight() - i);
         i = Math.max(i - j, 0);
         k = 10;
       }
       else if (str1 != null)
       {
-        i = Blockchain.getLastBlock().getHeight();
+        i = Nxt.getBlockchain().getLastBlock().getHeight();
         j = 10;
         k = 10;
       }
@@ -61,11 +63,11 @@ final class GetMilestoneBlockIds
         localJSONObject.put("error", "Old getMilestoneBlockIds protocol not supported, please upgrade");
         return localJSONObject;
       }
-      long l = Blockchain.getBlockIdAtHeight(i);
+      long l = Nxt.getBlockchain().getBlockIdAtHeight(i);
       while ((i > 0) && (k-- > 0))
       {
         localJSONArray.add(Convert.toUnsignedLong(l));
-        l = Blockchain.getBlockIdAtHeight(i);
+        l = Nxt.getBlockchain().getBlockIdAtHeight(i);
         i -= j;
       }
       localJSONObject.put("milestoneBlockIds", localJSONArray);

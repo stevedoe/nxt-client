@@ -2,6 +2,8 @@ package nxt.peer;
 
 import nxt.Block;
 import nxt.Blockchain;
+import nxt.BlockchainProcessor;
+import nxt.Nxt;
 import nxt.NxtException;
 import nxt.util.Convert;
 import nxt.util.JSON;
@@ -9,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 final class ProcessBlock
-  extends HttpJSONRequestHandler
+  extends PeerServlet.PeerRequestHandler
 {
   static final ProcessBlock instance = new ProcessBlock();
   private static final JSONStreamAware ACCEPTED;
@@ -29,15 +31,15 @@ final class ProcessBlock
     NOT_ACCEPTED = JSON.prepare(localJSONObject);
   }
   
-  JSONStreamAware processJSONRequest(JSONObject paramJSONObject, Peer paramPeer)
+  JSONStreamAware processRequest(JSONObject paramJSONObject, Peer paramPeer)
   {
     try
     {
-      if (!Blockchain.getLastBlock().getId().equals(Convert.parseUnsignedLong((String)paramJSONObject.get("previousBlock")))) {
+      if (!Nxt.getBlockchain().getLastBlock().getId().equals(Convert.parseUnsignedLong((String)paramJSONObject.get("previousBlock")))) {
         return NOT_ACCEPTED;
       }
-      boolean bool = Blockchain.pushBlock(paramJSONObject);
-      return bool ? ACCEPTED : NOT_ACCEPTED;
+      Nxt.getBlockchainProcessor().processPeerBlock(paramJSONObject);
+      return ACCEPTED;
     }
     catch (NxtException localNxtException)
     {

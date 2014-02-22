@@ -6,8 +6,8 @@ import nxt.Token;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-final class GenerateAuthorizationToken
-  extends UserRequestHandler
+public final class GenerateAuthorizationToken
+  extends UserServlet.UserRequestHandler
 {
   static final GenerateAuthorizationToken instance = new GenerateAuthorizationToken();
   

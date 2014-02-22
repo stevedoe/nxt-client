@@ -8,15 +8,23 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 final class Db
 {
-  private static JdbcConnectionPool cp;
+  private static volatile JdbcConnectionPool cp;
+  private static volatile int maxActiveConnections;
   
   static void init()
   {
-    long l = Runtime.getRuntime().maxMemory() / 2048L;
-    Logger.logDebugMessage("Database cache size set to " + l + " kB");
-    cp = JdbcConnectionPool.create("jdbc:h2:nxt_db/nxt;DB_CLOSE_DELAY=10;DB_CLOSE_ON_EXIT=FALSE;CACHE_SIZE=" + l, "sa", "sa");
-    cp.setMaxConnections(200);
-    cp.setLoginTimeout(70);
+    long l = Nxt.getIntProperty("nxt.dbCacheKB");
+    if (l == 0L) {
+      l = Runtime.getRuntime().maxMemory() / 2048L;
+    }
+    String str = Nxt.getStringProperty("nxt.dbUrl");
+    if (!str.contains("CACHE_SIZE=")) {
+      str = str + ";CACHE_SIZE=" + l;
+    }
+    Logger.logDebugMessage("Database jdbc url set to: " + str);
+    cp = JdbcConnectionPool.create(str, "sa", "sa");
+    cp.setMaxConnections(Nxt.getIntProperty("nxt.maxDbConnections"));
+    cp.setLoginTimeout(Nxt.getIntProperty("nxt.dbLoginTimeout"));
     DbVersion.init();
   }
   
@@ -33,6 +41,7 @@ final class Db
           try
           {
             localStatement.execute("SHUTDOWN COMPACT");
+            Logger.logDebugMessage("Database shutdown completed");
           }
           catch (Throwable localThrowable4)
           {
@@ -75,6 +84,12 @@ final class Db
   {
     Connection localConnection = cp.getConnection();
     localConnection.setAutoCommit(false);
+    int i = cp.getActiveConnections();
+    if (i > maxActiveConnections)
+    {
+      maxActiveConnections = i;
+      Logger.logDebugMessage("Database connection pool current size: " + i);
+    }
     return localConnection;
   }
 }
