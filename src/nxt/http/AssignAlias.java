@@ -107,4 +107,9 @@ public final class AssignAlias
     }
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

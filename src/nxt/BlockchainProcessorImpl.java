@@ -323,8 +323,14 @@ final class BlockchainProcessorImpl
 
 
 
-    addGenesisBlock();
-    scan();
+    ThreadPool.runBeforeStart(new Runnable()
+    {
+      public void run()
+      {
+        BlockchainProcessorImpl.this.addGenesisBlock();
+        BlockchainProcessorImpl.this.scan();
+      }
+    });
     ThreadPool.scheduleThread(this.getMoreBlocksThread, 1);
   }
   
@@ -828,7 +834,7 @@ final class BlockchainProcessorImpl
   {
     synchronized (this.blockchain)
     {
-      Logger.logDebugMessage("Scanning blockchain...");
+      Logger.logMessage("Scanning blockchain...");
       Account.clear();
       Alias.clear();
       Asset.clear();
@@ -892,7 +898,7 @@ final class BlockchainProcessorImpl
       {
         throw new RuntimeException(localValidationException.toString(), localValidationException);
       }
-      Logger.logDebugMessage("...done");
+      Logger.logMessage("...done");
     }
   }
 }

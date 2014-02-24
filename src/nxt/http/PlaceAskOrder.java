@@ -135,4 +135,9 @@ public final class PlaceAskOrder
     localJSONObject.put("transaction", localTransaction.getStringId());
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

@@ -121,4 +121,9 @@ public final class CastVote
     
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

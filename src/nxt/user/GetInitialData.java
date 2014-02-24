@@ -66,18 +66,15 @@ public final class GetInitialData
       }
       else if (((Peer)localObject1).getState() == Peer.State.NON_CONNECTED)
       {
-        if (((Peer)localObject1).getAnnouncedAddress() != null)
-        {
-          localObject3 = new JSONObject();
-          ((JSONObject)localObject3).put("index", Integer.valueOf(Users.getIndex((Peer)localObject1)));
-          ((JSONObject)localObject3).put("address", ((Peer)localObject1).getPeerAddress());
-          ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "-", 25, true));
-          ((JSONObject)localObject3).put("software", ((Peer)localObject1).getSoftware());
-          if (((Peer)localObject1).isWellKnown()) {
-            ((JSONObject)localObject3).put("wellKnown", Boolean.valueOf(true));
-          }
-          localJSONArray3.add(localObject3);
+        localObject3 = new JSONObject();
+        ((JSONObject)localObject3).put("index", Integer.valueOf(Users.getIndex((Peer)localObject1)));
+        ((JSONObject)localObject3).put("address", ((Peer)localObject1).getPeerAddress());
+        ((JSONObject)localObject3).put("announcedAddress", Convert.truncate(((Peer)localObject1).getAnnouncedAddress(), "-", 25, true));
+        ((JSONObject)localObject3).put("software", ((Peer)localObject1).getSoftware());
+        if (((Peer)localObject1).isWellKnown()) {
+          ((JSONObject)localObject3).put("wellKnown", Boolean.valueOf(true));
         }
+        localJSONArray3.add(localObject3);
       }
       else
       {
@@ -122,7 +119,7 @@ public final class GetInitialData
     }
     JSONObject localJSONObject1 = new JSONObject();
     localJSONObject1.put("response", "processInitialData");
-    localJSONObject1.put("version", "0.8.0e");
+    localJSONObject1.put("version", "0.8.1e");
     if (localJSONArray1.size() > 0) {
       localJSONObject1.put("unconfirmedTransactions", localJSONArray1);
     }

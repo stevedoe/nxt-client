@@ -155,4 +155,9 @@ public final class CreatePoll
     
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import nxt.Nxt;
 import nxt.NxtException;
 import nxt.util.Logger;
 import org.json.simple.JSONObject;
@@ -17,6 +18,18 @@ import org.json.simple.JSONStreamAware;
 public final class UserServlet
   extends HttpServlet
 {
+  static abstract class UserRequestHandler
+  {
+    abstract JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
+      throws NxtException, IOException;
+    
+    boolean requirePost()
+    {
+      return false;
+    }
+  }
+  
+  private static final boolean enforcePost = Nxt.getBooleanProperty("nxt.uiServerEnforcePOST").booleanValue();
   private static final Map<String, UserRequestHandler> userRequestHandlers;
   
   static
@@ -35,6 +48,18 @@ public final class UserServlet
   }
   
   protected void doGet(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
+    throws ServletException, IOException
+  {
+    process(paramHttpServletRequest, paramHttpServletResponse);
+  }
+  
+  protected void doPost(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
+    throws ServletException, IOException
+  {
+    process(paramHttpServletRequest, paramHttpServletResponse);
+  }
+  
+  private void process(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
     throws ServletException, IOException
   {
     paramHttpServletResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, private");
@@ -67,6 +92,10 @@ public final class UserServlet
           {
             localUser.enqueue(JSONResponses.INCORRECT_REQUEST);
           }
+          else if ((enforcePost) && (localUserRequestHandler.requirePost()) && (!"POST".equals(paramHttpServletRequest.getMethod())))
+          {
+            localUser.enqueue(JSONResponses.POST_REQUIRED);
+          }
           else
           {
             JSONStreamAware localJSONStreamAware = localUserRequestHandler.processRequest(paramHttpServletRequest, localUser);
@@ -91,11 +120,5 @@ public final class UserServlet
         localUser.processPendingResponses(paramHttpServletRequest, paramHttpServletResponse);
       }
     }
-  }
-  
-  static abstract class UserRequestHandler
-  {
-    abstract JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest, User paramUser)
-      throws NxtException, IOException;
   }
 }

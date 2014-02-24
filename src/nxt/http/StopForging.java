@@ -22,4 +22,9 @@ public final class StopForging
     localJSONObject.put("foundAndStopped", Boolean.valueOf(localGenerator != null));
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

@@ -41,7 +41,7 @@ public final class Logger
     {
       fileLog = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(Nxt.getStringProperty("nxt.log")))), true);
     }
-    catch (IOException localIOException)
+    catch (IOException|RuntimeException localIOException)
     {
       logMessage("Logging to file not possible, will log to stdout only", localIOException);
     }

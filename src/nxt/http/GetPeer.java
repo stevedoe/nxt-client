@@ -25,6 +25,7 @@ public final class GetPeer
     JSONObject localJSONObject = new JSONObject();
     localJSONObject.put("state", Integer.valueOf(localPeer.getState().ordinal()));
     localJSONObject.put("announcedAddress", localPeer.getAnnouncedAddress());
+    localJSONObject.put("shareAddress", Boolean.valueOf(localPeer.shareAddress()));
     if (localPeer.getHallmark() != null) {
       localJSONObject.put("hallmark", localPeer.getHallmark());
     }

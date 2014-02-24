@@ -12,12 +12,12 @@ final class GetInfo
   {
     PeerImpl localPeerImpl = (PeerImpl)paramPeer;
     String str1 = (String)paramJSONObject.get("announcedAddress");
-    if (str1 != null)
+    if ((str1 != null) && ((str1 = str1.trim()).length() > 0))
     {
-      str1 = str1.trim();
-      if (str1.length() > 0) {
-        localPeerImpl.setAnnouncedAddress(str1);
+      if ((localPeerImpl.getAnnouncedAddress() != null) && (!str1.equals(localPeerImpl.getAnnouncedAddress()))) {
+        localPeerImpl.setState(Peer.State.NON_CONNECTED);
       }
+      localPeerImpl.setAnnouncedAddress(str1);
     }
     String str2 = (String)paramJSONObject.get("application");
     if (str2 == null) {
@@ -39,7 +39,8 @@ final class GetInfo
     
     localPeerImpl.setShareAddress(Boolean.TRUE.equals(paramJSONObject.get("shareAddress")));
     
-    localPeerImpl.setState(Peer.State.CONNECTED);
+
+    Peers.notifyListeners(localPeerImpl, Peers.Event.ADDED_ACTIVE_PEER);
     
     return Peers.myPeerInfoResponse;
   }

@@ -123,4 +123,9 @@ public final class SendMoney
     
     return JSONResponses.NOTIFY_OF_ACCEPTED_TRANSACTION;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

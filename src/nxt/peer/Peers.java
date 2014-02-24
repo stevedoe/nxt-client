@@ -49,7 +49,7 @@ public final class Peers
   private static final int DEFAULT_PEER_PORT = 7874;
   private static final String myPlatform;
   private static final String myAddress;
-  private static final int myPeerPort;
+  private static final int myPeerServerPort;
   private static final String myHallmark;
   private static final boolean shareMyAddress;
   private static final int maxNumberOfConnectedPublicPeers;
@@ -62,7 +62,7 @@ public final class Peers
   
   public static enum Event
   {
-    BLACKLIST,  UNBLACKLIST,  DEACTIVATE,  REMOVE,  DOWNLOADED_VOLUME,  UPLOADED_VOLUME,  WEIGHT,  ADDED_ACTIVE_PEER,  CHANGED_ACTIVE_PEER;
+    BLACKLIST,  UNBLACKLIST,  DEACTIVATE,  REMOVE,  DOWNLOADED_VOLUME,  UPLOADED_VOLUME,  WEIGHT,  ADDED_ACTIVE_PEER,  CHANGED_ACTIVE_PEER,  NEW_PEER;
     
     private Event() {}
   }
@@ -81,36 +81,45 @@ public final class Peers
     
     static
     {
-      if (Peers.shareMyAddress) {
-        try
+      if (Peers.shareMyAddress)
+      {
+        Server localServer = new Server();
+        ServerConnector localServerConnector = new ServerConnector(localServer);
+        localServerConnector.setPort(Peers.myPeerServerPort);
+        final String str = Nxt.getStringProperty("nxt.peerServerHost");
+        localServerConnector.setHost(str);
+        localServerConnector.setIdleTimeout(Nxt.getIntProperty("nxt.peerServerIdleTimeout"));
+        localServer.addConnector(localServerConnector);
+        
+        ServletHandler localServletHandler = new ServletHandler();
+        localServletHandler.addServletWithMapping(PeerServlet.class, "/*");
+        FilterHolder localFilterHolder = localServletHandler.addFilterWithMapping(DoSFilter.class, "/*", 0);
+        localFilterHolder.setInitParameter("maxRequestsPerSec", Nxt.getStringProperty("nxt.peerServerDoSFilter.maxRequestsPerSec"));
+        localFilterHolder.setInitParameter("delayMs", Nxt.getStringProperty("nxt.peerServerDoSFilter.delayMs"));
+        localFilterHolder.setInitParameter("trackSessions", "false");
+        localFilterHolder.setAsyncSupported(true);
+        
+        localServer.setHandler(localServletHandler);
+        localServer.setStopAtShutdown(true);
+        ThreadPool.runBeforeStart(new Runnable()
         {
-          Server localServer = new Server();
-          ServerConnector localServerConnector = new ServerConnector(localServer);
-          localServerConnector.setPort(Peers.myPeerPort);
-          String str = Nxt.getStringProperty("nxt.peerServerHost");
-          localServerConnector.setHost(str);
-          localServerConnector.setIdleTimeout(Nxt.getIntProperty("nxt.peerServerIdleTimeout"));
-          localServer.addConnector(localServerConnector);
-          
-          ServletHandler localServletHandler = new ServletHandler();
-          localServletHandler.addServletWithMapping(PeerServlet.class, "/*");
-          FilterHolder localFilterHolder = localServletHandler.addFilterWithMapping(DoSFilter.class, "/*", 0);
-          localFilterHolder.setInitParameter("maxRequestsPerSec", Nxt.getStringProperty("nxt.peerServerDoSFilter.maxRequestsPerSec"));
-          localFilterHolder.setInitParameter("delayMs", Nxt.getStringProperty("nxt.peerServerDoSFilter.delayMs"));
-          localFilterHolder.setInitParameter("trackSessions", "false");
-          localFilterHolder.setAsyncSupported(true);
-          
-          localServer.setHandler(localServletHandler);
-          localServer.setStopAtShutdown(true);
-          localServer.start();
-          Logger.logMessage("Started peer networking server at " + str + ":" + Peers.myPeerPort);
-        }
-        catch (Exception localException)
-        {
-          Logger.logDebugMessage("Failed to start peer networking server", localException);
-          throw new RuntimeException(localException.toString(), localException);
-        }
-      } else {
+          public void run()
+          {
+            try
+            {
+              this.val$peerServer.start();
+              Logger.logMessage("Started peer networking server at " + str + ":" + Peers.myPeerServerPort);
+            }
+            catch (Exception localException)
+            {
+              Logger.logDebugMessage("Failed to start peer networking server", localException);
+              throw new RuntimeException(localException.toString(), localException);
+            }
+          }
+        });
+      }
+      else
+      {
         Logger.logMessage("shareMyAddress is disabled, will not start peer networking server");
       }
     }
@@ -120,48 +129,57 @@ public final class Peers
   {
     myPlatform = Nxt.getStringProperty("nxt.myPlatform");
     myAddress = Nxt.getStringProperty("nxt.myAddress");
-    myPeerPort = Nxt.getIntProperty("nxt.peerServerPort");
+    myPeerServerPort = Nxt.getIntProperty("nxt.peerServerPort");
     shareMyAddress = Nxt.getBooleanProperty("nxt.shareMyAddress").booleanValue();
     myHallmark = Nxt.getStringProperty("nxt.myHallmark");
     if ((myHallmark != null) && (myHallmark.length() > 0)) {
       try
       {
         Hallmark localHallmark = Hallmark.parseHallmark(myHallmark);
-        if (!localHallmark.isValid()) {
+        if ((!localHallmark.isValid()) || (myAddress == null)) {
+          throw new RuntimeException();
+        }
+        localObject1 = new URI("http://" + myAddress.trim());
+        localObject2 = ((URI)localObject1).getHost();
+        if (!localHallmark.getHost().equals(localObject2)) {
           throw new RuntimeException();
         }
       }
-      catch (RuntimeException localRuntimeException)
+      catch (RuntimeException|URISyntaxException localRuntimeException)
       {
-        Logger.logMessage("Your hallmark is invalid: " + myHallmark);
-        throw localRuntimeException;
+        Logger.logMessage("Your hallmark is invalid: " + myHallmark + " for your address: " + myAddress);
+        throw new RuntimeException(localRuntimeException.toString(), localRuntimeException);
       }
     }
     JSONObject localJSONObject = new JSONObject();
     if ((myAddress != null) && (myAddress.length() > 0)) {
-      localJSONObject.put("announcedAddress", myAddress + (myPeerPort != 7874 ? ":" + myPeerPort : ""));
+      if (myAddress.indexOf(':') > 0) {
+        localJSONObject.put("announcedAddress", myAddress);
+      } else {
+        localJSONObject.put("announcedAddress", myAddress + (myPeerServerPort != 7874 ? ":" + myPeerServerPort : ""));
+      }
     }
     if ((myHallmark != null) && (myHallmark.length() > 0)) {
       localJSONObject.put("hallmark", myHallmark);
     }
     localJSONObject.put("application", "NRS");
-    localJSONObject.put("version", "0.8.0e");
+    localJSONObject.put("version", "0.8.1e");
     localJSONObject.put("platform", myPlatform);
     localJSONObject.put("shareAddress", Boolean.valueOf(shareMyAddress));
     myPeerInfoResponse = JSON.prepare(localJSONObject);
     localJSONObject.put("requestType", "getInfo");
     myPeerInfoRequest = JSON.prepareRequest(localJSONObject);
     
-    String str1 = Nxt.getStringProperty("nxt.wellKnownPeers");
-    HashSet localHashSet = new HashSet();
-    Object localObject;
-    if ((str1 != null) && (str1.length() > 0))
+    Object localObject1 = Nxt.getStringProperty("nxt.wellKnownPeers");
+    Object localObject2 = new HashSet();
+    Object localObject3;
+    if ((localObject1 != null) && (((String)localObject1).length() > 0))
     {
-      for (localObject : str1.split(";"))
+      for (localObject3 : ((String)localObject1).split(";"))
       {
-        localObject = ((String)localObject).trim();
-        if (((String)localObject).length() > 0) {
-          localHashSet.add(localObject);
+        localObject3 = ((String)localObject3).trim();
+        if (((String)localObject3).length() > 0) {
+          ((Set)localObject2).add(localObject3);
         }
       }
     }
@@ -170,16 +188,16 @@ public final class Peers
       Logger.logMessage("No wellKnownPeers defined, using random nxtcrypto.org and nxtbase.com nodes");
       for (int i = 1; i <= 12; i++) {
         if (ThreadLocalRandom.current().nextInt(4) == 1) {
-          localHashSet.add("vps" + i + ".nxtcrypto.org");
+          ((Set)localObject2).add("vps" + i + ".nxtcrypto.org");
         }
       }
       for (i = 1; i <= 99; i++) {
         if (ThreadLocalRandom.current().nextInt(10) == 1) {
-          localHashSet.add("node" + i + ".nxtbase.com");
+          ((Set)localObject2).add("node" + i + ".nxtbase.com");
         }
       }
     }
-    wellKnownPeers = Collections.unmodifiableSet(localHashSet);
+    wellKnownPeers = Collections.unmodifiableSet((Set)localObject2);
     
     maxNumberOfConnectedPublicPeers = Nxt.getIntProperty("nxt.maxNumberOfConnectedPublicPeers");
     connectTimeout = Nxt.getIntProperty("nxt.connectTimeout");
@@ -193,15 +211,20 @@ public final class Peers
     sendToPeersLimit = Nxt.getIntProperty("nxt.sendToPeersLimit");
     
     StringBuilder localStringBuilder = new StringBuilder();
-    for (String str2 : wellKnownPeers)
+    for (String str : wellKnownPeers)
     {
-      localObject = addPeer(str2);
-      if (localObject != null) {
-        localStringBuilder.append(((Peer)localObject).getPeerAddress()).append("; ");
+      localObject3 = addPeer(str);
+      if (localObject3 != null) {
+        localStringBuilder.append(((Peer)localObject3).getPeerAddress()).append("; ");
       }
     }
     Logger.logDebugMessage("Well known peers: " + localStringBuilder.toString());
     
+
+
+
+
+
 
 
 
@@ -412,6 +435,7 @@ public final class Peers
     {
       localPeerImpl = new PeerImpl((String)localObject, str);
       peers.put(localObject, localPeerImpl);
+      listeners.notify(localPeerImpl, Event.NEW_PEER);
     }
     return localPeerImpl;
   }
@@ -476,7 +500,7 @@ public final class Peers
   {
     ArrayList localArrayList = new ArrayList();
     for (Peer localPeer1 : peers.values()) {
-      if ((!localPeer1.isBlacklisted()) && (localPeer1.getState() == paramState) && (localPeer1.getAnnouncedAddress() != null) && ((!paramBoolean) || (!enableHallmarkProtection) || (localPeer1.getWeight() >= pullThreshold))) {
+      if ((!localPeer1.isBlacklisted()) && (localPeer1.getState() == paramState) && ((!paramBoolean) || (!enableHallmarkProtection) || (localPeer1.getWeight() >= pullThreshold))) {
         localArrayList.add(localPeer1);
       }
     }

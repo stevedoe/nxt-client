@@ -97,4 +97,9 @@ public final class CancelAskOrder
     localJSONObject.put("transaction", localTransaction.getStringId());
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

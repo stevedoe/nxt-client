@@ -26,4 +26,9 @@ public final class GenerateAuthorizationToken
     
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

@@ -112,4 +112,9 @@ public final class SendMoney
     
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

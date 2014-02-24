@@ -41,7 +41,7 @@ final class Db
           try
           {
             localStatement.execute("SHUTDOWN COMPACT");
-            Logger.logDebugMessage("Database shutdown completed");
+            Logger.logMessage("Database shutdown completed");
           }
           catch (Throwable localThrowable4)
           {

@@ -1,6 +1,7 @@
 package nxt.http;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,13 +11,27 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import nxt.Nxt;
 import nxt.NxtException;
+import nxt.util.JSON;
 import nxt.util.Logger;
 import org.json.simple.JSONStreamAware;
 
 public final class APIServlet
   extends HttpServlet
 {
+  static abstract class APIRequestHandler
+  {
+    abstract JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
+      throws NxtException, IOException;
+    
+    boolean requirePost()
+    {
+      return false;
+    }
+  }
+  
+  private static final boolean enforcePost = Nxt.getBooleanProperty("nxt.apiServerEnforcePOST").booleanValue();
   private static final Map<String, APIRequestHandler> apiRequestHandlers;
   
   static
@@ -31,6 +46,7 @@ public final class APIServlet
     localHashMap.put("createPoll", CreatePoll.instance);
     localHashMap.put("decodeHallmark", DecodeHallmark.instance);
     localHashMap.put("decodeToken", DecodeToken.instance);
+    localHashMap.put("generateToken", GenerateToken.instance);
     localHashMap.put("getAccount", GetAccount.instance);
     localHashMap.put("getAccountBlockIds", GetAccountBlockIds.instance);
     localHashMap.put("getAccountId", GetAccountId.instance);
@@ -81,72 +97,307 @@ public final class APIServlet
   protected void doGet(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
     throws ServletException, IOException
   {
+    process(paramHttpServletRequest, paramHttpServletResponse);
+  }
+  
+  protected void doPost(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
+    throws ServletException, IOException
+  {
+    process(paramHttpServletRequest, paramHttpServletResponse);
+  }
+  
+  private void process(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
+    throws ServletException, IOException
+  {
     paramHttpServletResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, private");
     paramHttpServletResponse.setHeader("Pragma", "no-cache");
     paramHttpServletResponse.setDateHeader("Expires", 0L);
-    JSONStreamAware localJSONStreamAware;
-    if ((API.allowedBotHosts != null) && (!API.allowedBotHosts.contains(paramHttpServletRequest.getRemoteHost())))
+    
+    JSONStreamAware localJSONStreamAware = JSON.emptyJSON;
+    try
     {
-      localJSONStreamAware = JSONResponses.ERROR_NOT_ALLOWED;
-    }
-    else
-    {
-      localObject1 = paramHttpServletRequest.getParameter("requestType");
-      if (localObject1 == null)
+      Object localObject1;
+      Object localObject2;
+      if ((API.allowedBotHosts != null) && (!API.allowedBotHosts.contains(paramHttpServletRequest.getRemoteHost())))
       {
-        localJSONStreamAware = JSONResponses.ERROR_INCORRECT_REQUEST;
+        localJSONStreamAware = JSONResponses.ERROR_NOT_ALLOWED;
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
+        localObject1 = paramHttpServletResponse.getWriter();localObject2 = null;
+        try
+        {
+          localJSONStreamAware.writeJSONString((Writer)localObject1);
+        }
+        catch (Throwable localThrowable2)
+        {
+          localObject2 = localThrowable2; throw localThrowable2;
+        }
+        finally
+        {
+          if (localObject1 != null) {
+            if (localObject2 != null) {
+              try
+              {
+                ((Writer)localObject1).close();
+              }
+              catch (Throwable localThrowable7)
+              {
+                ((Throwable)localObject2).addSuppressed(localThrowable7);
+              }
+            } else {
+              ((Writer)localObject1).close();
+            }
+          }
+        }
       }
       else
       {
-        localObject2 = (APIRequestHandler)apiRequestHandlers.get(localObject1);
-        if (localObject2 != null) {
+        localObject1 = paramHttpServletRequest.getParameter("requestType");
+        Object localObject3;
+        if (localObject1 == null)
+        {
+          localJSONStreamAware = JSONResponses.ERROR_INCORRECT_REQUEST;
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
+          localObject2 = paramHttpServletResponse.getWriter();localObject3 = null;
           try
           {
-            localJSONStreamAware = ((APIRequestHandler)localObject2).processRequest(paramHttpServletRequest);
+            localJSONStreamAware.writeJSONString((Writer)localObject2);
           }
-          catch (NxtException|RuntimeException localNxtException)
+          catch (Throwable localThrowable6)
           {
-            Logger.logDebugMessage("Error processing API request", localNxtException);
-            localJSONStreamAware = JSONResponses.ERROR_INCORRECT_REQUEST;
+            localObject3 = localThrowable6; throw localThrowable6;
           }
-        } else {
-          localJSONStreamAware = JSONResponses.ERROR_INCORRECT_REQUEST;
+          finally
+          {
+            if (localObject2 != null) {
+              if (localObject3 != null) {
+                try
+                {
+                  ((Writer)localObject2).close();
+                }
+                catch (Throwable localThrowable12)
+                {
+                  ((Throwable)localObject3).addSuppressed(localThrowable12);
+                }
+              } else {
+                ((Writer)localObject2).close();
+              }
+            }
+          }
+        }
+        else
+        {
+          localObject2 = (APIRequestHandler)apiRequestHandlers.get(localObject1);
+          Object localObject5;
+          if (localObject2 == null)
+          {
+            localJSONStreamAware = JSONResponses.ERROR_INCORRECT_REQUEST;
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
+            localObject3 = paramHttpServletResponse.getWriter();localObject5 = null;
+            try
+            {
+              localJSONStreamAware.writeJSONString((Writer)localObject3);
+            }
+            catch (Throwable localThrowable9)
+            {
+              localObject5 = localThrowable9; throw localThrowable9;
+            }
+            finally
+            {
+              if (localObject3 != null) {
+                if (localObject5 != null) {
+                  try
+                  {
+                    ((Writer)localObject3).close();
+                  }
+                  catch (Throwable localThrowable13)
+                  {
+                    localObject5.addSuppressed(localThrowable13);
+                  }
+                } else {
+                  ((Writer)localObject3).close();
+                }
+              }
+            }
+          }
+          else if ((enforcePost) && (((APIRequestHandler)localObject2).requirePost()) && (!"POST".equals(paramHttpServletRequest.getMethod())))
+          {
+            localJSONStreamAware = JSONResponses.POST_REQUIRED;
+            
+
+
+
+
+
+
+
+
+
+
+            paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
+            localObject3 = paramHttpServletResponse.getWriter();localObject5 = null;
+            try
+            {
+              localJSONStreamAware.writeJSONString((Writer)localObject3);
+            }
+            catch (Throwable localThrowable11)
+            {
+              localObject5 = localThrowable11; throw localThrowable11;
+            }
+            finally
+            {
+              if (localObject3 != null) {
+                if (localObject5 != null) {
+                  try
+                  {
+                    ((Writer)localObject3).close();
+                  }
+                  catch (Throwable localThrowable14)
+                  {
+                    localObject5.addSuppressed(localThrowable14);
+                  }
+                } else {
+                  ((Writer)localObject3).close();
+                }
+              }
+            }
+          }
+          else
+          {
+            try
+            {
+              localJSONStreamAware = ((APIRequestHandler)localObject2).processRequest(paramHttpServletRequest);
+            }
+            catch (NxtException|RuntimeException localNxtException)
+            {
+              Logger.logDebugMessage("Error processing API request", localNxtException);
+              localJSONStreamAware = JSONResponses.ERROR_INCORRECT_REQUEST;
+            }
+            paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
+            localObject1 = paramHttpServletResponse.getWriter();localObject2 = null;
+            try
+            {
+              localJSONStreamAware.writeJSONString((Writer)localObject1);
+            }
+            catch (Throwable localThrowable4)
+            {
+              localObject2 = localThrowable4; throw localThrowable4;
+            }
+            finally
+            {
+              if (localObject1 != null) {
+                if (localObject2 != null) {
+                  try
+                  {
+                    ((Writer)localObject1).close();
+                  }
+                  catch (Throwable localThrowable15)
+                  {
+                    ((Throwable)localObject2).addSuppressed(localThrowable15);
+                  }
+                } else {
+                  ((Writer)localObject1).close();
+                }
+              }
+            }
+          }
         }
       }
-    }
-    paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
-    
-    Object localObject1 = paramHttpServletResponse.getWriter();Object localObject2 = null;
-    try
-    {
-      localJSONStreamAware.writeJSONString((Writer)localObject1);
-    }
-    catch (Throwable localThrowable2)
-    {
-      localObject2 = localThrowable2;throw localThrowable2;
     }
     finally
     {
-      if (localObject1 != null) {
-        if (localObject2 != null) {
-          try
-          {
-            ((Writer)localObject1).close();
+      paramHttpServletResponse.setContentType("text/plain; charset=UTF-8");
+      PrintWriter localPrintWriter = paramHttpServletResponse.getWriter();Object localObject11 = null;
+      try
+      {
+        localJSONStreamAware.writeJSONString(localPrintWriter);
+      }
+      catch (Throwable localThrowable17)
+      {
+        localObject11 = localThrowable17;throw localThrowable17;
+      }
+      finally
+      {
+        if (localPrintWriter != null) {
+          if (localObject11 != null) {
+            try
+            {
+              localPrintWriter.close();
+            }
+            catch (Throwable localThrowable18)
+            {
+              localObject11.addSuppressed(localThrowable18);
+            }
+          } else {
+            localPrintWriter.close();
           }
-          catch (Throwable localThrowable3)
-          {
-            ((Throwable)localObject2).addSuppressed(localThrowable3);
-          }
-        } else {
-          ((Writer)localObject1).close();
         }
       }
     }
-  }
-  
-  static abstract class APIRequestHandler
-  {
-    abstract JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
-      throws NxtException, IOException;
   }
 }

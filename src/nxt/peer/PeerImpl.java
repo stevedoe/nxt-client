@@ -11,9 +11,12 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -74,11 +77,17 @@ final class PeerImpl
   
   void setState(Peer.State paramState)
   {
-    Peer.State localState = this.state;
-    this.state = paramState;
-    if ((localState == Peer.State.NON_CONNECTED) && (paramState != Peer.State.NON_CONNECTED)) {
+    if (this.state == paramState) {
+      return;
+    }
+    if (this.state == Peer.State.NON_CONNECTED)
+    {
+      this.state = paramState;
       Peers.notifyListeners(this, Peers.Event.ADDED_ACTIVE_PEER);
-    } else if ((localState != Peer.State.NON_CONNECTED) && (paramState != Peer.State.NON_CONNECTED)) {
+    }
+    else if (paramState != Peer.State.NON_CONNECTED)
+    {
+      this.state = paramState;
       Peers.notifyListeners(this, Peers.Event.CHANGED_ACTIVE_PEER);
     }
   }
@@ -90,7 +99,10 @@ final class PeerImpl
   
   void updateDownloadedVolume(long paramLong)
   {
-    this.downloadedVolume += paramLong;
+    synchronized (this)
+    {
+      this.downloadedVolume += paramLong;
+    }
     Peers.notifyListeners(this, Peers.Event.DOWNLOADED_VOLUME);
   }
   
@@ -101,7 +113,10 @@ final class PeerImpl
   
   void updateUploadedVolume(long paramLong)
   {
-    this.uploadedVolume += paramLong;
+    synchronized (this)
+    {
+      this.uploadedVolume += paramLong;
+    }
     Peers.notifyListeners(this, Peers.Event.UPLOADED_VOLUME);
   }
   
@@ -216,7 +231,8 @@ final class PeerImpl
   public void blacklist()
   {
     this.blacklistingTime = System.currentTimeMillis();
-    deactivate();
+    setState(Peer.State.NON_CONNECTED);
+    
     Peers.notifyListeners(this, Peers.Event.BLACKLIST);
   }
   
@@ -236,9 +252,6 @@ final class PeerImpl
   
   public void deactivate()
   {
-    if (this.state == Peer.State.CONNECTED) {
-      setState(Peer.State.DISCONNECTED);
-    }
     setState(Peer.State.NON_CONNECTED);
     Peers.notifyListeners(this, Peers.Event.DEACTIVATE);
   }
@@ -251,19 +264,20 @@ final class PeerImpl
   
   public JSONObject send(JSONStreamAware paramJSONStreamAware)
   {
-    String str = null;
+    String str1 = null;
     int i = 0;
     HttpURLConnection localHttpURLConnection = null;
     JSONObject localJSONObject;
     try
     {
+      String str2 = this.announcedAddress != null ? this.announcedAddress : this.peerAddress;
       if (Peers.communicationLoggingMask != 0)
       {
         localObject1 = new StringWriter();
         paramJSONStreamAware.writeJSONString((Writer)localObject1);
-        str = "\"" + this.announcedAddress + "\": " + ((StringWriter)localObject1).toString();
+        str1 = "\"" + str2 + "\": " + ((StringWriter)localObject1).toString();
       }
-      Object localObject1 = new URL("http://" + this.announcedAddress + (this.port <= 0 ? ":7874" : "") + "/nxt");
+      Object localObject1 = new URL("http://" + str2 + (this.port <= 0 ? ":7874" : "") + "/nxt");
       
       localHttpURLConnection = (HttpURLConnection)((URL)localObject1).openConnection();
       localHttpURLConnection.setRequestMethod("POST");
@@ -336,7 +350,7 @@ final class PeerImpl
             }
           }
           localObject6 = ((ByteArrayOutputStream)localObject2).toString("UTF-8");
-          str = str + " >>> " + (String)localObject6;
+          str1 = str1 + " >>> " + (String)localObject6;
           i = 1;
           updateDownloadedVolume(((String)localObject6).getBytes("UTF-8").length);
           localJSONObject = (JSONObject)JSONValue.parse((String)localObject6);
@@ -377,10 +391,14 @@ final class PeerImpl
       {
         if ((Peers.communicationLoggingMask & 0x2) != 0)
         {
-          str = str + " >>> Peer responded with HTTP " + localHttpURLConnection.getResponseCode() + " code!";
+          str1 = str1 + " >>> Peer responded with HTTP " + localHttpURLConnection.getResponseCode() + " code!";
           i = 1;
         }
-        setState(Peer.State.DISCONNECTED);
+        if (this.state == Peer.State.CONNECTED) {
+          setState(Peer.State.DISCONNECTED);
+        } else {
+          setState(Peer.State.NON_CONNECTED);
+        }
         localJSONObject = null;
       }
     }
@@ -391,18 +409,18 @@ final class PeerImpl
       }
       if ((Peers.communicationLoggingMask & 0x1) != 0)
       {
-        str = str + " >>> " + localRuntimeException.toString();
+        str1 = str1 + " >>> " + localRuntimeException.toString();
         i = 1;
       }
       if (this.state == Peer.State.NON_CONNECTED) {
         blacklist();
-      } else {
+      } else if (this.state == Peer.State.CONNECTED) {
         setState(Peer.State.DISCONNECTED);
       }
       localJSONObject = null;
     }
     if (i != 0) {
-      Logger.logMessage(str + "\n");
+      Logger.logMessage(str1 + "\n");
     }
     if (localHttpURLConnection != null) {
       localHttpURLConnection.disconnect();
@@ -430,11 +448,20 @@ final class PeerImpl
       this.version = ((String)localJSONObject.get("version"));
       this.platform = ((String)localJSONObject.get("platform"));
       this.shareAddress = Boolean.TRUE.equals(localJSONObject.get("shareAddress"));
+      if (this.announcedAddress == null)
+      {
+        setAnnouncedAddress(this.peerAddress);
+        Logger.logDebugMessage("Connected to peer without announced address, setting to " + this.peerAddress);
+      }
       if (analyzeHallmark(this.announcedAddress, (String)localJSONObject.get("hallmark"))) {
         setState(Peer.State.CONNECTED);
       } else {
         blacklist();
       }
+    }
+    else
+    {
+      setState(Peer.State.NON_CONNECTED);
     }
   }
   
@@ -453,8 +480,11 @@ final class PeerImpl
     }
     try
     {
+      URI localURI = new URI("http://" + paramString1.trim());
+      String str = localURI.getHost();
+      
       Hallmark localHallmark = Hallmark.parseHallmark(paramString2);
-      if ((!localHallmark.isValid()) || (!localHallmark.getHost().equals(paramString1))) {
+      if ((!localHallmark.isValid()) || ((!localHallmark.getHost().equals(str)) && (!InetAddress.getByName(str).equals(InetAddress.getByName(localHallmark.getHost()))))) {
         return false;
       }
       this.hallmark = localHallmark;
@@ -490,9 +520,9 @@ final class PeerImpl
       }
       return true;
     }
-    catch (RuntimeException localRuntimeException)
+    catch (URISyntaxException|UnknownHostException|RuntimeException localURISyntaxException)
     {
-      Logger.logDebugMessage("Failed to analyze hallmark for peer " + this.announcedAddress + ", " + localRuntimeException.toString());
+      Logger.logDebugMessage("Failed to analyze hallmark for peer " + paramString1 + ", " + localURISyntaxException.toString());
     }
     return false;
   }

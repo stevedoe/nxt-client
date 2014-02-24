@@ -28,6 +28,7 @@ import nxt.peer.Peers.Event;
 import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Logger;
+import nxt.util.ThreadPool;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -56,6 +57,7 @@ public final class Users
   private static final Collection<User> allUsers = Collections.unmodifiableCollection(users.values());
   private static final AtomicInteger peerCounter = new AtomicInteger();
   private static final ConcurrentMap<String, Integer> peerIndexMap = new ConcurrentHashMap();
+  private static final ConcurrentMap<Integer, String> peerAddressMap = new ConcurrentHashMap();
   private static final AtomicInteger blockCounter = new AtomicInteger();
   private static final ConcurrentMap<Long, Integer> blockIndexMap = new ConcurrentHashMap();
   private static final AtomicInteger transactionCounter = new AtomicInteger();
@@ -83,84 +85,94 @@ public final class Users
       allowedUserHosts = null;
     }
     boolean bool1 = Nxt.getBooleanProperty("nxt.enableUIServer").booleanValue();
-    if (bool1) {
-      try
+    if (bool1)
+    {
+      final int i = Nxt.getIntProperty("nxt.uiServerPort");
+      final String str2 = Nxt.getStringProperty("nxt.uiServerHost");
+      Server localServer = new Server();
+      
+
+      boolean bool2 = Nxt.getBooleanProperty("nxt.uiSSL").booleanValue();
+      if (bool2)
       {
-        int i = Nxt.getIntProperty("nxt.uiServerPort");
-        String str2 = Nxt.getStringProperty("nxt.uiServerHost");
-        Server localServer = new Server();
+        Logger.logMessage("Using SSL (https) for the user interface server");
+        localObject2 = new HttpConfiguration();
+        ((HttpConfiguration)localObject2).setSecureScheme("https");
+        ((HttpConfiguration)localObject2).setSecurePort(i);
+        ((HttpConfiguration)localObject2).addCustomizer(new SecureRequestCustomizer());
+        localObject3 = new SslContextFactory();
+        ((SslContextFactory)localObject3).setKeyStorePath(Nxt.getStringProperty("nxt.keyStorePath"));
+        ((SslContextFactory)localObject3).setKeyStorePassword(Nxt.getStringProperty("nxt.keyStorePassword"));
+        ((SslContextFactory)localObject3).setExcludeCipherSuites(new String[] { "SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA", "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA" });
         
 
-        boolean bool2 = Nxt.getBooleanProperty("nxt.uiSSL").booleanValue();
-        if (bool2)
-        {
-          Logger.logMessage("Using SSL (https) for the user interface server");
-          localObject2 = new HttpConfiguration();
-          ((HttpConfiguration)localObject2).setSecureScheme("https");
-          ((HttpConfiguration)localObject2).setSecurePort(i);
-          ((HttpConfiguration)localObject2).addCustomizer(new SecureRequestCustomizer());
-          localObject3 = new SslContextFactory();
-          ((SslContextFactory)localObject3).setKeyStorePath(Nxt.getStringProperty("nxt.keyStorePath"));
-          ((SslContextFactory)localObject3).setKeyStorePassword(Nxt.getStringProperty("nxt.keyStorePassword"));
-          ((SslContextFactory)localObject3).setExcludeCipherSuites(new String[] { "SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA", "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA" });
-          
+        localObject1 = new ServerConnector(localServer, new ConnectionFactory[] { new SslConnectionFactory((SslContextFactory)localObject3, "http/1.1"), new HttpConnectionFactory((HttpConfiguration)localObject2) });
+      }
+      else
+      {
+        localObject1 = new ServerConnector(localServer);
+      }
+      ((ServerConnector)localObject1).setPort(i);
+      ((ServerConnector)localObject1).setHost(str2);
+      ((ServerConnector)localObject1).setIdleTimeout(Nxt.getIntProperty("nxt.uiServerIdleTimeout"));
+      localServer.addConnector((Connector)localObject1);
+      
 
-          localObject1 = new ServerConnector(localServer, new ConnectionFactory[] { new SslConnectionFactory((SslContextFactory)localObject3, "http/1.1"), new HttpConnectionFactory((HttpConfiguration)localObject2) });
-        }
-        else
-        {
-          localObject1 = new ServerConnector(localServer);
-        }
-        ((ServerConnector)localObject1).setPort(i);
-        ((ServerConnector)localObject1).setHost(str2);
-        ((ServerConnector)localObject1).setIdleTimeout(Nxt.getIntProperty("nxt.uiServerIdleTimeout"));
-        localServer.addConnector((Connector)localObject1);
-        
-
-        Object localObject2 = new HandlerList();
-        
-        Object localObject3 = new ResourceHandler();
-        ((ResourceHandler)localObject3).setDirectoriesListed(false);
-        ((ResourceHandler)localObject3).setWelcomeFiles(new String[] { "index.html" });
-        ((ResourceHandler)localObject3).setResourceBase(Nxt.getStringProperty("nxt.uiResourceBase"));
-        
-        ((HandlerList)localObject2).addHandler((Handler)localObject3);
-        
-        String str3 = Nxt.getStringProperty("nxt.javadocResourceBase");
-        if (str3 != null)
-        {
-          localObject4 = new ContextHandler("/doc");
-          localObject5 = new ResourceHandler();
-          ((ResourceHandler)localObject5).setDirectoriesListed(false);
-          ((ResourceHandler)localObject5).setWelcomeFiles(new String[] { "index.html" });
-          ((ResourceHandler)localObject5).setResourceBase(str3);
-          ((ContextHandler)localObject4).setHandler((Handler)localObject5);
-          ((HandlerList)localObject2).addHandler((Handler)localObject4);
-        }
-        Object localObject4 = new ServletHandler();
-        Object localObject5 = ((ServletHandler)localObject4).addServletWithMapping(UserServlet.class, "/nxt");
-        ((ServletHolder)localObject5).setAsyncSupported(true);
-        if (Nxt.getBooleanProperty("nxt.uiServerCORS").booleanValue())
-        {
-          FilterHolder localFilterHolder = ((ServletHandler)localObject4).addFilterWithMapping(CrossOriginFilter.class, "/*", 0);
-          localFilterHolder.setInitParameter("allowedHeaders", "*");
-          localFilterHolder.setAsyncSupported(true);
-        }
+      Object localObject2 = new HandlerList();
+      
+      Object localObject3 = new ResourceHandler();
+      ((ResourceHandler)localObject3).setDirectoriesListed(false);
+      ((ResourceHandler)localObject3).setWelcomeFiles(new String[] { "index.html" });
+      ((ResourceHandler)localObject3).setResourceBase(Nxt.getStringProperty("nxt.uiResourceBase"));
+      
+      ((HandlerList)localObject2).addHandler((Handler)localObject3);
+      
+      String str3 = Nxt.getStringProperty("nxt.javadocResourceBase");
+      if (str3 != null)
+      {
+        localObject4 = new ContextHandler("/doc");
+        localObject5 = new ResourceHandler();
+        ((ResourceHandler)localObject5).setDirectoriesListed(false);
+        ((ResourceHandler)localObject5).setWelcomeFiles(new String[] { "index.html" });
+        ((ResourceHandler)localObject5).setResourceBase(str3);
+        ((ContextHandler)localObject4).setHandler((Handler)localObject5);
         ((HandlerList)localObject2).addHandler((Handler)localObject4);
-        
-        ((HandlerList)localObject2).addHandler(new DefaultHandler());
-        
-        localServer.setHandler((Handler)localObject2);
-        localServer.setStopAtShutdown(true);
-        localServer.start();
-        Logger.logMessage("Started user interface server at " + str2 + ":" + i);
       }
-      catch (Exception localException)
+      Object localObject4 = new ServletHandler();
+      Object localObject5 = ((ServletHandler)localObject4).addServletWithMapping(UserServlet.class, "/nxt");
+      ((ServletHolder)localObject5).setAsyncSupported(true);
+      if (Nxt.getBooleanProperty("nxt.uiServerCORS").booleanValue())
       {
-        Logger.logDebugMessage("Failed to start user interface server", localException);
-        throw new RuntimeException(localException.toString(), localException);
+        FilterHolder localFilterHolder = ((ServletHandler)localObject4).addFilterWithMapping(CrossOriginFilter.class, "/*", 0);
+        localFilterHolder.setInitParameter("allowedHeaders", "*");
+        localFilterHolder.setAsyncSupported(true);
       }
-    } else {
+      ((HandlerList)localObject2).addHandler((Handler)localObject4);
+      
+      ((HandlerList)localObject2).addHandler(new DefaultHandler());
+      
+      localServer.setHandler((Handler)localObject2);
+      localServer.setStopAtShutdown(true);
+      
+      ThreadPool.runBeforeStart(new Runnable()
+      {
+        public void run()
+        {
+          try
+          {
+            this.val$userServer.start();
+            Logger.logMessage("Started user interface server at " + str2 + ":" + i);
+          }
+          catch (Exception localException)
+          {
+            Logger.logDebugMessage("Failed to start user interface server", localException);
+            throw new RuntimeException(localException.toString(), localException);
+          }
+        }
+      });
+    }
+    else
+    {
       Logger.logMessage("User interface server not enabled");
     }
     Account.addListener(new Listener()
@@ -194,18 +206,23 @@ public final class Users
         JSONObject localJSONObject2 = new JSONObject();
         localJSONObject2.put("index", Integer.valueOf(Users.getIndex(paramAnonymousPeer)));
         localJSONArray1.add(localJSONObject2);
-        localJSONObject1.put("removedKnownPeers", localJSONArray1);
+        localJSONObject1.put("removedActivePeers", localJSONArray1);
         JSONArray localJSONArray2 = new JSONArray();
         JSONObject localJSONObject3 = new JSONObject();
         localJSONObject3.put("index", Integer.valueOf(Users.getIndex(paramAnonymousPeer)));
-        localJSONObject3.put("address", paramAnonymousPeer.getPeerAddress());
-        localJSONObject3.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "-", 25, true));
-        if (paramAnonymousPeer.isWellKnown()) {
-          localJSONObject3.put("wellKnown", Boolean.valueOf(true));
-        }
-        localJSONObject3.put("software", paramAnonymousPeer.getSoftware());
         localJSONArray2.add(localJSONObject3);
-        localJSONObject1.put("addedBlacklistedPeers", localJSONArray2);
+        localJSONObject1.put("removedKnownPeers", localJSONArray2);
+        JSONArray localJSONArray3 = new JSONArray();
+        JSONObject localJSONObject4 = new JSONObject();
+        localJSONObject4.put("index", Integer.valueOf(Users.getIndex(paramAnonymousPeer)));
+        localJSONObject4.put("address", paramAnonymousPeer.getPeerAddress());
+        localJSONObject4.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "-", 25, true));
+        if (paramAnonymousPeer.isWellKnown()) {
+          localJSONObject4.put("wellKnown", Boolean.valueOf(true));
+        }
+        localJSONObject4.put("software", paramAnonymousPeer.getSoftware());
+        localJSONArray3.add(localJSONObject4);
+        localJSONObject1.put("addedBlacklistedPeers", localJSONArray3);
         Users.sendNewDataToAll(localJSONObject1);
       }
     }, Peers.Event.BLACKLIST);
@@ -346,7 +363,7 @@ public final class Users
         JSONArray localJSONArray2 = new JSONArray();
         JSONObject localJSONObject3 = new JSONObject();
         localJSONObject3.put("index", Integer.valueOf(Users.getIndex(paramAnonymousPeer)));
-        if (paramAnonymousPeer.getState() == Peer.State.DISCONNECTED) {
+        if (paramAnonymousPeer.getState() != Peer.State.CONNECTED) {
           localJSONObject3.put("disconnected", Boolean.valueOf(true));
         }
         localJSONObject3.put("address", Convert.truncate(paramAnonymousPeer.getPeerAddress(), "-", 25, true));
@@ -375,11 +392,37 @@ public final class Users
         JSONObject localJSONObject2 = new JSONObject();
         localJSONObject2.put("index", Integer.valueOf(Users.getIndex(paramAnonymousPeer)));
         localJSONObject2.put(paramAnonymousPeer.getState() == Peer.State.CONNECTED ? "connected" : "disconnected", Boolean.valueOf(true));
+        localJSONObject2.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "-", 25, true));
+        if (paramAnonymousPeer.isWellKnown()) {
+          localJSONObject2.put("wellKnown", Boolean.valueOf(true));
+        }
         localJSONArray.add(localJSONObject2);
         localJSONObject1.put("changedActivePeers", localJSONArray);
         Users.sendNewDataToAll(localJSONObject1);
       }
     }, Peers.Event.CHANGED_ACTIVE_PEER);
+    
+
+
+    Peers.addListener(new Listener()
+    {
+      public void notify(Peer paramAnonymousPeer)
+      {
+        JSONObject localJSONObject1 = new JSONObject();
+        JSONArray localJSONArray = new JSONArray();
+        JSONObject localJSONObject2 = new JSONObject();
+        localJSONObject2.put("index", Integer.valueOf(Users.getIndex(paramAnonymousPeer)));
+        localJSONObject2.put("address", paramAnonymousPeer.getPeerAddress());
+        localJSONObject2.put("announcedAddress", Convert.truncate(paramAnonymousPeer.getAnnouncedAddress(), "-", 25, true));
+        if (paramAnonymousPeer.isWellKnown()) {
+          localJSONObject2.put("wellKnown", Boolean.valueOf(true));
+        }
+        localJSONObject2.put("software", paramAnonymousPeer.getSoftware());
+        localJSONArray.add(localJSONObject2);
+        localJSONObject1.put("addedKnownPeers", localJSONArray);
+        Users.sendNewDataToAll(localJSONObject1);
+      }
+    }, Peers.Event.NEW_PEER);
     
 
 
@@ -605,8 +648,18 @@ public final class Users
     {
       localInteger = Integer.valueOf(peerCounter.incrementAndGet());
       peerIndexMap.put(paramPeer.getPeerAddress(), localInteger);
+      peerAddressMap.put(localInteger, paramPeer.getPeerAddress());
     }
     return localInteger.intValue();
+  }
+  
+  static Peer getPeer(int paramInt)
+  {
+    String str = (String)peerAddressMap.get(Integer.valueOf(paramInt));
+    if (str == null) {
+      return null;
+    }
+    return Peers.getPeer(str);
   }
   
   static int getIndex(Block paramBlock)

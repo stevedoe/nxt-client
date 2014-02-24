@@ -95,4 +95,9 @@ public final class IssueAsset
     localJSONObject.put("transaction", localTransaction.getStringId());
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

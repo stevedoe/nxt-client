@@ -30,4 +30,9 @@ public final class GetForging
     localJSONObject.put("deadline", Long.valueOf(localGenerator.getDeadline()));
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

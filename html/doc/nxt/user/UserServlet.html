@@ -150,13 +150,18 @@ extends javax.servlet.http.HttpServlet</pre>
 <td class="colLast"><code><strong><a href="../../nxt/user/UserServlet.html#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)">doGet</a></strong>(javax.servlet.http.HttpServletRequest&nbsp;req,
      javax.servlet.http.HttpServletResponse&nbsp;resp)</code>&nbsp;</td>
 </tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected void</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/user/UserServlet.html#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)">doPost</a></strong>(javax.servlet.http.HttpServletRequest&nbsp;req,
+      javax.servlet.http.HttpServletResponse&nbsp;resp)</code>&nbsp;</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods_inherited_from_class_javax.servlet.http.HttpServlet">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;javax.servlet.http.HttpServlet</h3>
-<code>doDelete, doHead, doOptions, doPost, doPut, doTrace, getLastModified, service, service</code></li>
+<code>doDelete, doHead, doOptions, doPut, doTrace, getLastModified, service, service</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods_inherited_from_class_javax.servlet.GenericServlet">
@@ -206,7 +211,7 @@ extends javax.servlet.http.HttpServlet</pre>
 <a name="doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>doGet</h4>
 <pre>protected&nbsp;void&nbsp;doGet(javax.servlet.http.HttpServletRequest&nbsp;req,
@@ -216,6 +221,24 @@ extends javax.servlet.http.HttpServlet</pre>
 <dl>
 <dt><strong>Overrides:</strong></dt>
 <dd><code>doGet</code>&nbsp;in class&nbsp;<code>javax.servlet.http.HttpServlet</code></dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code>javax.servlet.ServletException</code></dd>
+<dd><code>java.io.IOException</code></dd></dl>
+</li>
+</ul>
+<a name="doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>doPost</h4>
+<pre>protected&nbsp;void&nbsp;doPost(javax.servlet.http.HttpServletRequest&nbsp;req,
+          javax.servlet.http.HttpServletResponse&nbsp;resp)
+               throws javax.servlet.ServletException,
+                      java.io.IOException</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code>doPost</code>&nbsp;in class&nbsp;<code>javax.servlet.http.HttpServlet</code></dd>
 <dt><span class="strong">Throws:</span></dt>
 <dd><code>javax.servlet.ServletException</code></dd>
 <dd><code>java.io.IOException</code></dd></dl>

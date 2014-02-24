@@ -88,6 +88,7 @@ public final class JSONResponses
   public static final JSONStreamAware ERROR_NOT_ALLOWED;
   public static final JSONStreamAware ERROR_INCORRECT_REQUEST;
   public static final JSONStreamAware NOT_FORGING;
+  public static final JSONStreamAware POST_REQUIRED;
   
   static
   {
@@ -127,6 +128,14 @@ public final class JSONResponses
     localJSONObject.put("errorCode", Integer.valueOf(5));
     localJSONObject.put("errorDescription", "Account is not forging");
     NOT_FORGING = JSON.prepare(localJSONObject);
+    
+
+
+
+    localJSONObject = new JSONObject();
+    localJSONObject.put("errorCode", Integer.valueOf(1));
+    localJSONObject.put("errorDescription", "This request is only accepted using POST!");
+    POST_REQUIRED = JSON.prepare(localJSONObject);
   }
   
   private static JSONStreamAware missing(String paramString)

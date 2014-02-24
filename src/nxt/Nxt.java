@@ -1,5 +1,6 @@
 package nxt;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -13,7 +14,7 @@ import nxt.util.ThreadPool;
 
 public final class Nxt
 {
-  public static final String VERSION = "0.8.0e";
+  public static final String VERSION = "0.8.1e";
   public static final int BLOCK_HEADER_LENGTH = 224;
   public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
   public static final int MAX_PAYLOAD_LENGTH = 32640;
@@ -65,7 +66,51 @@ public final class Nxt
       localObject1 = ClassLoader.getSystemResourceAsStream("nxt-default.properties");localObject2 = null;
       try
       {
-        defaultProperties.load((InputStream)localObject1);
+        if (localObject1 != null)
+        {
+          defaultProperties.load((InputStream)localObject1);
+        }
+        else
+        {
+          String str = System.getProperty("nxt-default.properties");
+          if (str != null) {
+            try
+            {
+              FileInputStream localFileInputStream = new FileInputStream(str);Object localObject3 = null;
+              try
+              {
+                defaultProperties.load(localFileInputStream);
+              }
+              catch (Throwable localThrowable6)
+              {
+                localObject3 = localThrowable6;throw localThrowable6;
+              }
+              finally
+              {
+                if (localFileInputStream != null) {
+                  if (localObject3 != null) {
+                    try
+                    {
+                      localFileInputStream.close();
+                    }
+                    catch (Throwable localThrowable7)
+                    {
+                      localObject3.addSuppressed(localThrowable7);
+                    }
+                  } else {
+                    localFileInputStream.close();
+                  }
+                }
+              }
+            }
+            catch (IOException localIOException3)
+            {
+              throw new RuntimeException("Error loading nxt-default.properties from " + str);
+            }
+          } else {
+            throw new RuntimeException("nxt-default.properties not in classpath and system property nxt-default.properties not defined either");
+          }
+        }
       }
       catch (Throwable localThrowable2)
       {
@@ -79,9 +124,9 @@ public final class Nxt
             {
               ((InputStream)localObject1).close();
             }
-            catch (Throwable localThrowable5)
+            catch (Throwable localThrowable8)
             {
-              localObject2.addSuppressed(localThrowable5);
+              localObject2.addSuppressed(localThrowable8);
             }
           } else {
             ((InputStream)localObject1).close();
@@ -115,9 +160,9 @@ public final class Nxt
             {
               localInputStream.close();
             }
-            catch (Throwable localThrowable6)
+            catch (Throwable localThrowable9)
             {
-              localObject2.addSuppressed(localThrowable6);
+              localObject2.addSuppressed(localThrowable9);
             }
           } else {
             localInputStream.close();
@@ -192,10 +237,11 @@ public final class Nxt
   
   public static void main(String[] paramArrayOfString)
   {
-    
-    if ((paramArrayOfString.length == 1) && ("reset".equalsIgnoreCase(paramArrayOfString[0]))) {
-      getBlockchainProcessor().fullReset();
-    }
+    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
+    {
+      public void run() {}
+    }));
+    init();
   }
   
   public static void init(Properties paramProperties)
@@ -204,12 +250,12 @@ public final class Nxt
     init();
   }
   
-  private static void shutdown()
+  public static void shutdown()
   {
     Peers.shutdown();
     ThreadPool.shutdown();
     Db.shutdown();
-    Logger.logMessage("Nxt server 0.8.0e stopped.");
+    Logger.logMessage("Nxt server 0.8.1e stopped.");
   }
   
   public static void init() {}
@@ -220,7 +266,7 @@ public final class Nxt
     
     static
     {
-      System.out.println("Initializing Nxt server version 0.8.0e");
+      System.out.println("Initializing Nxt server version 0.8.1e");
       
       long l1 = System.currentTimeMillis();
       
@@ -230,10 +276,6 @@ public final class Nxt
         System.setProperty("org.eclipse.jetty.LEVEL", "OFF");
         Logger.logDebugMessage("jetty logging disabled");
       }
-      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
-      {
-        public void run() {}
-      }));
       Db.init();
       BlockchainProcessorImpl.getInstance();
       TransactionProcessorImpl.getInstance();
@@ -245,7 +287,7 @@ public final class Nxt
       
       long l2 = System.currentTimeMillis();
       Logger.logDebugMessage("Initialization took " + (l2 - l1) / 1000L + " seconds");
-      Logger.logMessage("Nxt server 0.8.0e started successfully.");
+      Logger.logMessage("Nxt server 0.8.1e started successfully.");
     }
   }
 }

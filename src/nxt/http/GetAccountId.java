@@ -25,4 +25,9 @@ public final class GetAccountId
     
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

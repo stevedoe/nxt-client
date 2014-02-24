@@ -12,6 +12,7 @@ public final class JSONResponses
   public static final JSONStreamAware NOTIFY_OF_ACCEPTED_TRANSACTION;
   public static final JSONStreamAware DENY_ACCESS;
   public static final JSONStreamAware INCORRECT_REQUEST;
+  public static final JSONStreamAware POST_REQUIRED;
   
   static
   {
@@ -56,5 +57,13 @@ public final class JSONResponses
     localJSONObject.put("response", "showMessage");
     localJSONObject.put("message", "Incorrect request!");
     INCORRECT_REQUEST = JSON.prepare(localJSONObject);
+    
+
+
+
+    localJSONObject = new JSONObject();
+    localJSONObject.put("response", "showMessage");
+    localJSONObject.put("message", "This request is only accepted using POST!");
+    POST_REQUIRED = JSON.prepare(localJSONObject);
   }
 }

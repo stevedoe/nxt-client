@@ -131,4 +131,9 @@ public final class TransferAsset
     localJSONObject.put("transaction", localTransaction.getStringId());
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

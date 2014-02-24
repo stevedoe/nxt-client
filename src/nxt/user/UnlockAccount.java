@@ -211,4 +211,9 @@ public final class UnlockAccount
     }
     return localObject2;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

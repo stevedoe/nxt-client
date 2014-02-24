@@ -35,4 +35,9 @@ public final class BroadcastTransaction
     catch (RuntimeException localRuntimeException) {}
     return JSONResponses.INCORRECT_TRANSACTION_BYTES;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

@@ -54,4 +54,9 @@ public final class MarkHost
     catch (RuntimeException localRuntimeException) {}
     return JSONResponses.INCORRECT_DATE;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }

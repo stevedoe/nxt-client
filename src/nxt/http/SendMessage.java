@@ -116,4 +116,9 @@ public final class SendMessage
     
     return localJSONObject;
   }
+  
+  boolean requirePost()
+  {
+    return true;
+  }
 }
