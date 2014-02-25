@@ -1,5 +1,6 @@
 package nxt.http;
 
+import java.util.Collections;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Poll;
@@ -38,19 +39,17 @@ public final class GetPoll
     if (localPoll.getDescription().length() > 0) {
       localJSONObject.put("description", localPoll.getDescription());
     }
-    JSONArray localJSONArray = new JSONArray();
-    for (Object localObject2 : localPoll.getOptions()) {
-      localJSONArray.add(localObject2);
-    }
-    localJSONObject.put("options", localJSONArray);
+    JSONArray localJSONArray1 = new JSONArray();
+    Collections.addAll(localJSONArray1, localPoll.getOptions());
+    localJSONObject.put("options", localJSONArray1);
     localJSONObject.put("minNumberOfOptions", Byte.valueOf(localPoll.getMinNumberOfOptions()));
     localJSONObject.put("maxNumberOfOptions", Byte.valueOf(localPoll.getMaxNumberOfOptions()));
     localJSONObject.put("optionsAreBinary", Boolean.valueOf(localPoll.isOptionsAreBinary()));
-    ??? = new JSONArray();
+    JSONArray localJSONArray2 = new JSONArray();
     for (Long localLong : localPoll.getVoters().keySet()) {
-      ((JSONArray)???).add(Convert.toUnsignedLong(localLong));
+      localJSONArray2.add(Convert.toUnsignedLong(localLong));
     }
-    localJSONObject.put("voters", ???);
+    localJSONObject.put("voters", localJSONArray2);
     
     return localJSONObject;
   }

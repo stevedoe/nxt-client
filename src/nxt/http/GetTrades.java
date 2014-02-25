@@ -73,7 +73,10 @@ public final class GetTrades
         localJSONArray.add(localJSONObject2);
       }
     }
-    catch (RuntimeException localRuntimeException2) {}
+    catch (RuntimeException localRuntimeException2)
+    {
+      localJSONObject1.put("error", localRuntimeException2.toString());
+    }
     localJSONObject1.put("trades", localJSONArray);
     
     return localJSONObject1;

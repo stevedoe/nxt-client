@@ -1,9 +1,11 @@
 package nxt;
 
+import [B;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Collections;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import org.json.simple.JSONArray;
@@ -165,8 +167,8 @@ public abstract interface Attachment
       try
       {
         int i = 2 + this.pollName.getBytes("UTF-8").length + 2 + this.pollDescription.getBytes("UTF-8").length + 1;
-        for (int j = 0; j < this.pollOptions.length; j++) {
-          i += 2 + this.pollOptions[j].getBytes("UTF-8").length;
+        for (String str : this.pollOptions) {
+          i += 2 + str.getBytes("UTF-8").length;
         }
         i += 3;
         return i;
@@ -184,9 +186,9 @@ public abstract interface Attachment
       {
         byte[] arrayOfByte1 = this.pollName.getBytes("UTF-8");
         byte[] arrayOfByte2 = this.pollDescription.getBytes("UTF-8");
-        byte[][] arrayOfByte = new byte[this.pollOptions.length][];
+        byte[][] arrayOfByte3 = new byte[this.pollOptions.length][];
         for (int i = 0; i < this.pollOptions.length; i++) {
-          arrayOfByte[i] = this.pollOptions[i].getBytes("UTF-8");
+          arrayOfByte3[i] = this.pollOptions[i].getBytes("UTF-8");
         }
         ByteBuffer localByteBuffer = ByteBuffer.allocate(getSize());
         localByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -194,11 +196,11 @@ public abstract interface Attachment
         localByteBuffer.put(arrayOfByte1);
         localByteBuffer.putShort((short)arrayOfByte2.length);
         localByteBuffer.put(arrayOfByte2);
-        localByteBuffer.put((byte)arrayOfByte.length);
-        for (int j = 0; j < arrayOfByte.length; j++)
+        localByteBuffer.put((byte)arrayOfByte3.length);
+        for ([B local[B : arrayOfByte3)
         {
-          localByteBuffer.putShort((short)arrayOfByte[j].length);
-          localByteBuffer.put(arrayOfByte[j]);
+          localByteBuffer.putShort((short)local[B.length);
+          localByteBuffer.put(local[B);
         }
         localByteBuffer.put(this.minNumberOfOptions);
         localByteBuffer.put(this.maxNumberOfOptions);
@@ -219,9 +221,7 @@ public abstract interface Attachment
       localJSONObject.put("name", this.pollName);
       localJSONObject.put("description", this.pollDescription);
       JSONArray localJSONArray = new JSONArray();
-      for (int i = 0; i < this.pollOptions.length; i++) {
-        localJSONArray.add(this.pollOptions[i]);
-      }
+      Collections.addAll(localJSONArray, this.pollOptions);
       localJSONObject.put("options", localJSONArray);
       localJSONObject.put("minNumberOfOptions", Byte.valueOf(this.minNumberOfOptions));
       localJSONObject.put("maxNumberOfOptions", Byte.valueOf(this.maxNumberOfOptions));
@@ -300,8 +300,8 @@ public abstract interface Attachment
       JSONObject localJSONObject = new JSONObject();
       localJSONObject.put("pollId", Convert.toUnsignedLong(this.pollId));
       JSONArray localJSONArray = new JSONArray();
-      for (int i = 0; i < this.pollVote.length; i++) {
-        localJSONArray.add(Byte.valueOf(this.pollVote[i]));
+      for (byte b : this.pollVote) {
+        localJSONArray.add(Byte.valueOf(b));
       }
       localJSONObject.put("vote", localJSONArray);
       

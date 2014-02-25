@@ -152,13 +152,7 @@ final class PeerImpl
   
   public String getSoftware()
   {
-    StringBuilder localStringBuilder = new StringBuilder();
-    localStringBuilder.append(Convert.truncate(this.application, "?", 10, false));
-    localStringBuilder.append(" (");
-    localStringBuilder.append(Convert.truncate(this.version, "?", 10, false));
-    localStringBuilder.append(")").append(" @ ");
-    localStringBuilder.append(Convert.truncate(this.platform, "?", 10, false));
-    return localStringBuilder.toString();
+    return Convert.truncate(this.application, "?", 10, false) + " (" + Convert.truncate(this.version, "?", 10, false) + ")" + " @ " + Convert.truncate(this.platform, "?", 10, false);
   }
   
   public boolean shareAddress()

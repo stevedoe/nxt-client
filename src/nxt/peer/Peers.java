@@ -163,7 +163,7 @@ public final class Peers
       localJSONObject.put("hallmark", myHallmark);
     }
     localJSONObject.put("application", "NRS");
-    localJSONObject.put("version", "0.8.1e");
+    localJSONObject.put("version", "0.8.2e");
     localJSONObject.put("platform", myPlatform);
     localJSONObject.put("shareAddress", Boolean.valueOf(shareMyAddress));
     myPeerInfoResponse = JSON.prepare(localJSONObject);
@@ -185,15 +185,20 @@ public final class Peers
     }
     else
     {
-      Logger.logMessage("No wellKnownPeers defined, using random nxtcrypto.org and nxtbase.com nodes");
+      Logger.logMessage("No wellKnownPeers defined, using random nxtcrypto.org, nxtbase.com and mynxt.info nodes");
       for (int i = 1; i <= 12; i++) {
         if (ThreadLocalRandom.current().nextInt(4) == 1) {
           ((Set)localObject2).add("vps" + i + ".nxtcrypto.org");
         }
       }
-      for (i = 1; i <= 99; i++) {
+      for (i = 1; i <= 100; i++) {
         if (ThreadLocalRandom.current().nextInt(10) == 1) {
           ((Set)localObject2).add("node" + i + ".nxtbase.com");
+        }
+      }
+      for (i = 1; i <= 20; i++) {
+        if (ThreadLocalRandom.current().nextInt(4) == 1) {
+          ((Set)localObject2).add("node" + i + ".mynxt.info");
         }
       }
     }

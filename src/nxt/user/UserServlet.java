@@ -108,11 +108,15 @@ public final class UserServlet
     }
     catch (RuntimeException|NxtException localRuntimeException)
     {
+      Object localObject1;
       Logger.logMessage("Error processing GET request", localRuntimeException);
-      Object localObject1 = new JSONObject();
-      ((JSONObject)localObject1).put("response", "showMessage");
-      ((JSONObject)localObject1).put("message", localRuntimeException.toString());
-      localUser.enqueue((JSONStreamAware)localObject1);
+      if (localUser != null)
+      {
+        localObject1 = new JSONObject();
+        ((JSONObject)localObject1).put("response", "showMessage");
+        ((JSONObject)localObject1).put("message", localRuntimeException.toString());
+        localUser.enqueue((JSONStreamAware)localObject1);
+      }
     }
     finally
     {

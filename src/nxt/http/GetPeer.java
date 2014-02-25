@@ -1,6 +1,7 @@
 package nxt.http;
 
 import javax.servlet.http.HttpServletRequest;
+import nxt.peer.Hallmark;
 import nxt.peer.Peer;
 import nxt.peer.Peer.State;
 import nxt.peer.Peers;
@@ -27,7 +28,7 @@ public final class GetPeer
     localJSONObject.put("announcedAddress", localPeer.getAnnouncedAddress());
     localJSONObject.put("shareAddress", Boolean.valueOf(localPeer.shareAddress()));
     if (localPeer.getHallmark() != null) {
-      localJSONObject.put("hallmark", localPeer.getHallmark());
+      localJSONObject.put("hallmark", localPeer.getHallmark().getHallmarkString());
     }
     localJSONObject.put("weight", Integer.valueOf(localPeer.getWeight()));
     localJSONObject.put("downloadedVolume", Long.valueOf(localPeer.getDownloadedVolume()));

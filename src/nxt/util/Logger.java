@@ -31,32 +31,44 @@ public final class Logger
   };
   private static final Listeners<String, Event> messageListeners = new Listeners();
   private static final Listeners<Exception, Event> exceptionListeners = new Listeners();
-  private static PrintWriter fileLog = null;
+  private static final PrintWriter fileLog;
   
   static
   {
     debug = Nxt.getBooleanProperty("nxt.debug").booleanValue();
     enableStackTraces = Nxt.getBooleanProperty("nxt.enableStackTraces").booleanValue();
+    PrintWriter localPrintWriter = null;
     try
     {
-      fileLog = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(Nxt.getStringProperty("nxt.log")))), true);
+      localPrintWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(Nxt.getStringProperty("nxt.log")))), true);
     }
     catch (IOException|RuntimeException localIOException)
     {
       logMessage("Logging to file not possible, will log to stdout only", localIOException);
     }
+    fileLog = localPrintWriter;
     logMessage("Debug logging " + (debug ? "enabled" : "disabled"));
     logMessage("Exception stack traces " + (enableStackTraces ? "enabled" : "disabled"));
   }
   
-  public static void addMessageListener(Listener<String> paramListener, Event paramEvent)
+  public static boolean addMessageListener(Listener<String> paramListener, Event paramEvent)
   {
-    messageListeners.addListener(paramListener, paramEvent);
+    return messageListeners.addListener(paramListener, paramEvent);
   }
   
-  public static void addExceptionListener(Listener<Exception> paramListener, Event paramEvent)
+  public static boolean addExceptionListener(Listener<Exception> paramListener, Event paramEvent)
   {
-    exceptionListeners.addListener(paramListener, paramEvent);
+    return exceptionListeners.addListener(paramListener, paramEvent);
+  }
+  
+  public static boolean removeMessageListener(Listener<String> paramListener, Event paramEvent)
+  {
+    return messageListeners.removeListener(paramListener, paramEvent);
+  }
+  
+  public static boolean removeExceptionListener(Listener<Exception> paramListener, Event paramEvent)
+  {
+    return exceptionListeners.removeListener(paramListener, paramEvent);
   }
   
   public static void logMessage(String paramString)
@@ -74,7 +86,10 @@ public final class Logger
     if (enableStackTraces)
     {
       logMessage(paramString);
-      paramException.printStackTrace();
+      paramException.printStackTrace(System.out);
+      if (fileLog != null) {
+        paramException.printStackTrace(fileLog);
+      }
     }
     else
     {
@@ -95,7 +110,10 @@ public final class Logger
     if (enableStackTraces)
     {
       logMessage("DEBUG: " + paramString);
-      paramException.printStackTrace();
+      paramException.printStackTrace(System.out);
+      if (fileLog != null) {
+        paramException.printStackTrace(fileLog);
+      }
     }
     else if (debug)
     {

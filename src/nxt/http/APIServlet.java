@@ -23,7 +23,7 @@ public final class APIServlet
   static abstract class APIRequestHandler
   {
     abstract JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
-      throws NxtException, IOException;
+      throws NxtException;
     
     boolean requirePost()
     {
@@ -107,7 +107,7 @@ public final class APIServlet
   }
   
   private void process(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
-    throws ServletException, IOException
+    throws IOException
   {
     paramHttpServletResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, private");
     paramHttpServletResponse.setHeader("Pragma", "no-cache");

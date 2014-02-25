@@ -1,6 +1,5 @@
 package nxt.http;
 
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import nxt.Account;
 import nxt.Attachment.MessagingVoteCasting;
@@ -21,7 +20,7 @@ public final class CastVote
   static final CastVote instance = new CastVote();
   
   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
-    throws NxtException, IOException
+    throws NxtException
   {
     String str1 = paramHttpServletRequest.getParameter("secretPhrase");
     String str2 = paramHttpServletRequest.getParameter("poll");
@@ -47,6 +46,8 @@ public final class CastVote
       localPoll = Poll.getPoll(Convert.parseUnsignedLong(str2));
       if (localPoll != null) {
         i = localPoll.getOptions().length;
+      } else {
+        return JSONResponses.INCORRECT_POLL;
       }
     }
     catch (RuntimeException localRuntimeException1)

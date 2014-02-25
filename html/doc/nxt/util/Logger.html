@@ -133,12 +133,12 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static void</code></td>
+<td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/util/Logger.html#addExceptionListener(nxt.util.Listener, nxt.util.Logger.Event)">addExceptionListener</a></strong>(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.Exception&gt;&nbsp;listener,
                     <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static void</code></td>
+<td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/util/Logger.html#addMessageListener(nxt.util.Listener, nxt.util.Logger.Event)">addMessageListener</a></strong>(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.String&gt;&nbsp;listener,
                   <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</code>&nbsp;</td>
 </tr>
@@ -159,6 +159,16 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><strong><a href="../../nxt/util/Logger.html#logMessage(java.lang.String, java.lang.Exception)">logMessage</a></strong>(java.lang.String&nbsp;message,
           java.lang.Exception&nbsp;e)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/util/Logger.html#removeExceptionListener(nxt.util.Listener, nxt.util.Logger.Event)">removeExceptionListener</a></strong>(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.Exception&gt;&nbsp;listener,
+                       <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><strong><a href="../../nxt/util/Logger.html#removeMessageListener(nxt.util.Listener, nxt.util.Logger.Event)">removeMessageListener</a></strong>(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.String&gt;&nbsp;listener,
+                     <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -188,8 +198,8 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>addMessageListener</h4>
-<pre>public static&nbsp;void&nbsp;addMessageListener(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.String&gt;&nbsp;listener,
-                      <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</pre>
+<pre>public static&nbsp;boolean&nbsp;addMessageListener(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.String&gt;&nbsp;listener,
+                         <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</pre>
 </li>
 </ul>
 <a name="addExceptionListener(nxt.util.Listener, nxt.util.Logger.Event)">
@@ -198,8 +208,28 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>addExceptionListener</h4>
-<pre>public static&nbsp;void&nbsp;addExceptionListener(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.Exception&gt;&nbsp;listener,
-                        <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</pre>
+<pre>public static&nbsp;boolean&nbsp;addExceptionListener(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.Exception&gt;&nbsp;listener,
+                           <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</pre>
+</li>
+</ul>
+<a name="removeMessageListener(nxt.util.Listener, nxt.util.Logger.Event)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeMessageListener</h4>
+<pre>public static&nbsp;boolean&nbsp;removeMessageListener(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.String&gt;&nbsp;listener,
+                            <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</pre>
+</li>
+</ul>
+<a name="removeExceptionListener(nxt.util.Listener, nxt.util.Logger.Event)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>removeExceptionListener</h4>
+<pre>public static&nbsp;boolean&nbsp;removeExceptionListener(<a href="../../nxt/util/Listener.html" title="interface in nxt.util">Listener</a>&lt;java.lang.Exception&gt;&nbsp;listener,
+                              <a href="../../nxt/util/Logger.Event.html" title="enum in nxt.util">Logger.Event</a>&nbsp;eventType)</pre>
 </li>
 </ul>
 <a name="logMessage(java.lang.String)">

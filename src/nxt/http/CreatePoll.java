@@ -1,6 +1,5 @@
 package nxt.http;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ public final class CreatePoll
   static final CreatePoll instance = new CreatePoll();
   
   JSONStreamAware processRequest(HttpServletRequest paramHttpServletRequest)
-    throws NxtException, IOException
+    throws NxtException
   {
     String str1 = paramHttpServletRequest.getParameter("secretPhrase");
     String str2 = paramHttpServletRequest.getParameter("name");

@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
-import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -79,7 +78,7 @@ final class User
   }
   
   synchronized void processPendingResponses(HttpServletRequest paramHttpServletRequest, HttpServletResponse paramHttpServletResponse)
-    throws ServletException, IOException
+    throws IOException
   {
     JSONArray localJSONArray = new JSONArray();
     JSONStreamAware localJSONStreamAware;
