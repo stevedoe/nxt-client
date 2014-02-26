@@ -14,7 +14,7 @@ import nxt.util.ThreadPool;
 
 public final class Nxt
 {
-  public static final String VERSION = "0.8.2e";
+  public static final String VERSION = "0.8.3";
   public static final int BLOCK_HEADER_LENGTH = 224;
   public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
   public static final int MAX_PAYLOAD_LENGTH = 32640;
@@ -255,7 +255,7 @@ public final class Nxt
     Peers.shutdown();
     ThreadPool.shutdown();
     Db.shutdown();
-    Logger.logMessage("Nxt server 0.8.2e stopped.");
+    Logger.logMessage("Nxt server 0.8.3 stopped.");
   }
   
   public static void init() {}
@@ -266,7 +266,7 @@ public final class Nxt
     
     static
     {
-      System.out.println("Initializing Nxt server version 0.8.2e");
+      System.out.println("Initializing Nxt server version 0.8.3");
       
       long l1 = System.currentTimeMillis();
       
@@ -287,7 +287,7 @@ public final class Nxt
       
       long l2 = System.currentTimeMillis();
       Logger.logDebugMessage("Initialization took " + (l2 - l1) / 1000L + " seconds");
-      Logger.logMessage("Nxt server 0.8.2e started successfully.");
+      Logger.logMessage("Nxt server 0.8.3 started successfully.");
     }
   }
 }

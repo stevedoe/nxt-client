@@ -163,7 +163,7 @@ public final class Peers
       localJSONObject.put("hallmark", myHallmark);
     }
     localJSONObject.put("application", "NRS");
-    localJSONObject.put("version", "0.8.2e");
+    localJSONObject.put("version", "0.8.3");
     localJSONObject.put("platform", myPlatform);
     localJSONObject.put("shareAddress", Boolean.valueOf(shareMyAddress));
     myPeerInfoResponse = JSON.prepare(localJSONObject);
@@ -347,6 +347,9 @@ public final class Peers
               return;
             }
             JSONArray localJSONArray = (JSONArray)localJSONObject.get("peers");
+            if (localJSONArray == null) {
+              return;
+            }
             for (Object localObject : localJSONArray) {
               Peers.addPeer((String)localObject);
             }
@@ -419,7 +422,21 @@ public final class Peers
   
   public static Peer addPeer(String paramString)
   {
-    return addPeer(paramString, paramString);
+    if (paramString == null) {
+      return null;
+    }
+    try
+    {
+      URI localURI = new URI("http://" + paramString.trim());
+      String str = localURI.getHost();
+      InetAddress localInetAddress = InetAddress.getByName(str);
+      return addPeer(localInetAddress.getHostAddress(), paramString);
+    }
+    catch (URISyntaxException|UnknownHostException localURISyntaxException)
+    {
+      Logger.logDebugMessage("Invalid peer address: " + paramString, localURISyntaxException);
+    }
+    return null;
   }
   
   static PeerImpl addPeer(String paramString1, String paramString2)

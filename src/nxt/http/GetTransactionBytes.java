@@ -45,7 +45,7 @@ public final class GetTransactionBytes
     {
       localJSONObject.put("bytes", Convert.toHexString(localTransaction.getBytes()));
       Block localBlock = localTransaction.getBlock();
-      localJSONObject.put("confirmations", Integer.valueOf(Nxt.getBlockchain().getLastBlock().getHeight() - localBlock.getHeight() + 1));
+      localJSONObject.put("confirmations", Integer.valueOf(Nxt.getBlockchain().getLastBlock().getHeight() - localBlock.getHeight()));
     }
     return localJSONObject;
   }

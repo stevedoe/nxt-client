@@ -301,7 +301,9 @@ final class BlockchainProcessorImpl
             BlockDb.deleteBlock(paramAnonymousBlock.getNextBlockId());
           }
           Logger.logMessage("Will do a re-scan");
+          BlockchainProcessorImpl.this.blockListeners.notify(paramAnonymousBlock, BlockchainProcessor.Event.RESCAN_BEGIN);
           BlockchainProcessorImpl.this.scan();
+          BlockchainProcessorImpl.this.blockListeners.notify(paramAnonymousBlock, BlockchainProcessor.Event.RESCAN_END);
           Logger.logDebugMessage("Last block is " + BlockchainProcessorImpl.this.blockchain.getLastBlock().getStringId() + " at " + BlockchainProcessorImpl.this.blockchain.getLastBlock().getHeight());
         }
       }
@@ -622,14 +624,15 @@ final class BlockchainProcessorImpl
         addBlock(paramBlockImpl);
         
         this.transactionProcessor.apply(paramBlockImpl);
-        
-        this.transactionProcessor.updateUnconfirmedTransactions(paramBlockImpl);
       }
       catch (RuntimeException localRuntimeException)
       {
         Logger.logMessage("Error pushing block", localRuntimeException);
         throw new BlockchainProcessor.BlockNotAcceptedException(localRuntimeException.toString());
       }
+      this.blockListeners.notify(paramBlockImpl, BlockchainProcessor.Event.BLOCK_PUSHED);
+      
+      this.transactionProcessor.updateUnconfirmedTransactions(paramBlockImpl);
     }
     if (paramBlockImpl.getTimestamp() >= Convert.getEpochTime() - 15)
     {
@@ -637,7 +640,6 @@ final class BlockchainProcessorImpl
       ((JSONObject)???).put("requestType", "processBlock");
       Peers.sendToSomePeers((JSONObject)???);
     }
-    this.blockListeners.notify(paramBlockImpl, BlockchainProcessor.Event.BLOCK_PUSHED);
   }
   
   private boolean popLastBlock()

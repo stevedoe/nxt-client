@@ -36,6 +36,7 @@ public final class GetPeer
     localJSONObject.put("application", localPeer.getApplication());
     localJSONObject.put("version", localPeer.getVersion());
     localJSONObject.put("platform", localPeer.getPlatform());
+    localJSONObject.put("blacklisted", Boolean.valueOf(localPeer.isBlacklisted()));
     
     return localJSONObject;
   }

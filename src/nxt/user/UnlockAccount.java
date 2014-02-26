@@ -75,7 +75,7 @@ public final class UnlockAccount
             ((JSONObject)localObject4).put("receivedAmount", Integer.valueOf(localTransaction1.getAmount()));
           }
           ((JSONObject)localObject4).put("fee", Integer.valueOf(localTransaction1.getFee()));
-          ((JSONObject)localObject4).put("numberOfConfirmations", Integer.valueOf(0));
+          ((JSONObject)localObject4).put("numberOfConfirmations", Integer.valueOf(-1));
           ((JSONObject)localObject4).put("id", localTransaction1.getStringId());
           
           localJSONArray.add(localObject4);
@@ -89,7 +89,7 @@ public final class UnlockAccount
           ((JSONObject)localObject4).put("account", Convert.toUnsignedLong(localTransaction1.getSenderId()));
           ((JSONObject)localObject4).put("receivedAmount", Integer.valueOf(localTransaction1.getAmount()));
           ((JSONObject)localObject4).put("fee", Integer.valueOf(localTransaction1.getFee()));
-          ((JSONObject)localObject4).put("numberOfConfirmations", Integer.valueOf(0));
+          ((JSONObject)localObject4).put("numberOfConfirmations", Integer.valueOf(-1));
           ((JSONObject)localObject4).put("id", localTransaction1.getStringId());
           
           localJSONArray.add(localObject4);
@@ -108,7 +108,7 @@ public final class UnlockAccount
           if (localBlock.getTotalFee() > 0)
           {
             localJSONObject = new JSONObject();
-            localJSONObject.put("index", Integer.valueOf(Users.getIndex(localBlock)));
+            localJSONObject.put("index", "block" + Users.getIndex(localBlock));
             localJSONObject.put("blockTimestamp", Integer.valueOf(localBlock.getTimestamp()));
             localJSONObject.put("block", localBlock.getStringId());
             localJSONObject.put("earnedAmount", Integer.valueOf(localBlock.getTotalFee()));

@@ -226,7 +226,6 @@ final class PeerImpl
   {
     this.blacklistingTime = System.currentTimeMillis();
     setState(Peer.State.NON_CONNECTED);
-    
     Peers.notifyListeners(this, Peers.Event.BLACKLIST);
   }
   

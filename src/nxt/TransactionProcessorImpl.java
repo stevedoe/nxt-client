@@ -152,6 +152,9 @@ final class TransactionProcessorImpl
             return;
           }
           JSONArray localJSONArray = (JSONArray)localJSONObject.get("unconfirmedTransactions");
+          if (localJSONArray == null) {
+            return;
+          }
           TransactionProcessorImpl.this.processJSONTransactions(localJSONArray, false);
         }
         catch (Exception localException)

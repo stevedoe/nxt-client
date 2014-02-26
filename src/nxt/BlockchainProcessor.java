@@ -16,7 +16,7 @@ public abstract interface BlockchainProcessor
   
   public static enum Event
   {
-    BLOCK_PUSHED,  BLOCK_POPPED,  BLOCK_GENERATED,  BLOCK_SCANNED;
+    BLOCK_PUSHED,  BLOCK_POPPED,  BLOCK_GENERATED,  BLOCK_SCANNED,  RESCAN_BEGIN,  RESCAN_END;
     
     private Event() {}
   }

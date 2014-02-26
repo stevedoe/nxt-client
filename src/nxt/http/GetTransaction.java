@@ -48,7 +48,7 @@ public final class GetTransaction
       localJSONObject.put("sender", Convert.toUnsignedLong(localTransaction.getSenderId()));
       Block localBlock = localTransaction.getBlock();
       localJSONObject.put("block", localBlock.getStringId());
-      localJSONObject.put("confirmations", Integer.valueOf(Nxt.getBlockchain().getLastBlock().getHeight() - localBlock.getHeight() + 1));
+      localJSONObject.put("confirmations", Integer.valueOf(Nxt.getBlockchain().getLastBlock().getHeight() - localBlock.getHeight()));
     }
     return localJSONObject;
   }

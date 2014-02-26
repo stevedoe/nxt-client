@@ -34,7 +34,7 @@ public final class GetState
   {
     JSONObject localJSONObject = new JSONObject();
     
-    localJSONObject.put("version", "0.8.2e");
+    localJSONObject.put("version", "0.8.3");
     localJSONObject.put("time", Integer.valueOf(Convert.getEpochTime()));
     localJSONObject.put("lastBlock", Nxt.getBlockchain().getLastBlock().getStringId());
     localJSONObject.put("cumulativeDifficulty", Nxt.getBlockchain().getLastBlock().getCumulativeDifficulty().toString());

@@ -66,7 +66,12 @@ public final class PeerServlet
     Object localObject1;
     try
     {
-      localPeerImpl = Peers.addPeer(paramHttpServletRequest.getRemoteHost(), null);
+      localPeerImpl = Peers.addPeer(paramHttpServletRequest.getRemoteAddr(), null);
+      if (localPeerImpl == null)
+      {
+        Logger.logDebugMessage("Invalid peer address: " + paramHttpServletRequest.getRemoteAddr());
+        return;
+      }
       if (localPeerImpl.isBlacklisted()) {
         return;
       }
